@@ -1,0 +1,116 @@
+{
+ "category": "persp",
+ "ok": 7,
+ "total": 10,
+ "images": [
+  {
+   "image": "persp_000",
+   "ok": true,
+   "detectable": 9,
+   "detected": 9,
+   "false_ids": 0,
+   "corner_mean_px": 0.25838144307771166,
+   "t_err_mm": 0.9377747907444113,
+   "missed": []
+  },
+  {
+   "image": "persp_001",
+   "ok": true,
+   "detectable": 8,
+   "detected": 8,
+   "false_ids": 0,
+   "corner_mean_px": 0.23802675404237972,
+   "t_err_mm": 0.5943325001856288,
+   "missed": []
+  },
+  {
+   "image": "persp_002",
+   "ok": true,
+   "detectable": 6,
+   "detected": 6,
+   "false_ids": 0,
+   "corner_mean_px": 0.22101515514499512,
+   "t_err_mm": 0.3012808811038245,
+   "missed": []
+  },
+  {
+   "image": "persp_003",
+   "ok": true,
+   "detectable": 7,
+   "detected": 7,
+   "false_ids": 0,
+   "corner_mean_px": 0.25601084987495,
+   "t_err_mm": 0.4672405662404092,
+   "missed": []
+  },
+  {
+   "image": "persp_004",
+   "ok": true,
+   "detectable": 8,
+   "detected": 8,
+   "false_ids": 0,
+   "corner_mean_px": 0.2588646664023103,
+   "t_err_mm": 0.45772015617557577,
+   "missed": []
+  },
+  {
+   "image": "persp_005",
+   "ok": true,
+   "detectable": 8,
+   "detected": 8,
+   "false_ids": 0,
+   "corner_mean_px": 0.2606760959251234,
+   "t_err_mm": 0.5745724691844915,
+   "missed": []
+  },
+  {
+   "image": "persp_006",
+   "ok": false,
+   "detectable": 8,
+   "detected": 6,
+   "false_ids": 0,
+   "corner_mean_px": 0.2448215742534089,
+   "t_err_mm": 0.4491556694295078,
+   "missed": [
+    58,
+    202
+   ]
+  },
+  {
+   "image": "persp_007",
+   "ok": true,
+   "detectable": 3,
+   "detected": 3,
+   "false_ids": 0,
+   "corner_mean_px": 0.33387140960708145,
+   "t_err_mm": 4.593527798050356,
+   "missed": []
+  },
+  {
+   "image": "persp_008",
+   "ok": false,
+   "detectable": 8,
+   "detected": 6,
+   "false_ids": 0,
+   "corner_mean_px": 0.27743956318424906,
+   "t_err_mm": 0.805633923543192,
+   "missed": [
+    17,
+    101
+   ]
+  },
+  {
+   "image": "persp_009",
+   "ok": false,
+   "detectable": 7,
+   "detected": 5,
+   "false_ids": 0,
+   "corner_mean_px": 0.3563412533833717,
+   "t_err_mm": 1.6614371530577627,
+   "missed": [
+    77,
+    101
+   ]
+  }
+ ]
+}

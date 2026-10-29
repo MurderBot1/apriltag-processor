@@ -1,0 +1,48 @@
+# Reusable workflow: run ONE dataset category (10 frames) through the reference detector and report "category X: N/10 detected"
+# in the job summary and as a single create-or-update PR comment.  Called by dataset-<category>.yml (one independent check each).
+name: dataset-category
+on:
+  workflow_call:
+    inputs:
+      category:
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  detect:
+    name: category ${{ inputs.category }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements-ci.txt
+      - name: Install Python dependencies
+        run: python -m pip install -r requirements-ci.txt
+      - name: Run category ${{ inputs.category }}
+        run: python tests/ci_category.py "${{ inputs.category }}" --out "results/ci/${{ inputs.category }}.md" --json "results/ci/${{ inputs.category }}.json"
+      - name: Job summary and PR comment
+        if: ${{ !cancelled() }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -f "results/ci/${{ inputs.category }}.md" ]; then
+            python tools/ci_report.py --marker "category-${{ inputs.category }}" --body-file "results/ci/${{ inputs.category }}.md"
+          else
+            echo "category ${{ inputs.category }}: the detection run did not produce a result" > /tmp/fail.md
+            python tools/ci_report.py --marker "category-${{ inputs.category }}" --body-file /tmp/fail.md
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: category-${{ inputs.category }}
+          path: results/ci/

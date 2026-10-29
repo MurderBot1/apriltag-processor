@@ -1,0 +1,6 @@
+# Python packages needed by the CI workflows (ubuntu-latest, Python 3.12)
+numpy
+scipy
+opencv-python-headless
+pupil-apriltags>=1.0.4
+pytest

@@ -1,4 +1,5 @@
-"""Build the test-image dataset: poses -> Blender -> lens distortion -> sensor model.
+"""LEGACY (old 100-frame set, no longer in the repo; kept as the library of camera model, lens-distortion maps and sensor model used by
+tools/make_dataset_100.py - run that script to build the current dataset).  Build the test-image dataset: poses -> Blender -> lens distortion -> sensor model.
    test_images/raw/<name>.png    pinhole canvas straight from Blender (1920x1200 RGB)
    test_images/sensor/<name>.png 1280x800 mono 8-bit as the OV9281 would deliver it
    test_images/ground_truth.json camera pose + per-tag projected corners (distorted px)"""

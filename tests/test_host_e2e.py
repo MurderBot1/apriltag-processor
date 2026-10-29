@@ -21,7 +21,7 @@ import atcam                       # noqa: E402
 GT = fwutil.load_json('test_images/ground_truth.json')['images']
 CAL = fwutil.load_json('config/camera_calibration.json')
 TMAP = fwutil.load_json('config/tag_map.json')
-SEQ = ['dist_07', 'dist_15', 'dist_25', 'yaw_30', 'yaw_45', 'roll_090', 'bright', 'dark_b', 'grad_a', 'rand_00', 'rand_05', 'rand_10']
+SEQ = ['normal_000', 'normal_004', 'normal_007', 'persp_002', 'persp_004', 'persp_000', 'bright_001', 'dark_004', 'grad_000', 'clutter_009', 'noise_003', 'noise_001']
 
 
 def configured_cam(frames=None, **kw):
@@ -164,7 +164,7 @@ def test_stream_sequence_matches_ground_truth():
 
 
 def test_stream_divider_and_position_semantics():
-    frames = load_rtl_frames(['dist_15'] * 9)
+    frames = load_rtl_frames(['normal_004'] * 9)
     cam = configured_cam(frames)
     poses = list(cam.stream(divider=3, max_frames=3))
     assert [p.frame_id for p in poses] == [3, 6, 9]
@@ -172,21 +172,21 @@ def test_stream_divider_and_position_semantics():
     assert len(p.position) == 3 and len(p.quaternion) == 4
     assert abs(sum(x * x for x in p.quaternion) - 1) < 1e-5
     assert np.allclose(np.array(p.rotation_matrix()) @ np.array(p.rotation_matrix()).T, np.eye(3), atol=1e-5)
-    assert err(p, 'dist_15')[0] < 10
+    assert err(p, 'normal_004')[0] < 10
 
 
 def test_stream_stops_cleanly_when_source_ends_or_times_out():
-    cam = configured_cam(load_rtl_frames(['dist_15', 'dist_20']), timeout=0.05)
+    cam = configured_cam(load_rtl_frames(['normal_004', 'normal_006']), timeout=0.05)
     got = list(cam.stream(timeout=0.05, on_timeout='stop'))
     assert len(got) == 2
-    cam = configured_cam(load_rtl_frames(['dist_15']), timeout=0.05)
+    cam = configured_cam(load_rtl_frames(['normal_004']), timeout=0.05)
     with pytest.raises(CameraTimeout):
         list(cam.stream(timeout=0.05))
     assert not cam.get_status().streaming
 
 
 def test_stream_break_early_turns_streaming_off():
-    cam = configured_cam(load_rtl_frames(['dist_15'] * 5))
+    cam = configured_cam(load_rtl_frames(['normal_004'] * 5))
     g = cam.stream()
     next(g)
     g.close()
@@ -194,7 +194,7 @@ def test_stream_break_early_turns_streaming_off():
 
 
 def test_commands_work_while_streaming_and_poses_are_not_lost():
-    st = SimTransport(load_rtl_frames(['dist_15'] * 6))
+    st = SimTransport(load_rtl_frames(['normal_004'] * 6))
     cam = Camera(st)
     cam.set_calibration(CAL); cam.set_field(TMAP)
     g = cam.stream()
@@ -212,16 +212,16 @@ def test_get_pose_and_raw_tags():
     cam = configured_cam()
     cam = Camera(st)
     cam.set_calibration(CAL); cam.set_field(TMAP)
-    st.capture(load_rtl_frames(['yaw_30'])[0])
+    st.capture(load_rtl_frames(['persp_002'])[0])
     p = cam.get_pose()
-    assert p.frame_id == 1 and err(p, 'yaw_30')[0] < 10
+    assert p.frame_id == 1 and err(p, 'persp_002')[0] < 10
     raw = cam.get_raw_tags()
     assert raw['frame_id'] == 1 and 1 <= len(raw['tags']) <= 7
     assert all(len(t['corners']) == 4 for t in raw['tags'])
 
 
 def test_ae_through_host_api_with_sim_frames():
-    frames = [dict(load_rtl_frames(['dist_15'])[0], mean=30.0)] * 6
+    frames = [dict(load_rtl_frames(['normal_004'])[0], mean=30.0)] * 6
     st = SimTransport(frames)
     cam = Camera(st)
     cam.set_calibration(CAL); cam.set_field(TMAP)
@@ -283,7 +283,7 @@ def test_cli_configure_status_stream(tmp_path, capsys):
     assert rc == 0 and 'configured 12 tags and committed' in out
     rc, out, _ = run_cli(capsys, *base, 'status')
     assert rc == 0 and 'ntags' in out and '12' in out                  # config persisted across CLI invocations (flash file)
-    rc, out, _ = run_cli(capsys, *base, '--sim-images', 'dist_15,bright', 'stream', '--count', '2', '--json')
+    rc, out, _ = run_cli(capsys, *base, '--sim-images', 'normal_004,bright_001', 'stream', '--count', '2', '--json')
     lines = [json.loads(l) for l in out.strip().splitlines()]
     assert rc == 0 and [l['frame_id'] for l in lines] == [1, 2] and lines[0]['ntags'] >= 4
     rc, out, _ = run_cli(capsys, *base, 'config')

@@ -12,13 +12,15 @@ def build():
     return rtlutil.build('tb_cam', RTL)
 
 
-def run_frames(vvp, frames, tag, **kw):
+def run_frames(vvp, frames, tag, maxcyc=None, **kw):
+    """maxcyc: simulation clock budget for the testbench (default 400M = the testbench's own limit; tests that expect FEWER results than
+    frames, e.g. a rejected bad-CRC frame, pass a small budget because the testbench otherwise waits for the missing result until it expires)"""
     pre = os.path.join(rtlutil.SIM, tag)
     npk = csi_stream.write_stream(frames, pre, **kw)
     out = pre + '.out'
     t = time.time()
     log = rtlutil.run(vvp, [f'frames={pre}.frames.hex', f'plen={pre}.plen.hex', f'npk={npk}', f'nframes={len(frames)}',
-                            f'out={out}'], timeout=7200)
+                            f'out={out}'] + ([f'maxcyc={maxcyc}'] if maxcyc else []), timeout=7200)
     return log, parse(out), time.time() - t
 
 

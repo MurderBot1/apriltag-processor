@@ -20,7 +20,7 @@ estimates (id + sub-pixel corners), never an image.
 | `rtl/` | the chip: D-PHY + CSI-2 receiver, adaptive threshold, despeckle, connected components, **TPU** (custom processor + baked tag36h11 ROM), SPI/I2C, top levels, pin constraints (`apriltag_cam.lpf`), generated TPU program (`tpu_prog.hex`) |
 | `tools/` | golden Python models of every block, TPU assembler + instruction-set simulator + the baked program (`tpu_prog.py`), Blender scene/dataset generator, reference detector, sensor init generator, FPGA flow scripts |
 | `tb/`, `tests/` | Verilog testbenches and 226 pytest tests (see `docs/verification.md`) |
-| `test_images/` | **100 rendered 1280x800 test frames** (Blender Cycles, lens distortion + sensor noise model) with ground-truth poses (`ground_truth.json`) |
+| `test_images/` | **100 rendered 1280x800 test frames in 10 categories of 10** (normal, bright, dark, low-contrast, gradient light, shadow, noise, clutter, blur, perspective; Blender Cycles, lens distortion + sensor noise model) with ground-truth poses (`ground_truth.json`) |
 | `firmware/core`, `firmware/rp2350` | MCU firmware: pose solver, USB protocol, flash storage, auto exposure; RP2350 (Pico SDK) port |
 | `host/` | Python library + CLI (`atcam.py`) with a simulated device so everything runs without hardware |
 | `pcb/` | 4-layer 48 x 48 mm board generated from code (`design.py`, `build_pcb.py`), routed, fabrication outputs |
@@ -47,7 +47,7 @@ Protocol: `docs/protocol.md`. Conventions (world, tag, camera frames, corner ord
 
 ```
 py -3.12 tools/make_tags.py               # tag images + the 587-code ROM table
-py -3.12 tools/make_dataset.py            # Blender renders (needs Blender 5.x) -> test_images/
+py -3.12 tools/make_dataset_100.py        # the 100-image dataset: Blender renders (needs Blender 5.x) -> test_images/ (deterministic, see docs/verification.md)
 py -3.12 tools/tpu_prog.py                # assemble the TPU program ROM (rtl/tpu_prog.hex)
 py -3.12 tests/run_all.py                 # the whole verification suite
 bash tools/fpga_flow.sh                   # yosys + nextpnr-ecp5 (+ ecppack bitstream)
@@ -76,8 +76,10 @@ build/test results. Earlier releases are never overwritten. `main` does not trig
 
 * **120.08 fps** sustained in full-chip simulation at true sensor timing (832,800 clocks per frame at 100 MHz), no dropped
   frames, two frame banks so capture never stalls.
-* 100 rendered frames through the simulated chip + the MCU's solver: **median camera position error about 1-2 mm and
-  0.02-0.04 deg**; 93 % of visible tags detected in normal-light frames (the reference AprilTag library: 96 %).
+* 100 rendered frames (10 conditions x 10) through the simulated chip + the MCU's solver: **median camera position error about
+  1-3 mm and 0.02-0.05 deg** where tags are found; 70 % of the detectable tags overall (the reference AprilTag library: 97 %) -
+  95 % on the clean baseline but 0 % on the low-contrast and 14 % on the cluttered category, see `docs/verification.md`.
+* GitHub Actions: one check per dataset category (`N/10 detected`, reference detector) plus an all-tests workflow, see `docs/verification.md`.
 * RTL is verified bit-exact against Python golden models (threshold, despeckle, labelling, the custom CPU), and the whole
   chain is exercised with real CSI-2 packets and a bit-level D-PHY model with lane skew and clock offsets.
 * Open-source place-and-route onto the real ECP5-85F pins, with measured resource use and timing (`docs/fpga.md`).

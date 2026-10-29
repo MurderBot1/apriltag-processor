@@ -56,7 +56,7 @@ def test_no_known_tags_returns_failure(solver):
     assert solver.solve([]) is None
 
 def test_outlier_tag_is_rejected(solver):
-    g = GT['dist_15']; m = gt_meas(g)
+    g = GT['normal_004']; m = gt_meas(g)
     assert len(m) >= 4
     ok = solver.solve(m)
     bad = [(m[0][0], m[0][1] + np.array([25.0, -18.0]))] + m[1:]          # one tag 25 px off
@@ -68,7 +68,7 @@ def test_outlier_tag_is_rejected(solver):
 def test_float_and_double_agree():
     a, b = atcore.Solver(False), atcore.Solver(True)
     a.set_field(TMAP); b.set_field(TMAP)
-    for name in ('dist_10', 'rand_05', 'yaw_30', 'roll_090'):
+    for name in ('normal_002', 'clutter_001', 'persp_002', 'persp_000'):
         if name not in GT: continue
         m = gt_meas(GT[name])
         if not m: continue
