@@ -1,0 +1,57 @@
+# All tests of the repository that are feasible in CI: the full pytest suite (incl. RTL testbenches through Icarus Verilog, tb_clock,
+# the long CSI-2 / whole-chip frame simulations), the I2C RTL test, and the Python / C++ / Java / Rust client API tests.
+# Counts per suite go to the job summary and into ONE create-or-update PR comment.
+# NOT run (stated in the report too): tests/run_chain_dataset.py (full RTL chain over 100 frames, ~40 s per frame), Blender dataset
+# generation, and the FPGA / PCB / MCU toolchain flows.  The dataset itself is checked per category by the dataset-<category> workflows.
+name: all-tests
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: all-tests-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  all-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements-ci.txt
+      - name: Install tools (Icarus Verilog, C/C++ toolchain, JDK)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends iverilog build-essential cmake default-jdk-headless
+          iverilog -V | head -1
+      - name: Install Python dependencies
+        run: python -m pip install -r requirements-ci.txt
+      - name: Run all test suites
+        id: tests
+        run: python tools/ci_all_tests.py --out results/ci/all_tests.md
+      - name: Job summary and PR comment
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -f results/ci/all_tests.md ]; then
+            python tools/ci_report.py --marker all-tests --body-file results/ci/all_tests.md
+          else
+            echo "### All tests: the runner did not produce a report (see the job log)" > /tmp/fail.md
+            python tools/ci_report.py --marker all-tests --body-file /tmp/fail.md
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: all-tests-report
+          path: results/ci/all_tests.md
