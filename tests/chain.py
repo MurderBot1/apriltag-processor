@@ -9,7 +9,7 @@ RTL = ['rtl/csi2_rx.v', 'rtl/thresh_binarize.v', 'rtl/despeckle.v', 'rtl/run_ccl
 
 def build():
     tpu_harness.tpu_prog.program()[1].hexfile(os.path.join(rtlutil.ROOT, 'rtl', 'tpu_prog.hex'))
-    return rtlutil.build('tb_cam', RTL)
+    return rtlutil.build('tb_cam' + os.environ.get('CHAIN_TAG', ''), RTL)      # CHAIN_TAG lets several chain test processes run side by side
 
 
 def run_frames(vvp, frames, tag, **kw):
@@ -17,8 +17,11 @@ def run_frames(vvp, frames, tag, **kw):
     npk = csi_stream.write_stream(frames, pre, **kw)
     out = pre + '.out'
     t = time.time()
+    # the testbench waits for `nframes` results or `maxcyc` clocks; a rejected frame never produces one, so bound the wait to the
+    # stream length plus 8 M clocks (the slowest TPU run measured is 2.5 M) instead of the testbench default of 400 M
+    maxcyc = (len(frames) + 1) * 832800 + 8_000_000
     log = rtlutil.run(vvp, [f'frames={pre}.frames.hex', f'plen={pre}.plen.hex', f'npk={npk}', f'nframes={len(frames)}',
-                            f'out={out}'], timeout=7200)
+                            f'out={out}', f'maxcyc={maxcyc}'], timeout=7200)
     return log, parse(out), time.time() - t
 
 
