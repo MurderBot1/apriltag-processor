@@ -13,6 +13,7 @@ def detector():
     if _DET is None:
         from pupil_apriltags import Detector
         _DET = Detector(families='tag36h11', quad_decimate=1.0, refine_edges=True, decode_sharpening=0.25)
+        type(_DET).__del__ = lambda self: None       # pupil-apriltags segfaults in its destructor at interpreter exit on Linux (exit code 139): never destroy it
     return _DET
 
 

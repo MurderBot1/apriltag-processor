@@ -72,7 +72,8 @@ def golden_check():
     g = os.path.join(ROOT, 'api', 'testdata', 'golden_frames.json')
     before = open(g, 'rb').read()
     rc, out, dt = sh([PY, 'api/testdata/gen_golden.py'])
-    same = open(g, 'rb').read() == before
+    norm = lambda b: b.replace(bytes([13, 10]), bytes([10]))          # a Windows checkout may have CRLF line endings
+    same = norm(open(g, 'rb').read()) == norm(before)
     if not same:
         open(g, 'wb').write(before)
     return dict(rc=0 if rc == 0 and same else 1, passed=1 if rc == 0 and same else 0, failed=0 if rc == 0 and same else 1, skipped=0, dt=dt,
