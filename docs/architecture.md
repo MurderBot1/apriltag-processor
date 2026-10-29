@@ -53,7 +53,7 @@ OV9281 settings (`tools/ov9281_init.py`, register values from the mainline Linux
   in flight, so even a 100-140 runs-per-row noise frame (113,759 runs, slowest row 590 clocks) fits the 686-clock line of the
   real 85.714 MHz core. Unions of several components, new labels and finished components cost more (10-20 clocks each); a
   row that still cannot be labelled in time is dropped with a flag (`max_row_cycles` is exported in the status registers) -
-  never a hang. 7 of the 500 evaluation frames lose 1-5 rows that way, see `docs/verification.md`
+  never a hang. 7 of 500 frames of an earlier (historical) evaluation set lose 1-5 rows that way, none of the current 100, see `docs/verification.md`
 * two frame banks: frame N is processed by the TPU (median ~0.2-0.35 ms, worst case measured 2.1 ms) while frame N+1
   streams into the other bank, so capture never stalls; a frame is only dropped (and counted) if the TPU is still busy
   with the bank the next frame would overwrite

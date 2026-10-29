@@ -41,7 +41,7 @@ orphan-check flags, separate decision/finish states, registered find loop). A re
 closes that clock with ~1 MHz margin; the other seeds land 0.3-9 MHz short, so closure is seed-dependent and thin
 (as before the rework: 80.9 - 87.7 MHz over four seeds). The 120 fps requirement is a property of the sensor rate (line period
 8.0 us, frame 1041 lines = 8.328 ms), not of the core clock, as long as the core keeps up: 686 clocks per line is the budget for
-the CCL (the slowest row of 499 of the 500 frames is below it, see `docs/verification.md`), and the TPU run time is discussed in
+the CCL (the slowest row of 493 of 500 frames of the earlier 500-frame evaluation set is below it, see `docs/verification.md`), and the TPU run time is discussed in
 `docs/verification.md` (heavy-clutter frames can exceed one frame period and are then dropped in a stream).
 
 **100 MHz is not closed** (best 87.7 MHz before, 86.8 MHz now). Going to 100 MHz needs more pipelining in the TPU (`tpu_core`) and
@@ -54,4 +54,4 @@ corresponds to 713,840 clocks, and the per-line budget was re-checked at 686 clo
 * Timing is nextpnr's estimate, not signoff; real-device margins are unknown.
 * Seed variation (76.8 - 86.8 MHz over five seeds) means the bitstream should be built with seed 4 and re-checked after any RTL change.
 * Block RAM at 94 % leaves very little room for added features; `NLAB` 1024 -> 512 should free about 7 more (estimate) (the peak live-label count on the
-  500 frames is 167).
+  the earlier 500-frame set is 167).

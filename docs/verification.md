@@ -11,7 +11,7 @@ About 230 tests in 18 files (run_all counts below). What each layer proves:
 | D-PHY receiver (RTL, bit level) | `test_dphy.py` | 12 | real lane bit streams at 800 Mb/s: lane skew 0-21 UI, +-200 ppm clock offset, noise between bursts, slot jitter, header bit errors, back-to-back frames, **reversed gearbox bit order** |
 | threshold (RTL) | (bit-exact script in `run_all`/`tests/rtlutil`) | - | 0 mismatching pixels vs `tools/golden.py` on 1280x800 frames |
 | despeckle (RTL) | `test_rtl_despeckle.py` | 4 | bit-exact vs golden on 35 % random noise, edge/corner structures, a real mask, all-ones/zeros |
-| connected components (RTL) | `test_rtl_ccl.py` | 8 | areas, bounding boxes and all 8 extremes identical to scipy labelling on random shapes, merging combs, parity edge cases, whole-frame black, **overflow flags + clean recovery on the next frame**, row-time budget |
+| connected components (RTL) | `test_rtl_ccl.py` | 14 | areas, bounding boxes and all 8 extremes identical to scipy labelling on random shapes, merging combs, parity edge cases, whole-frame black, **overflow flags + clean recovery on the next frame**, row-time budget |
 | TPU | `test_tpu.py` | 14 | ISA semantics, **RTL == ISS bit-exact** (micro-program over all arithmetic corner cases, full scenes), algorithm accuracy (72/72 synthetic tags, 0.29 px mean corner error), rejection of non-tags, cycle budget |
 | sensor bring-up | `test_i2c.py` | 1 | all 103 OV9281 init writes land in order over I2C, read-back, ID 0x9281, NACK detection |
 | system (RTL) | `test_chain.py` | 6 | whole chip at true 120 fps timing: 3 frames back-to-back, **FS-to-FS = 832,800 clocks exactly (120.08 fps), zero dropped frames**, ping-pong banks, bad-CRC / missing-line frames rejected and the next frame delivered, overload frame does not hang, SPI register path |
@@ -55,30 +55,37 @@ median camera position error 0.7 mm (p95 4.5 mm, max 6.3 mm).
 
 Chip (CSI-2 at 120 fps timing, simulated RTL as it is in this branch) -> tag estimates over SPI -> C pose solver, versus the reference
 detector on the *same* 100 images (`tests/run_chain_dataset.py`, `tests/analyze_chain.py`, `results/rtl_chain_results.json`;
-measured 572 s for the 100 frames with 10 workers):
+measured 474 s for the 100 frames with 12 workers):
 
 | category | detectable tags | chip detects | pose t median / max (mm) | reference t median (mm) |
 |---|---|---|---|---|
-| normal | 62 | 59 (95 %) | 2.1 / 7.2 | 0.6 |
-| bright | 81 | 76 (94 %) | 1.4 / 5.7 | 1.5 |
-| dark | 69 | 50 (72 %) | 2.0 / 5.9 | 0.6 |
+| normal | 62 | 62 (100 %) | 2.0 / 7.2 | 0.6 |
+| bright | 81 | 80 (99 %) | 1.1 / 5.7 | 1.5 |
+| dark | 69 | 69 (100 %) | 1.9 / 2.9 | 0.6 |
 | lowcon | 66 | **0 (0 %)** | no pose | 1.0 |
-| grad | 75 | 67 (89 %) | 1.4 / 2.0 | 0.5 |
-| shadow | 47 | 32 (68 %) | 2.9 / 13.6 | 1.9 |
-| noise | 57 | 40 (70 %) | 2.2 / 8.0 | 0.7 |
-| clutter | 59 | **8 (14 %)** | 9.4 / 17.0 | 0.6 |
+| grad | 75 | 75 (100 %) | 1.3 / 2.0 | 0.5 |
+| shadow | 47 | 43 (91 %) | 3.0 / 13.6 | 1.9 |
+| noise | 57 | 57 (100 %) | 2.2 / 8.0 | 0.7 |
+| clutter | 59 | 57 (97 %) | 1.7 / 17.0 | 0.6 |
 | blur | 59 | 54 (92 %) | 2.0 / 14.9 | 0.8 |
-| persp | 72 | 64 (89 %) | 1.3 / 2.5 | 0.6 |
-| **all** | 647 | **450 (70 %)** | | reference 630 (97 %) |
+| persp | 72 | 65 (90 %) | 1.3 / 2.5 | 0.6 |
+| **all** | 647 | **562 (86.9 %)** | | reference 630 (97 %) |
 
-9 false-id detections (ids not in the tag map or not visible; ignored by the MCU), no dropped frames. The chip detects
-clean, bright, gradient, perspective and blurred frames well and its pose error is within a few mm, but this dataset exposes two
-real weaknesses that the old, mostly well-lit set hid: **low-contrast frames are lost completely** (probably the fixed 24-level tile-threshold margin;
-not investigated further) and **cluttered / noisy frames lose most tags, consistent with connected-component overflow**
-(runs-per-row / label capacity, see `tests/sweep_noise.py` and the sweep output `results/sweeps.log`; 22 frames overflow with the baseline thresholds, 13 with a 3x3 smoothing
-pre-filter). These numbers are the state of `rtl/run_ccl.v` in this branch; they were not tuned to the dataset.
-On two frames (`persp_000`, `bright_001`) the RTL and the golden model also report different tag sets (the RTL finds a spurious id 0 where the
-golden model finds id 133 / 250); `tests/test_chain.py` therefore uses frames where they agree.
+0 false-id detections, no dropped frames (single-frame runs). These numbers are with the noise-robust labeller (`rtl/run_ccl.v`: 256 runs
+per row, ~3 clocks per run on the common path, label recycling, the 64 largest candidates by area; CCL flags are diagnostics of a degraded
+frame, never a rejection). Before that rework the same harness gave **450 / 647 (70 %)**: dark 72 %, noise 70 %, shadow 68 %, clutter 14 %.
+The remaining clear weakness is **low-contrast frames (0 %)**, probably the fixed 24-level tile-threshold margin; not investigated.
+The chip now misses only a few tags in `blur`, `persp` and `shadow` (small / grazing / shadowed tags).
+CCL status flag set on 6 of the 100 frames (candidate table full, i.e. more than 64 candidates, only the 64 largest kept), no dropped rows.
+
+TPU time (`tests/analyze_tpu_budget.py`, `results/tpu_budget_by_category.md`): median 427k clocks, worst 2.55 M (noise). One frame period is
+713,840 clocks at 85.714 MHz, so 20 of the 100 frames (clutter 7, noise 6, dark 3, grad 2, shadow 2) would make the *next* frame be dropped
+if the whole stream looked like them. Clean frames keep 120.08 fps with no drops (`test_chain.py`).
+
+CCL-only checks (`tests/sweep_ccl_rtl.py`): the RTL candidate table equals the streaming model `golden.stream_components()` (same order); on a
+historical 500-frame set (no longer in the repository) at the real 686-clock line 493 of 500 frames were identical, 7 lost 1-5 rows, peak
+live labels 167 (258 with dropped rows), slowest row 590 clocks for the busiest frame (113,759 runs). On that historical set the chain
+found 2651 of 2825 tags (93.8 %) with 0 false positives, up from 2158 (76.4 %).
 
 ## Continuous integration (GitHub Actions)
 
@@ -97,7 +104,8 @@ category counts therefore describe the dataset and the reference detector, not t
 ## Timing and resources (measured)
 
 120 fps: FS-to-FS period 832,800 clocks @ 100 MHz = **8.328 ms = 120.08 fps**, no dropped frames in multi-frame runs.
-Per frame: CCL row time <= 651 clocks in every unflagged image (budget 800); TPU 190k clocks median, 523k worst
-(5.2 ms @ 100 MHz, inside the 8.3 ms frame period).
+Per frame (100-frame set, 100 MHz chain run): the CCL status flags are diagnostics only (6 frames set one, none dropped a row); TPU
+427k clocks median, 2.55 M worst (see the table above for how many frames exceed one 713,840-clock frame period). Historical 500-frame
+set at the real 686-clock line: slowest CCL row <= 686 clocks in 485 of 500 frames, `done` 185 clocks (median) to 2738 (worst) after the last row.
 
 FPGA (yosys + nextpnr-ecp5, LFE5U-85F-8BG381C): see `docs/fpga.md`.

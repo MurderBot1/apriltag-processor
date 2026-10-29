@@ -77,8 +77,9 @@ build/test results. Earlier releases are never overwritten. `main` does not trig
 * **120.08 fps** sustained in full-chip simulation at true sensor timing (832,800 clocks per frame at 100 MHz), no dropped
   frames, two frame banks so capture never stalls.
 * 100 rendered frames (10 conditions x 10) through the simulated chip + the MCU's solver: **median camera position error about
-  1-3 mm and 0.02-0.05 deg** where tags are found; 70 % of the detectable tags overall (the reference AprilTag library: 97 %) -
-  95 % on the clean baseline but 0 % on the low-contrast and 14 % on the cluttered category, see `docs/verification.md`.
+  1-3 mm and 0.02-0.05 deg** where tags are found; **87 % of the detectable tags overall (562 / 647; the reference AprilTag library: 97 %)**,
+  up from 70 % before the noise-robust labeller - 100 % on normal / dark / grad / noise, 97 % clutter, 90-92 % blur / persp / shadow, but still
+  **0 % on the low-contrast category**, see `docs/verification.md`.
 * GitHub Actions: one check per dataset category (`N/10 detected`, reference detector) plus an all-tests workflow, see `docs/verification.md`.
 * RTL is verified bit-exact against Python golden models (threshold, despeckle, labelling, the custom CPU), and the whole
   chain is exercised with real CSI-2 packets and a bit-level D-PHY model with lane skew and clock offsets.
@@ -93,7 +94,9 @@ build/test results. Earlier releases are never overwritten. `main` does not trig
    M12 holder needs a specialist assembler.
 3. **Timing closure**: see `docs/fpga.md` for the measured fmax of each clock domain against the 100 MHz / 200 MHz
    targets. Anything reported as failing there must be fixed (more pipelining) before relying on 120 fps in hardware.
-4. Detection is weaker than the reference library at long range (> ~3.5 m for 16.5 cm tags), in very low light (until
-   the MCU's auto-exposure runs) and in cluttered, dim backgrounds (the labeller drops rows beyond ~55 runs/row and
-   flags it).
+4. Detection is weaker than the reference library at long range (> ~3.5 m for 16.5 cm tags), for low-contrast scenes (0 % on the
+   `lowcon` category) and for small / grazing / shadowed tags. The labeller no longer rejects busy frames (256 runs/row, label recycling,
+   the 64 largest candidates kept), but a cluttered or noisy frame can need up to 2.55 M TPU clocks (30 ms at 85.7 MHz): in a stream at
+   120 fps such a frame makes the following frame be dropped (`frames_dropped`); 20 of the 100 evaluation frames would do so if the
+   whole stream looked like them (`results/tpu_budget_by_category.md`).
 5. No schematic capture: the board is netlist-first (`pcb/design.py`, `pcb/output/netlist.txt`).
