@@ -56,6 +56,22 @@ bash tools/fpga_flow.sh                   # yosys + nextpnr-ecp5 (+ ecppack bits
 Tools used: Icarus Verilog 13, Yosys 0.66, nextpnr-ecp5 0.7, KiCad 10, Freerouting 2.1, OpenSCAD 2021, Blender 5.1,
 arm-none-eabi-gcc, Pico SDK (all installed during the build; see `docs/`).
 
+## Build and release (deploy)
+
+`bash tools/build_all.sh [--strict] [--skip-tests] [--skip-fpga]` builds every buildable output into `products/` (git-ignored) and writes
+`products/MANIFEST.json` / `MANIFEST.txt` (commit, build date, tool versions, per-step ok/skipped/failed with notes, and file name, size and sha256).
+Products: FPGA bitstream + netlist/config + timing/utilisation reports (yosys, nextpnr-ecp5, ecppack), RP2350 firmware (`.uf2/.elf/.bin`, needs
+arm-none-eabi-gcc + Pico SDK via `PICO_SDK_PATH`), native firmware-sim library, host bundle + configs, Python wheel, C++ static lib + headers,
+Java jar, Rust `.crate`/rlib, docs tarball and the committed PCB gerbers/BOM (copied, not regenerated; needs KiCad). A step whose toolchain is
+missing is recorded as `skipped` in the manifest (never faked); set `REQUIRE="fpga firmware ..."` to make that an error. A timing miss in the FPGA
+flow is recorded as a `warning`, and the bitstream is still produced.
+
+**Releasing:** pushing to the `deploy` branch (`git push origin main:deploy`, or merge `main` into `deploy`) runs `.github/workflows/release.yml`.
+It installs the toolchains, runs `tools/build_all.sh --strict`, uploads `products/` as a workflow artifact, and creates a NEW GitHub Release
+tagged `deploy-<run_number>-<short sha>` with the products and manifest attached and notes listing the commit, date, tool versions and
+build/test results. Earlier releases are never overwritten. `main` does not trigger releases. The workflow can also be started manually
+(workflow_dispatch) from any ref. It uses `GITHUB_TOKEN` with `contents: write`.
+
 ## Headline results (details and caveats in `docs/verification.md`, `docs/fpga.md`, `docs/hardware.md`)
 
 * **120.08 fps** sustained in full-chip simulation at true sensor timing (832,800 clocks per frame at 100 MHz), no dropped

@@ -8,3 +8,4 @@ api/rust/target/
 api/java/out/
 api/cpp/build/
 *.vvp
+products/
