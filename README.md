@@ -62,6 +62,8 @@ arm-none-eabi-gcc, Pico SDK (all installed during the build; see `docs/`).
   frames, two frame banks so capture never stalls.
 * 100 rendered frames through the simulated chip + the MCU's solver: **median camera position error about 1-2 mm and
   0.02-0.04 deg**; 93 % of visible tags detected in normal-light frames (the reference AprilTag library: 96 %).
+* On the 500-frame set (clutter, glare, dark, noise-only, ...): **2651 of 2825 detectable tags (93.8 %), 0 false positives**
+  (reference library 2739 = 96.9 %). The noise-robust labeller raised this from 2158 (76.4 %); see `results/ccl_failure_mechanism.md`.
 * RTL is verified bit-exact against Python golden models (threshold, despeckle, labelling, the custom CPU), and the whole
   chain is exercised with real CSI-2 packets and a bit-level D-PHY model with lane skew and clock offsets.
 * Open-source place-and-route onto the real ECP5-85F pins, with measured resource use and timing (`docs/fpga.md`).
@@ -76,6 +78,9 @@ arm-none-eabi-gcc, Pico SDK (all installed during the build; see `docs/`).
 3. **Timing closure**: see `docs/fpga.md` for the measured fmax of each clock domain against the 100 MHz / 200 MHz
    targets. Anything reported as failing there must be fixed (more pipelining) before relying on 120 fps in hardware.
 4. Detection is weaker than the reference library at long range (> ~3.5 m for 16.5 cm tags), in very low light (until
-   the MCU's auto-exposure runs) and in cluttered, dim backgrounds (the labeller drops rows beyond ~55 runs/row and
-   flags it).
+   the MCU's auto-exposure runs) and in cluttered backgrounds. The labeller no longer rejects busy frames (256 runs/row, label
+   recycling, the 64 largest candidates kept), but a cluttered frame can need up to 2.5 M TPU clocks (29 ms at 85.7 MHz): in a
+   stream at 120 fps such a frame makes the following frame be dropped (`frames_dropped`); 102 of the 500 evaluation frames
+   (`results/tpu_budget_by_category.md`) would do so if the whole stream looked like them. 7 of the 500 frames also lose 1-5
+   image rows in the labeller (status flag) because their rows are too busy for the 686-clock line.
 5. No schematic capture: the board is netlist-first (`pcb/design.py`, `pcb/output/netlist.txt`).

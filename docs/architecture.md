@@ -28,7 +28,7 @@ ID and four sub-pixel corners (Q16.16), solves the camera pose from the stored f
 | CSI-2 | `csi2_rx` | header ECC (SEC-DED, 1-bit correction), CRC-16, FS/FE, line count check; 2 pixels / clock | 3 clocks |
 | threshold | `thresh_binarize` | 2x2 binning, 8x8-pixel tile min/max, 3x3 tile neighbourhood, per-tile contrast test, black mask; 17-row delay line | 17 rows |
 | despeckle | `despeckle` | 3x3 majority filter (suppresses isolated speckle so the labeller is not flooded) | 1 row |
-| components | `run_ccl` | streaming run-based 4-connected labelling, union-find, per-component area and 8 directional extremes; filters; candidate records | ~13 rows + scan |
+| components | `run_ccl` | streaming run-based 4-connected labelling, union-find with **label recycling**, per-component area and 8 directional extremes; filters; the **64 largest** candidates by area are kept as records; capacity limits degrade a frame (flags) and never reject it | 2-3 rows + termination (median `done` 185 clocks after the last row) |
 | tag unit | `tpu_core` | **custom processor**, baked program: coarse quad -> sub-pixel edge refinement by line fitting on binary samples -> homography -> 6x6 sampling -> tag36h11 match (587 codes x 4 rotations in ROM) | ~0.2 ms / 6 tags |
 | bridge | `cam_core`, `spi_slave` | ping-pong frame/candidate/result banks, registers, SPI (mode 0, <= 16 MHz), I2C bring-up of the sensor | - |
 
@@ -48,14 +48,17 @@ OV9281 settings (`tools/ov9281_init.py`, register values from the mainline Linux
 **200e6 / (1600 x 1041) = 120.08 fps**.
 
 * byte clock = 100 MHz; 2 pixels per clock; one line = 800 clocks (640 carry pixels), frame = 832,800 clocks (8.328 ms)
-* threshold + CCL are paced by the line rate; CCL needs <= ~13 clocks per run, so it sustains about 55 runs per row
-  inside the 800-clock line (`max_row_cycles` is exported in the status registers); rows beyond that are dropped
-  with a flag (never a hang) - see `docs/verification.md`
+* threshold + CCL are paced by the line rate; the labeller needs about 2-4 clocks per run on the common path (a run that just
+  extends the label of the run above it), 256 runs per row are kept, and up to 4 rows (2 pending + current + previous) may be
+  in flight, so even a 100-140 runs-per-row noise frame (113,759 runs, slowest row 590 clocks) fits the 686-clock line of the
+  real 85.714 MHz core. Unions of several components, new labels and finished components cost more (10-20 clocks each); a
+  row that still cannot be labelled in time is dropped with a flag (`max_row_cycles` is exported in the status registers) -
+  never a hang. 7 of the 500 evaluation frames lose 1-5 rows that way, see `docs/verification.md`
 * two frame banks: frame N is processed by the TPU (median ~0.2-0.35 ms, worst case measured 2.1 ms) while frame N+1
   streams into the other bank, so capture never stalls; a frame is only dropped (and counted) if the TPU is still busy
   with the bank the next frame would overwrite
 * end-to-end latency (last pixel -> tag list in the result RAM) = 17-row threshold delay + 1 row despeckle +
-  ~13 rows CCL + TPU run ~ 0.15 ms + TPU time
+  ~2-3 rows CCL + TPU run ~ 0.15 ms + TPU time
 
 ## Memory map (SPI, 24-bit byte addresses)
 

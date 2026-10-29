@@ -119,7 +119,7 @@ lines then gain up to 0xFF, at most 4x change per step, one frame skipped after 
 | offset | type | field |
 |--------|------|-------|
 | 0  | u32 | FPGA STATUS register: `seq[31:16] tag_count[15:8] init_done[3] tpu_busy[2] res_bank[1] res_valid[0]` |
-| 4  | u32 | FPGA CCL register (0x28) |
+| 4  | u32 | FPGA CCL register (0x28): `max_row_clocks[31:16] flags[11:8] candidates[7:0]`. The flags are **diagnostics of a degraded frame, never a rejection**: bit 8 a row was dropped (labeller too slow for a very busy row), bit 9 a row had more than 256 runs (extra runs ignored), bit 10 the 1024-entry label table was full (the affected runs stayed background), bit 11 more than 64 candidates were found (only the 64 largest by area are kept). The frame is processed and its tags reported in every case; `candidates` is the number handed to the tag unit (0 is valid). |
 | 8  | u32 | frames dropped (0x30) |
 | 12 | u32 | frames total (0x34) |
 | 16 | u32 | frames processed (0x38) |
