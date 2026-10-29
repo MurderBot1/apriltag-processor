@@ -3,6 +3,7 @@
 `timescale 1ns/1ps
 module tb_ccl;
     parameter LINE = 905;
+    integer line_n = LINE;                      // +line=<clocks per sensor line> overrides (686 = real 85.714 MHz timing)
     reg clk = 0, rst = 1;
     always #5 clk = ~clk;
     reg [7:0] mask [0:1280*800-1];
@@ -10,7 +11,11 @@ module tb_ccl;
     wire cand_we; wire [9:0] cand_waddr; wire [31:0] cand_wdata; wire done; wire [7:0] cand_count; wire [3:0] flags;
     wire [15:0] max_row_cycles;
     reg [23:0] min_area = 100, max_area = 400000; reg [7:0] min_dim = 10; reg rej = 1;
-    run_ccl dut(.clk(clk), .rst(rst), .cfg_min_area(min_area), .cfg_max_area(max_area), .cfg_min_dim(min_dim),
+`ifndef P_NLAB
+`define P_NLAB 1024
+`define P_LB 10
+`endif
+    run_ccl #(.NLAB(`P_NLAB), .LB(`P_LB)) dut(.clk(clk), .rst(rst), .cfg_min_area(min_area), .cfg_max_area(max_area), .cfg_min_dim(min_dim),
         .cfg_reject_border(rej), .v(v), .b0(b0), .b1(b1), .first(first), .last(last), .fstart(fstart), .fend(fend),
         .cand_we(cand_we), .cand_waddr(cand_waddr), .cand_wdata(cand_wdata), .done(done), .cand_count(cand_count),
         .flags(flags), .max_row_cycles(max_row_cycles));
@@ -32,7 +37,7 @@ module tb_ccl;
                     @(posedge clk);
                 end
                 v <= 0; last <= 0; first <= 0; fend <= 0;
-                repeat (LINE - 640) @(posedge clk);
+                repeat (line_n - 640) @(posedge clk);
             end
             repeat (40000) @(posedge clk);
         end
@@ -43,12 +48,13 @@ module tb_ccl;
             $fdisplay(fd, "%0d", cand_count);
             for (i = 0; i < cand_count * 16; i = i + 1) $fdisplay(fd, "%08x", cram[i]);
             $fclose(fd);
-            $display("RESULT done=%0d count=%0d flags=%b max_row_cycles=%0d done_latency=%0d", done_cnt, cand_count, flags, max_row_cycles, done_cycle - fend_cycle);
+            $display("RESULT done=%0d count=%0d flags=%b max_row_cycles=%0d done_latency=%0d rows_dropped=%0d labels_used=%0d", done_cnt, cand_count, flags, max_row_cycles, done_cycle - fend_cycle, dut.rows_dropped, dut.nlab);
         end
     endtask
     initial begin
         if (!$value$plusargs("mask=%s", maskf)) begin $display("need +mask"); $finish; end
         if (!$value$plusargs("out=%s", outf)) begin $display("need +out"); $finish; end
+        if ($value$plusargs("line=%d", n)) line_n = n;
         if ($value$plusargs("minarea=%d", n)) min_area = n;
         if ($value$plusargs("mindim=%d", n)) min_dim = n;
         if ($value$plusargs("maxarea=%d", n)) max_area = n;
