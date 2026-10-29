@@ -14,8 +14,8 @@ MIN_AREA_DEFAULT = 100
 MAX_AREA_DEFAULT = 400000
 MIN_DIM_DEFAULT = 10
 MAX_CAND = 64
-MAX_LABELS = 4096
-MAX_RUNS_ROW = 96
+MAX_LABELS = 1024        # label table entries (label 0 reserved); finished components are recycled
+MAX_RUNS_ROW = 256       # runs kept per row (rtl/run_ccl.v MAXR)
 
 
 # ------------------------------------------------------------------ threshold
@@ -85,6 +85,118 @@ def components(black, min_area=MIN_AREA_DEFAULT, max_area=MAX_AREA_DEFAULT, min_
             continue
         keep.append(c)
     return keep, lab, comps
+
+
+# ------------------------------------------------- streaming model of rtl/run_ccl.v (capacity limits included)
+def row_runs(black):
+    """list (per row) of (start, end) inclusive runs of black pixels"""
+    d = np.diff(np.pad(black.astype(np.int8), ((0, 0), (1, 1))), axis=1)
+    return [list(zip(np.nonzero(d[y] == 1)[0].tolist(), (np.nonzero(d[y] == -1)[0] - 1).tolist()))
+            for y in range(black.shape[0])]
+
+
+def stream_components(black, min_area=MIN_AREA_DEFAULT, max_area=MAX_AREA_DEFAULT, min_dim=MIN_DIM_DEFAULT,
+                      reject_border=True, maxr=MAX_RUNS_ROW, nlab=MAX_LABELS, max_cand=MAX_CAND):
+    """Run-based streaming labeller with the same policy as the RTL (rtl/run_ccl.v), without its timing:
+      * a row keeps its first `maxr` runs (the rest are dropped -> flag ovf_run);
+      * a run that overlaps no labelled run of the previous row gets a new label; if all nlab-1 labels are in use the run stays
+        unlabelled (background, flag ovf_lab) - the component is lost, the frame is not;
+      * a component finishes when the row after its last run has been processed; labels of finished components are freed at
+        once, labels absorbed by a union one row later;
+      * a finished component that passes the filter is offered to a table of `max_cand` entries ranked by area (a larger
+        one replaces the smallest, ties keep the earlier one; flag ovf_cand when something was discarded).
+    Returns (cands in table order, info dict).  Each candidate: area, scores[8], x0..y1 (label = component id)."""
+    H, W = black.shape
+    R = row_runs(black)
+    parent = {}
+    st = {}                     # root -> [area, scores(8), x0, x1, y0, y1]
+    last = {}                   # root -> last row with a run
+    in_use = 0; peak = 0; allocated = 0
+    absorbed_prev, absorbed_cur = [], []
+    table = []                  # [area, cand]
+    flags = dict(ovf_run=0, ovf_lab=0, ovf_cand=0)
+    nid = [0]
+
+    def find(a):
+        while parent[a] != a:
+            a = parent[a]
+        return a
+
+    def run_stats(s, e, y):
+        return [e - s + 1, np.array([e, -s, y, -y, e + y, -(s + y), e - y, y - s]), s, e, y, y]
+
+    def merge_into(a, b):               # b absorbed into a
+        a[0] += b[0]; a[1] = np.maximum(a[1], b[1]); a[2] = min(a[2], b[2]); a[3] = max(a[3], b[3])
+        a[4] = min(a[4], b[4]); a[5] = max(a[5], b[5])
+
+    def finish(r):
+        nonlocal in_use
+        a, sc, x0, x1, y0, y1 = st[r]
+        in_use -= 1
+        bw, bh = x1 - x0 + 1, y1 - y0 + 1
+        if a < min_area or a > max_area or bw < min_dim or bh < min_dim:
+            return
+        if reject_border and (x0 == 0 or y0 == 0 or x1 == W - 1 or y1 == H - 1):
+            return
+        c = dict(label=r, area=int(a), scores=sc.copy(), x0=int(x0), x1=int(x1), y0=int(y0), y1=int(y1))
+        if len(table) < max_cand:
+            table.append([a, c])
+        else:
+            mi = min(range(len(table)), key=lambda i: (table[i][0], i))
+            flags['ovf_cand'] = 1
+            if a > table[mi][0]:
+                table[mi] = [a, c]
+
+    prev = []; prevlab = []
+    done = set()
+    for y in range(H):
+        cur = R[y]
+        if len(cur) > maxr:
+            flags['ovf_run'] = 1; cur = cur[:maxr]
+        curlab = []
+        matched = [False] * len(prev)
+        j = 0
+        for (s, e) in cur:
+            while j < len(prev) and prev[j][1] < s:
+                j += 1
+            k = j; L = 0
+            while k < len(prev) and prev[k][0] <= e:
+                matched[k] = True
+                r = find(prevlab[k]) if prevlab[k] else 0
+                if r:
+                    if L == 0:
+                        L = r
+                    elif r != L:
+                        parent[r] = L; merge_into(st[L], st[r]); absorbed_cur.append(r)
+                k += 1
+            if L == 0:
+                if in_use < nlab - 1:
+                    nid[0] += 1; L = nid[0]; allocated += 1; in_use += 1; peak = max(peak, in_use)
+                    parent[L] = L; st[L] = run_stats(s, e, y)
+                else:
+                    flags['ovf_lab'] = 1
+            else:
+                merge_into(st[L], run_stats(s, e, y))
+            if L:
+                last[L] = y
+            curlab.append(L)
+            j = k - 1 if k > j and prev[k - 1][1] > e else k
+        # row end: roots of previous-row runs that no current run extended finish
+        for k, (ps, pe) in enumerate(prev):
+            if not matched[k] and prevlab[k]:
+                r = find(prevlab[k])
+                if last.get(r, -1) != y and r not in done:
+                    done.add(r); finish(r)
+        in_use -= len(absorbed_prev)
+        absorbed_prev, absorbed_cur = absorbed_cur, []
+        prev, prevlab = cur, curlab
+    for k in range(len(prev)):
+        if prevlab[k]:
+            r = find(prevlab[k])
+            if r not in done:
+                done.add(r); finish(r)
+    cands = [c for _, c in table]
+    return cands, dict(flags=flags, labels_allocated=allocated, peak_labels=peak, runs=sum(len(r) for r in R))
 
 
 def extreme_points(sc):

@@ -9,7 +9,7 @@ RTL = ['rtl/csi2_rx.v', 'rtl/thresh_binarize.v', 'rtl/despeckle.v', 'rtl/run_ccl
 
 def build():
     tpu_harness.tpu_prog.program()[1].hexfile(os.path.join(rtlutil.ROOT, 'rtl', 'tpu_prog.hex'))
-    return rtlutil.build('tb_cam', RTL)
+    return rtlutil.build('tb_cam' + os.environ.get('CHAIN_TAG', ''), RTL)
 
 
 def run_frames(vvp, frames, tag, maxcyc=None, **kw):
@@ -31,9 +31,9 @@ def parse(path):
         l = lines[i]
         if l.startswith('RESULT'):
             d = dict(x.split('=') for x in l.split()[1:])
-            words = [int(x, 16) for x in lines[i + 1:i + 1 + 16 + 16 * 8]]
+            words = [int(x, 16) for x in lines[i + 1:i + 1 + 16 + 16 * 31]]
             results.append(dict(seq=int(d['seq']), bank=int(d['bank']), tags=int(d['tags']), cyc=int(d['cyc']), words=words))
-            i += 1 + 16 + 16 * 8
+            i += 1 + 16 + 16 * 31
         elif l.startswith('STATS'):
             stats = dict(x.split('=') for x in l.split()[1:]); i += 1
         else: i += 1

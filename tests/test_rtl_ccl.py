@@ -10,9 +10,10 @@ def vvp():
     return rtlutil.build('tb_ccl', ['rtl/run_ccl.v', 'tb/tb_ccl.v'])
 
 
-def run_mask(vvp, m, tag, m2=None, minarea=1, mindim=1, rej=0, maxarea=4000000):
+def run_mask(vvp, m, tag, m2=None, minarea=1, mindim=1, rej=0, maxarea=4000000, line=None):
     p = os.path.join(S, f'{tag}.mask'); m.astype(np.uint8).tofile(p)
     args = [f'mask={p}', f'out={S}/{tag}.cand', f'minarea={minarea}', f'mindim={mindim}', f'rej={rej}', f'maxarea={maxarea}']
+    if line: args.append(f'line={line}')
     if m2 is not None:
         p2 = os.path.join(S, f'{tag}_2.mask'); m2.astype(np.uint8).tofile(p2)
         args += [f'mask2={p2}', f'out2={S}/{tag}_2.cand']
@@ -106,3 +107,104 @@ def test_row_budget_on_realistic_density(vvp):
     out = run_mask(vvp, shapes(5, 40), 'budget')
     mrc = int(out.split('max_row_cycles=')[1].split()[0])
     assert mrc < 700, mrc
+
+
+# ---------------------------------------------------------------- capacity / noise robustness (run_ccl: MAXR 256, label recycling, top-64 by area)
+def rtl_result(out, n=0):
+    l = [x for x in out.splitlines() if x.startswith('RESULT')][n]
+    import re
+    d = dict(re.findall(r'(\w+)=(\S+)', l))
+    return dict(done=int(d['done']), count=int(d['count']), flags=d['flags'], max_row=int(d['max_row_cycles']),
+                dropped=int(d['rows_dropped']), labels=int(d['labels_used']))
+
+
+def topn_check(vvp, m, tag, maxc=64, min_area=1, min_dim=1, nlab=1024, line=None, **kw):
+    """RTL candidate table == streaming model (same order) and every RTL record is an exact golden component"""
+    out = run_mask(vvp, m, tag, minarea=min_area, mindim=min_dim, line=line, **kw)
+    recs = ccl_check.parse_dump(os.path.join(S, f'{tag}.cand'))
+    cands, info = golden.stream_components(m.astype(bool), min_area=min_area, min_dim=min_dim, reject_border=False, nlab=nlab, max_cand=maxc)
+    assert [r['area'] for r in recs] == [c['area'] for c in cands], (len(recs), len(cands))
+    assert all(tuple(r['scores']) == tuple(c['scores']) for r, c in zip(recs, cands))
+    return out, recs, cands, info
+
+
+def test_row_with_200_runs(vvp):
+    m = np.zeros((800, 1280), np.uint8)
+    for k in range(200):                                              # 200 bars (2 px wide, pitch 4) of different heights: 200 runs on the busiest rows
+        m[100:100 + 20 + k % 37 + k // 37 * 3, 4 * k + 10:4 * k + 12] = 1
+    out, recs, cands, info = topn_check(vvp, m, 'runs200')
+    r = rtl_result(out)
+    assert r['flags'][-2] == '0' and info['runs'] > 200 * 20             # no run overflow with 200 runs per row
+    # top-64 by area of the full golden decomposition (areas 2*h are not all distinct, compare the area multiset)
+    keep, lab, allc = golden.components(m, min_area=1, min_dim=1, reject_border=False)
+    top = sorted((c['area'] for c in keep), reverse=True)[:64]
+    assert sorted((r['area'] for r in recs), reverse=True) == top
+    assert r['count'] == 64 and r['flags'][0] == '1'                    # candidate table full: diagnostic bit only
+    assert rtl_result(out)['done'] == 1
+
+
+def test_label_recycling_3000_dots_then_a_tag(vvp):
+    m = np.zeros((800, 1280), np.uint8)
+    for yy in range(2, 2 + 4 * 19, 4):
+        for xx in range(4, 4 + 8 * 160, 8): m[yy, xx] = 1                # 3040 one-pixel components (no neighbours)
+    m[300:340, 400:440] = 1; m[310:330, 410:430] = 0                     # a real ring (area 1200 - 400)
+    out, recs, cands, info = topn_check(vvp, m, 'dots3000', min_area=10, min_dim=1)
+    r = rtl_result(out)
+    assert info['labels_allocated'] >= 3040 and info['peak_labels'] < 400  # recycling is what keeps the 1024-entry table sufficient
+    assert r['flags'][1] == '0', 'label table must not overflow'
+    assert r['count'] == 1 and recs[0]['area'] == 40 * 40 - 20 * 20
+    assert r['labels'] < 400                                             # label high-water mark of the RTL
+    keep, lab, allc = golden.components(m, min_area=10, min_dim=1, reject_border=False)
+    assert not ccl_check.compare(recs, keep, lab)
+
+
+def test_100_components_keep_the_64_largest(vvp):
+    m = np.zeros((800, 1280), np.uint8)
+    for k in range(100):
+        r_, c_ = divmod(k, 10)
+        m[20 + r_ * 78:20 + r_ * 78 + 30, 10 + c_ * 125:10 + c_ * 125 + 12 + k] = 1     # area 30*(12+k): all distinct
+    out, recs, cands, info = topn_check(vvp, m, 'big100')
+    r = rtl_result(out)
+    assert r['count'] == 64 and r['flags'][0] == '1' and r['flags'][1:] == '000'
+    assert sorted(x['area'] for x in recs) == [30 * (12 + k) for k in range(36, 100)]
+    keep, lab, allc = golden.components(m, min_area=1, min_dim=1, reject_border=False)
+    top = [c for c in keep if c['area'] >= 30 * (12 + 36)]
+    assert not ccl_check.compare(recs, top, lab)
+
+
+def test_every_resource_overflows_and_the_frame_still_completes(vvp):
+    m = np.zeros((800, 1280), np.uint8)
+    m[0:60] = (np.indices((60, 1280)).sum(0) % 2)                        # checkerboard: 640 runs/row (> 256), thousands of 1-px components
+    for yy in range(70, 70 + 4 * 19, 4):
+        for xx in range(4, 4 + 8 * 160, 8): m[yy, xx] = 1                # 3040 dots
+    for k in range(100):
+        r_, c_ = divmod(k, 10)
+        m[160 + r_ * 60:160 + r_ * 60 + 25, 10 + c_ * 125:10 + c_ * 125 + 12 + k] = 1
+    m[700:740, 600:640] = 1; m[710:730, 610:630] = 0                     # a tag-sized ring, found among the 64 largest
+    out, recs, cands, info = topn_check(vvp, m, 'allovf', min_area=100, min_dim=10)
+    r = rtl_result(out)
+    assert r['done'] == 1 and r['count'] > 0
+    assert r['flags'][2] == '1' and r['flags'][0] == '1'                 # run overflow and candidate overflow reported (as diagnostics)
+    assert any(x['area'] == 1200 for x in recs) or any(x['area'] >= 25 * 12 for x in recs)
+
+
+def test_label_table_exhaustion_loses_components_not_the_frame():
+    """small label table (16 entries): the runs that find no label stay background; model and RTL agree, frame completes"""
+    v = rtlutil.build('tb_ccl_small', ['rtl/run_ccl.v', 'tb/tb_ccl.v'], defines=['P_NLAB=16', 'P_LB=4'])
+    m = np.zeros((800, 1280), np.uint8)
+    for k in range(40): m[100:140, 20 + k * 30:30 + k * 30] = 1          # 40 simultaneously live components
+    m[300:330, 100:130] = 1                                              # one more, after the bars finished -> labelled again
+    out, recs, cands, info = topn_check(v, m, 'smalltab', nlab=16)
+    r = rtl_result(out)
+    assert r['done'] == 1 and r['flags'][1] == '1' and info['flags']['ovf_lab'] == 1
+    assert len(recs) == 16                                              # 15 bars labelled + the late one
+    assert any(x['area'] == 900 for x in recs)
+
+
+def test_realtime_line_timing_busy_rows(vvp):
+    """200-run rows at the real 686-clock line period: nothing dropped, row sequencer keeps up"""
+    m = np.zeros((800, 1280), np.uint8)
+    for k in range(200): m[50:300 + 2 * k, 4 * k + 10:4 * k + 12] = 1     # 200 long vertical bars ending on different rows: ~200 runs on every line
+    out, recs, cands, info = topn_check(vvp, m, 'rt686', line=686)
+    r = rtl_result(out)
+    assert r['dropped'] == 0 and r['max_row'] < 686, r
