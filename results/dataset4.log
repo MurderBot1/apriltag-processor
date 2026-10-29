@@ -1,0 +1,111 @@
+D:\apriltag-proccessor\tools\blender_render.py:28: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new(name); m.use_nodes = True
+D:\apriltag-proccessor\tools\blender_render.py:69: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new(f"tag{t['id']}"); m.use_nodes = True
+D:\apriltag-proccessor\tools\blender_render.py:89: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  world = bpy.data.worlds.new('w'); world.use_nodes = True; sc.world = world
+00:19.828  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_00.png'
+[INFO ] services.locationservice ...............: Not adding link to MakeHuman user data, since neither explicit path nor auto-discovery is set in preferences.
+[INFO ] mpfb.init ..............................: Build info 20261010
+[INFO ] mpfb.init ..............................: MPFB initialization has finished.
+addon_utils.disable: bl_ext.lab_blender_org.mcp not enabled
+rendered rand_00
+00:38.110  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_01.png'
+rendered rand_01
+00:56.110  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_02.png'
+rendered rand_02
+01:14.031  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_03.png'
+rendered rand_03
+01:32.813  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_04.png'
+rendered rand_04
+01:51.250  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_05.png'
+rendered rand_05
+02:09.891  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_06.png'
+rendered rand_06
+02:28.235  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_07.png'
+rendered rand_07
+02:46.985  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_08.png'
+rendered rand_08
+03:05.375  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_09.png'
+rendered rand_09
+03:24.235  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_10.png'
+rendered rand_10
+03:42.672  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_11.png'
+rendered rand_11
+04:00.688  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_12.png'
+rendered rand_12
+04:19.141  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_13.png'
+rendered rand_13
+04:38.266  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_14.png'
+rendered rand_14
+04:57.688  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_15.png'
+rendered rand_15
+05:16.969  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_16.png'
+rendered rand_16
+05:36.016  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_17.png'
+rendered rand_17
+05:55.578  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_18.png'
+rendered rand_18
+06:14.719  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_19.png'
+rendered rand_19
+06:33.203  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_20.png'
+rendered rand_20
+06:53.000  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_21.png'
+rendered rand_21
+07:12.360  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_22.png'
+rendered rand_22
+07:31.563  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_23.png'
+rendered rand_23
+07:50.547  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_24.png'
+rendered rand_24
+08:10.047  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_25.png'
+rendered rand_25
+08:28.656  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_26.png'
+rendered rand_26
+08:48.266  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_27.png'
+rendered rand_27
+09:07.469  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_28.png'
+rendered rand_28
+09:25.906  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_29.png'
+rendered rand_29
+09:45.344  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_30.png'
+rendered rand_30
+10:04.688  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_31.png'
+rendered rand_31
+10:23.813  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_32.png'
+rendered rand_32
+10:42.938  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_33.png'
+rendered rand_33
+11:02.485  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_34.png'
+rendered rand_34
+11:20.985  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_35.png'
+rendered rand_35
+11:39.813  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_36.png'
+rendered rand_36
+11:59.219  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_37.png'
+rendered rand_37
+12:18.610  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_38.png'
+rendered rand_38
+12:37.594  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_39.png'
+rendered rand_39
+12:57.281  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_40.png'
+rendered rand_40
+13:16.531  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_41.png'
+rendered rand_41
+13:36.063  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_42.png'
+rendered rand_42
+13:55.703  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_43.png'
+rendered rand_43
+14:15.516  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_44.png'
+rendered rand_44
+14:35.219  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_45.png'
+rendered rand_45
+14:53.906  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_46.png'
+rendered rand_46
+15:14.047  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_47.png'
+rendered rand_47
+Blender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 01:37:34)
+
+Blender quit
+dataset ok: 100 images
+done

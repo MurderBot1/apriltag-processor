@@ -1,0 +1,7 @@
+SEED=1: time 78.9 unrouted 0 viol 32 in2=116
+SEED=2: time 30.2 unrouted 0 viol 19 in2=149
+SEED=3: time 42.4 unrouted 0 viol 2 in2=143
+SEED=4: time 32.4 unrouted 0 viol 50 in2=153
+SEED=5: time 50.0 unrouted 0 viol 15 in2=145
+SEED=6: time 46.5 unrouted 0 viol 11 in2=168
+ALLDONE

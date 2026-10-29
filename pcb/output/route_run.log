@@ -1,0 +1,23 @@
+U1 orientation (5866666.666666672, 270)
+legalized: moved 122 parts
+WARNING: no via site for C77 2 GND
+WARNING: no via site for D2 2 +3V3
+WARNING: no via site for J1 A1 GND
+WARNING: no via site for J1 A12 GND
+WARNING: no via site for J1 B1 GND
+WARNING: no via site for J1 B12 GND
+WARNING: no via site for U2 1 +3V3
+WARNING: no via site for U2 11 +3V3
+WARNING: no via site for U2 20 +3V3
+WARNING: no via site for U2 30 +3V3
+WARNING: no via site for U2 38 +3V3
+WARNING: no via site for U2 45 +3V3
+WARNING: no via site for U2 47 GND
+WARNING: no via site for U2 49 +3V3
+WARNING: no via site for U2 53 +3V3
+WARNING: no via site for U2 54 +3V3
+plane fan-out: 315 vias, 16 failed
+placed 152 parts -> D:\apriltag-proccessor\pcb\output\apriltag_cam_unrouted.kicad_pcb
+DSN export True
+C:\Program Files\Java\jdk-25\bin\java.exe -jar D:\apriltag-proccessor\pcb\tools\freerouting.jar -de D:\apriltag-proccessor\pcb\output\apriltag_cam.dsn -do D:\apriltag-proccessor\pcb\output\apriltag_cam.ses -mp 20 --gui.enabled=false
+freerouting timed out

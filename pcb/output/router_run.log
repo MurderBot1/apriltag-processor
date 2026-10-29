@@ -1,0 +1,78 @@
+grid offset 0.050 0.050 (346 pads)
+grid 961 x 961, 1483 primitives, 825 pins, 16 threads
+static maps built 0.0s
+106 jobs
+scratch ready 0.2s
+power iter 0: viol 609  0.2s
+power iter 1: viol 503  0.3s
+power iter 2: viol 546  0.3s
+power iter 3: viol 581  0.4s
+power iter 4: viol 425  0.5s
+power iter 5: viol 440  0.5s
+power iter 6: viol 336  0.6s
+power iter 7: viol 254  0.7s
+power iter 8: viol 213  0.8s
+power iter 9: viol 245  0.8s
+power iter 10: viol 344  0.9s
+power iter 11: viol 202  1.0s
+iter 0: rerouted 92, dirty 73, viol 9251, unrouted 0, pf 0.40, expanded 1525k, 1.1s
+iter 1: rerouted 73, dirty 72, viol 8777, unrouted 0, pf 0.60, expanded 2467k, 1.2s
+iter 2: rerouted 72, dirty 71, viol 8662, unrouted 0, pf 0.90, expanded 2857k, 1.4s
+iter 3: rerouted 71, dirty 70, viol 7443, unrouted 0, pf 1.35, expanded 3148k, 1.6s
+iter 4: rerouted 70, dirty 64, viol 7486, unrouted 0, pf 2.03, expanded 3358k, 1.7s
+iter 5: rerouted 64, dirty 60, viol 8694, unrouted 0, pf 3.04, expanded 3971k, 2.0s
+iter 6: rerouted 60, dirty 58, viol 9171, unrouted 0, pf 4.56, expanded 3935k, 2.2s
+iter 7: rerouted 58, dirty 55, viol 8633, unrouted 0, pf 6.83, expanded 4198k, 2.4s
+iter 8: rerouted 55, dirty 53, viol 9162, unrouted 0, pf 10.25, expanded 4201k, 2.7s
+iter 9: rerouted 53, dirty 51, viol 8364, unrouted 0, pf 15.38, expanded 4243k, 2.9s
+iter 10: rerouted 51, dirty 52, viol 9207, unrouted 0, pf 23.07, expanded 4206k, 3.1s
+iter 11: rerouted 52, dirty 52, viol 8947, unrouted 0, pf 34.60, expanded 4942k, 3.4s
+iter 12: rerouted 52, dirty 50, viol 8525, unrouted 0, pf 51.90, expanded 4826k, 3.7s
+iter 13: rerouted 50, dirty 49, viol 8641, unrouted 0, pf 77.85, expanded 4366k, 4.0s
+iter 14: rerouted 49, dirty 50, viol 9373, unrouted 0, pf 116.77, expanded 4713k, 4.2s
+iter 15: rerouted 50, dirty 50, viol 9555, unrouted 0, pf 175.16, expanded 4458k, 4.5s
+iter 16: rerouted 50, dirty 48, viol 9652, unrouted 0, pf 200.00, expanded 4897k, 4.7s
+iter 17: rerouted 48, dirty 49, viol 9631, unrouted 0, pf 200.00, expanded 4528k, 5.0s
+iter 18: rerouted 49, dirty 49, viol 9172, unrouted 0, pf 200.00, expanded 5172k, 5.3s
+iter 19: rerouted 49, dirty 48, viol 9300, unrouted 0, pf 200.00, expanded 4885k, 5.6s
+iter 20: rerouted 48, dirty 47, viol 9044, unrouted 0, pf 200.00, expanded 4993k, 5.9s
+iter 21: rerouted 47, dirty 45, viol 8411, unrouted 0, pf 200.00, expanded 5100k, 6.1s
+iter 22: rerouted 45, dirty 46, viol 9098, unrouted 0, pf 200.00, expanded 5045k, 6.4s
+iter 23: rerouted 46, dirty 44, viol 9035, unrouted 0, pf 200.00, expanded 5357k, 6.7s
+iter 24: rerouted 44, dirty 46, viol 8004, unrouted 0, pf 200.00, expanded 5192k, 7.0s
+iter 25: rerouted 46, dirty 45, viol 8574, unrouted 0, pf 200.00, expanded 5370k, 7.3s
+iter 26: rerouted 45, dirty 47, viol 8626, unrouted 0, pf 200.00, expanded 5341k, 7.7s
+iter 27: rerouted 47, dirty 45, viol 8875, unrouted 0, pf 200.00, expanded 5337k, 8.0s
+iter 28: rerouted 45, dirty 46, viol 8974, unrouted 0, pf 200.00, expanded 5877k, 8.3s
+iter 29: rerouted 46, dirty 45, viol 8617, unrouted 0, pf 200.00, expanded 5119k, 8.5s
+iter 30: rerouted 45, dirty 45, viol 8361, unrouted 0, pf 200.00, expanded 5341k, 8.9s
+iter 31: rerouted 45, dirty 42, viol 8892, unrouted 0, pf 200.00, expanded 5469k, 9.2s
+iter 32: rerouted 42, dirty 43, viol 8152, unrouted 0, pf 200.00, expanded 5309k, 9.5s
+iter 33: rerouted 43, dirty 44, viol 8269, unrouted 0, pf 200.00, expanded 5808k, 9.8s
+iter 34: rerouted 44, dirty 41, viol 8878, unrouted 0, pf 200.00, expanded 6080k, 10.1s
+iter 35: rerouted 41, dirty 44, viol 8616, unrouted 0, pf 200.00, expanded 5462k, 10.4s
+iter 36: rerouted 44, dirty 43, viol 7604, unrouted 0, pf 200.00, expanded 5517k, 10.8s
+iter 37: rerouted 43, dirty 45, viol 7658, unrouted 0, pf 200.00, expanded 5825k, 11.1s
+iter 38: rerouted 45, dirty 44, viol 7876, unrouted 0, pf 200.00, expanded 5533k, 11.4s
+iter 39: rerouted 44, dirty 44, viol 7461, unrouted 0, pf 200.00, expanded 5914k, 11.7s
+iter 40: rerouted 44, dirty 45, viol 7129, unrouted 0, pf 200.00, expanded 5730k, 12.1s
+iter 41: rerouted 45, dirty 43, viol 8160, unrouted 0, pf 200.00, expanded 6116k, 12.4s
+iter 42: rerouted 43, dirty 44, viol 7754, unrouted 0, pf 200.00, expanded 5979k, 12.7s
+iter 43: rerouted 44, dirty 43, viol 7312, unrouted 0, pf 200.00, expanded 5572k, 13.1s
+iter 44: rerouted 43, dirty 38, viol 8352, unrouted 0, pf 200.00, expanded 5804k, 13.4s
+iter 45: rerouted 38, dirty 41, viol 7598, unrouted 0, pf 200.00, expanded 5415k, 13.7s
+iter 46: rerouted 41, dirty 42, viol 9438, unrouted 0, pf 200.00, expanded 5927k, 14.0s
+iter 47: rerouted 42, dirty 42, viol 8457, unrouted 0, pf 200.00, expanded 5866k, 14.3s
+iter 48: rerouted 42, dirty 39, viol 8927, unrouted 0, pf 200.00, expanded 5680k, 14.6s
+iter 49: rerouted 39, dirty 42, viol 7264, unrouted 0, pf 200.00, expanded 5762k, 15.0s
+iter 50: rerouted 42, dirty 44, viol 7351, unrouted 0, pf 200.00, expanded 5926k, 15.3s
+iter 51: rerouted 44, dirty 48, viol 8030, unrouted 0, pf 200.00, expanded 5735k, 15.6s
+iter 52: rerouted 48, dirty 45, viol 8815, unrouted 0, pf 200.00, expanded 5855k, 15.9s
+iter 53: rerouted 45, dirty 46, viol 8344, unrouted 0, pf 200.00, expanded 6070k, 16.3s
+iter 54: rerouted 46, dirty 46, viol 7860, unrouted 0, pf 200.00, expanded 5752k, 16.6s
+iter 55: rerouted 46, dirty 47, viol 9762, unrouted 0, pf 200.00, expanded 6011k, 16.9s
+iter 56: rerouted 47, dirty 47, viol 9311, unrouted 0, pf 200.00, expanded 6118k, 17.2s
+iter 57: rerouted 47, dirty 45, viol 9206, unrouted 0, pf 200.00, expanded 6132k, 17.6s
+iter 58: rerouted 45, dirty 49, viol 7046, unrouted 0, pf 200.00, expanded 6502k, 17.9s
+iter 59: rerouted 49, dirty 47, viol 9231, unrouted 0, pf 200.00, expanded 6462k, 18.3s
+DONE 18.3s: 5745 segments, 344 vias, unrouted jobs 0 (of 106), remaining violations (signals) 9231

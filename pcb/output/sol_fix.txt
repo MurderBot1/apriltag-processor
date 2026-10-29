@@ -1,0 +1,13 @@
+U GND~fix1
+U GND~fix2
+U GND~fix3
+U GND~fix4
+U +3V3~fix5
+U +3V3~fix6
+U +3V3~fix7
+U +3V3~fix8
+U +3V3~fix9
+U +3V3~fix10
+U +3V3~fix11
+U +3V3~fix12
+U +1V1~fix13

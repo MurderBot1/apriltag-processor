@@ -1,0 +1,18 @@
+.....F                                                                   [100%]
+================================== FAILURES ===================================
+________________ test_dark_overloaded_frame_still_reports_tags ________________
+
+vvp = 'D:\\apriltag-proccessor\\sim\\tb_cam.vvp'
+
+    
+    def test_dark_overloaded_frame_still_reports_tags(vvp):
+        log, res, el = chain.run_frames(vvp, [img('dark_c')], 'sys_darkc')
+>       assert len(res['results']) == 1
+E       assert 0 >= 2
+E        +  where 0 = len([])
+E        +    where [] = decode_tags([0, 0, 0, 0, 0, 0, ...])
+
+tests\test_chain.py:86: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_chain.py::test_dark_overloaded_frame_still_reports_tags - a...
+1 failed, 5 passed in 11200.78s (3:06:40)

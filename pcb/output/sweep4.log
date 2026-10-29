@@ -1,0 +1,7 @@
+PEN=2 SEED=1: time 154.0 unrouted 0 viol 38 in2=154
+PEN=2 SEED=2: time 71.4 unrouted 0 viol 37 in2=205
+PEN=2 SEED=3: time 163.8 unrouted 0 viol 3 in2=148
+PEN=3 SEED=1: time 225.0 unrouted 0 viol 49 in2=95
+PEN=3 SEED=2: time 98.9 unrouted 0 viol 50 in2=97
+PEN=3 SEED=3: time 104.8 unrouted 0 viol 29 in2=114
+ALLDONE

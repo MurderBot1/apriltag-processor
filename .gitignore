@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+sim/
+test_images/raw/
+render/work/
+pcb/tools/freerouting.jar
+api/rust/target/
+api/java/out/
+api/cpp/build/
+*.vvp

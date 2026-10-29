@@ -1,0 +1,6 @@
+SEED=7: time 33.4 unrouted 0 viol 18
+SEED=8: time 40.9 unrouted 0 viol 53
+SEED=9: time 41.8 unrouted 0 viol 45
+SEED=10: time 78.4 unrouted 0 viol 0
+FOUND 10
+ALLDONE

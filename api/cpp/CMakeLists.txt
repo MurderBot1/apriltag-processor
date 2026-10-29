@@ -1,0 +1,17 @@
+cmake_minimum_required(VERSION 3.10)
+project(apriltag_camera CXX)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+add_library(apriltag_camera src/protocol.cpp src/transport.cpp src/camera.cpp src/clock.cpp)
+target_include_directories(apriltag_camera PUBLIC include)
+if(MSVC)
+  target_compile_options(apriltag_camera PRIVATE /W4)
+else()
+  target_compile_options(apriltag_camera PRIVATE -Wall -Wextra)
+endif()
+
+enable_testing()
+add_executable(test_api tests/test_api.cpp)
+target_link_libraries(test_api apriltag_camera)
+add_test(NAME api COMMAND test_api ${CMAKE_CURRENT_SOURCE_DIR}/../testdata/golden_frames.txt)

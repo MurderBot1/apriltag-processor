@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AprilTag camera project</title>
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/ui.css">
+<link rel="stylesheet" href="assets/viewers3d.css">
+<link rel="stylesheet" href="assets/views.css">
+<link rel="stylesheet" href="assets/pcbview.css">
+<link rel="stylesheet" href="assets/bom2.css">
+{{SIMHEAD}}
+<script>try{var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+</head>
+<body>
+<header class="top">
+  <button id="navtoggle" aria-label="menu">&#9776;</button>
+  <a class="brand" href="#/home">AprilTag camera</a>
+  <span class="grow"></span>
+  <button id="themetoggle" title="toggle light / dark">theme</button>
+</header>
+<nav id="nav">
+  <input id="navsearch" type="search" placeholder="search pages and text..." autocomplete="off">
+  <div id="navlinks">
+{{NAV}}
+  </div>
+  <div id="navempty" class="muted" hidden>no match</div>
+  <div class="navfoot muted">built {{BUILT}}</div>
+</nav>
+<main id="main">
+{{PAGES}}
+</main>
+<script src="vendor/three.min.js"></script>
+<script src="vendor/OrbitControls.js"></script>
+<script src="data/search.js"></script>
+<script src="data/models.js"></script>
+<script src="data/gallery.js"></script>
+<script src="data/rtl.js"></script>
+<script src="data/bom.js"></script>
+<script src="assets/bom.js"></script>
+<script src="data/partthumbs.js"></script>
+<script src="assets/partthumbs.js"></script>
+<script src="assets/bom2.js"></script>
+{{SIMSCRIPTS}}
+<script src="assets/viewers3d.js"></script>
+<script src="assets/pcb3dtex.js"></script>
+<script src="pcb/manifest.js"></script>
+<script src="assets/pcbview.js"></script>
+<script src="assets/gallery.js"></script>
+<script src="assets/charts.js"></script>
+<script src="assets/rtlview.js"></script>
+<script src="assets/app.js"></script>
+<!--UI-LAYER--><script src="assets/ui.js"></script>
+</body>
+</html>

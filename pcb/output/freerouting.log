@@ -1,0 +1,1082 @@
+2026-10-28 01:43:37.645 INFO   Freerouting v2.1.0 (build-date: 2025-04-12)
+2026-10-28 01:43:39.143 INFO   [552ADB\2571DD] Job '552ADB\2571DD' started at 2026-10-28T08:43:39.143999500Z
+2026-10-28 01:43:39.260 INFO   New version available: v2.5.0
+2026-10-28 01:43:48.353 INFO   [552ADB\2571DD] Auto-router pass #1 on board '11b34afd5b1829ee62af6b230af0ca64' was completed in 9.09 seconds with the score of 817.10 (131 unrouted), using 44.28 CPU seconds and 9660 MB memory.
+2026-10-28 01:43:50.092 WARN   PolylineTrace.get_trace_connection_shape p_index out of range
+2026-10-28 01:43:50.092 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.NullPointerException: Cannot invoke "app.freerouting.geometry.planar.TileShape.nearest_point_approx(app.freerouting.geometry.planar.FloatPoint)" because "target_shape" is null
+	at app.freerouting.autoroute.MazeSearchAlgo.expand_to_target_doors(MazeSearchAlgo.java:534) ~[freerouting.jar:unspecified]
+	at app.freerouting.autoroute.MazeSearchAlgo.expand_to_room_doors(MazeSearchAlgo.java:398) ~[freerouting.jar:unspecified]
+	at app.freerouting.autoroute.MazeSearchAlgo.occupy_next_element(MazeSearchAlgo.java:286) ~[freerouting.jar:unspecified]
+	at app.freerouting.autoroute.MazeSearchAlgo.find_connection(MazeSearchAlgo.java:206) ~[freerouting.jar:unspecified]
+	at app.freerouting.autoroute.AutorouteEngine.autoroute_connection(AutorouteEngine.java:155) [freerouting.jar:unspecified]
+	at app.freerouting.autoroute.BatchAutorouter.autoroute_item(BatchAutorouter.java:610) [freerouting.jar:unspecified]
+	at app.freerouting.autoroute.BatchAutorouter.autoroute_pass(BatchAutorouter.java:332) [freerouting.jar:unspecified]
+	at app.freerouting.autoroute.BatchAutorouter.runBatchLoop(BatchAutorouter.java:447) [freerouting.jar:unspecified]
+	at app.freerouting.management.RoutingJobSchedulerActionThread.thread_action(RoutingJobSchedulerActionThread.java:131) [freerouting.jar:unspecified]
+	at app.freerouting.core.StoppableThread.run(StoppableThread.java:26) [freerouting.jar:unspecified]
+2026-10-28 01:43:51.536 WARN   PolylineTrace.get_trace_connection_shape p_index out of range
+2026-10-28 01:43:51.536 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.NullPointerException: Cannot invoke "app.freerouting.geometry.planar.TileShape.nearest_point_approx(app.freerouting.geometry.planar.FloatPoint)" because "target_shape" is null
+	at app.freerouting.autoroute.MazeSearchAlgo.expand_to_target_doors(MazeSearchAlgo.java:534) ~[freerouting.jar:unspecified]
+	at app.freerouting.autoroute.MazeSearchAlgo.expand_to_room_doors(MazeSearchAlgo.java:398) ~[freerouting.jar:unspecified]
+	at app.freerouting.autoroute.MazeSearchAlgo.occupy_next_element(MazeSearchAlgo.java:286) ~[freerouting.jar:unspecified]
+	at app.freerouting.autoroute.MazeSearchAlgo.find_connection(MazeSearchAlgo.java:206) ~[freerouting.jar:unspecified]
+	at app.freerouting.autoroute.AutorouteEngine.autoroute_connection(AutorouteEngine.java:155) [freerouting.jar:unspecified]
+	at app.freerouting.autoroute.BatchAutorouter.autoroute_item(BatchAutorouter.java:610) [freerouting.jar:unspecified]
+	at app.freerouting.autoroute.BatchAutorouter.autoroute_pass(BatchAutorouter.java:332) [freerouting.jar:unspecified]
+	at app.freerouting.autoroute.BatchAutorouter.runBatchLoop(BatchAutorouter.java:447) [freerouting.jar:unspecified]
+	at app.freerouting.management.RoutingJobSchedulerActionThread.thread_action(RoutingJobSchedulerActionThread.java:131) [freerouting.jar:unspecified]
+	at app.freerouting.core.StoppableThread.run(StoppableThread.java:26) [freerouting.jar:unspecified]
+2026-10-28 01:43:53.192 INFO   [552ADB\2571DD] Auto-router pass #2 on board '76dcf022ec30faba12c80b76d3553347' was completed in 4.81 seconds with the score of 823.96 (127 unrouted), using 103.77 CPU seconds and 15298 MB memory.
+2026-10-28 01:43:57.222 INFO   [552ADB\2571DD] Auto-router pass #3 on board 'fea48260b720ee156e0e4baaff81faa1' was completed in 4.00 seconds with the score of 825.80 (126 unrouted), using 169.17 CPU seconds and 20088 MB memory.
+2026-10-28 01:44:06.713 INFO   [552ADB\2571DD] Auto-router pass #4 on board '2d0f3e8f27f92d6cf90ac4776b8c197f' was completed in 9.46 seconds with the score of 843.93 (117 unrouted), using 373.94 CPU seconds and 29951 MB memory.
+2026-10-28 01:44:10.646 INFO   [552ADB\2571DD] Auto-router pass #5 on board '582296227a4e94553f052419b7f92e7f' was completed in 3.90 seconds with the score of 846.68 (115 unrouted), using 490.64 CPU seconds and 34670 MB memory.
+2026-10-28 01:44:14.438 INFO   [552ADB\2571DD] Auto-router pass #6 on board 'b66a6fb58c054b661e1e389a51346899' was completed in 3.76 seconds with the score of 850.22 (113 unrouted), using 623.22 CPU seconds and 39435 MB memory.
+2026-10-28 01:44:18.281 INFO   [552ADB\2571DD] Auto-router pass #7 on board '8c18a9be47af335eceb585a4a392f112' was completed in 3.82 seconds with the score of 850.79 (113 unrouted), using 771.69 CPU seconds and 44069 MB memory.
+2026-10-28 01:44:22.403 INFO   [552ADB\2571DD] Restoring an earlier board that has the score of 850.79 (113 unrouted).
+2026-10-28 01:44:22.403 INFO   [552ADB\2571DD] Auto-router pass #8 on board '1d832158b00f52414d7ec8110305bb8a' was completed in 4.09 seconds with the score of 850.02 (113 unrouted), using 936.09 CPU seconds and 48562 MB memory.
+2026-10-28 01:44:45.699 INFO   [552ADB\2571DD] Auto-router pass #9 on board '1d832158b00f52414d7ec8110305bb8a' was completed in 23.29 seconds with the score of 931.89 (62 unrouted), using 2187.59 CPU seconds and 72573 MB memory.
+2026-10-28 01:44:58.207 INFO   [552ADB\2571DD] Auto-router pass #10 on board 'b50cebaaff97b929d995abe804999d7d' was completed in 12.47 seconds with the score of 930.09 (63 unrouted), using 3047.00 CPU seconds and 84282 MB memory.
+2026-10-28 01:45:02.591 WARN   Polyline.corner_approx: p_no must be less than arr.length - 1
+2026-10-28 01:45:02.591 WARN   Polyline.corner_approx: p_no must be less than arr.length - 1
+2026-10-28 01:45:02.605 WARN   Polyline.corner_approx: p_no must be less than arr.length - 1
+2026-10-28 01:45:02.606 WARN   Polyline.corner_approx: p_no must be less than arr.length - 1
+2026-10-28 01:45:02.609 WARN   Polyline.corner_approx: p_no must be less than arr.length - 1
+2026-10-28 01:45:02.609 WARN   Polyline.corner_approx: p_no must be less than arr.length - 1
+2026-10-28 01:45:03.723 WARN   PolylineTrace.get_trace_connection_shape p_index out of range
+2026-10-28 01:45:03.723 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.NullPointerException: null
+2026-10-28 01:45:04.315 WARN   LocateFoundConnectionAlgo45Degree.calculate_next_trace_corners: next_room is null
+2026-10-28 01:45:07.016 INFO   [552ADB\2571DD] Auto-router pass #11 on board '6f7a6a404870548058e8d8fc67414872' was completed in 8.78 seconds with the score of 917.58 (74 unrouted), using 3784.25 CPU seconds and 92638 MB memory.
+2026-10-28 01:45:24.870 WARN   LocateFoundConnectionAlgo45Degree.calculate_next_trace_corners: next_room is null
+2026-10-28 01:45:28.823 INFO   [552ADB\2571DD] Auto-router pass #12 on board 'f9cd9bfe0d183d68364d3ba856232ac4' was completed in 21.77 seconds with the score of 952.25 (42 unrouted), using 5922.19 CPU seconds and 116743 MB memory.
+2026-10-28 01:45:29.458 WARN   PolylineTrace.get_trace_connection_shape p_index out of range
+2026-10-28 01:45:29.458 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.NullPointerException: null
+2026-10-28 01:45:30.576 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:30.576 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:30.576 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:30.577 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:30.577 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:30.577 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:30.577 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:30.577 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:30.578 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:30.578 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:30.578 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:30.578 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:30.580 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:30.580 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:30.580 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:30.580 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:30.583 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:30.583 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:30.585 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:30.585 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:30.590 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:30.591 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:30.591 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:30.591 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:30.591 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:30.592 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:30.598 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:30.599 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:30.599 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:30.599 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:30.634 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:30.634 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:30.634 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:30.634 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:31.364 INFO   [552ADB\2571DD] Auto-router pass #13 on board '30510c282d609f7dd2ef06887ae6e2f7' was completed in 2.50 seconds with the score of 950.10 (44 unrouted), using 6250.67 CPU seconds and 120251 MB memory.
+2026-10-28 01:45:32.062 WARN   PolylineTrace.get_trace_connection_shape p_index out of range
+2026-10-28 01:45:32.063 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.NullPointerException: null
+2026-10-28 01:45:32.831 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:32.831 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:32.835 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:32.836 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:32.837 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:32.837 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:33.154 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:33.155 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:33.155 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:33.155 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:33.296 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:33.296 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:33.296 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:33.297 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:34.141 INFO   [552ADB\2571DD] Auto-router pass #14 on board '4ec158eff15a5a181ce7378ab0c2765b' was completed in 2.74 seconds with the score of 945.06 (49 unrouted), using 6474.61 CPU seconds and 122687 MB memory.
+2026-10-28 01:45:36.976 INFO   [552ADB\2571DD] Auto-router pass #15 on board '4ce021ba8f18c99e78b7d09bcf63ca30' was completed in 2.80 seconds with the score of 945.34 (49 unrouted), using 6818.00 CPU seconds and 126400 MB memory.
+2026-10-28 01:45:52.945 INFO   [552ADB\2571DD] Auto-router pass #16 on board '984cd978260ce339ef3599e6754a58bf' was completed in 15.93 seconds with the score of 954.96 (40 unrouted), using 8799.73 CPU seconds and 143178 MB memory.
+2026-10-28 01:45:54.002 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:54.003 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:54.029 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:54.029 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:54.030 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:54.030 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:54.030 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:54.030 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:54.038 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:54.038 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:54.040 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:54.040 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:54.043 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:54.044 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:54.045 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:54.046 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:54.046 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:54.046 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:54.048 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:54.048 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:54.048 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:54.049 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:54.057 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:54.057 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:54.061 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:54.061 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:54.063 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:54.063 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:54.063 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:54.063 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:54.064 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:54.064 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:54.501 WARN   PolylineTrace.get_trace_connection_shape p_index out of range
+2026-10-28 01:45:54.502 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.NullPointerException: null
+2026-10-28 01:45:55.852 INFO   [552ADB\2571DD] Auto-router pass #17 on board '5c16872f45293d1a3ef23a783ae9758f' was completed in 2.87 seconds with the score of 950.15 (45 unrouted), using 9199.27 CPU seconds and 146722 MB memory.
+2026-10-28 01:45:56.230 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:56.230 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:56.238 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:56.239 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:57.206 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:57.206 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:57.206 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:57.206 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:57.211 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:57.211 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:57.212 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:57.212 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:57.212 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:57.212 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:57.212 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:57.213 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:57.214 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:57.215 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:57.218 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:57.218 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:57.220 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:57.220 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:57.220 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:57.220 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:57.223 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:57.223 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.101 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.101 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.119 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.119 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.119 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.119 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.120 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.120 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.121 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.121 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.121 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.121 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.121 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.122 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.122 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.122 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.122 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.122 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.122 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.123 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.134 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.134 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.134 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.134 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.136 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.136 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.136 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.137 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.138 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.138 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.139 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.139 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.139 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.139 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.140 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.140 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.142 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.142 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.143 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.143 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.152 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.152 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.154 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.154 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.155 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.155 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.155 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.155 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.158 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.158 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.158 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.158 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.159 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.160 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.160 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.161 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.162 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.163 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.167 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.168 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.169 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.169 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.220 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.221 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.221 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.221 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.222 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.223 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.223 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.223 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.268 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.268 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.273 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.273 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.278 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.278 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.278 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.278 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.279 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.279 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.280 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.280 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.280 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.280 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.280 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.281 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.281 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.281 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.282 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.282 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.285 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.285 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.286 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.286 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.286 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.286 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.287 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.287 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.287 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.287 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.287 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.288 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.288 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.289 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.292 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.293 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.297 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.298 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.300 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.303 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.304 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.304 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.304 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.304 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.305 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.305 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.306 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.306 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.309 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.310 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.312 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.312 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.316 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.317 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.317 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:45:58.317 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.129 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.129 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.130 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.130 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.133 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.133 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.133 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.134 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.134 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.134 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.134 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.134 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.135 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.135 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.135 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.135 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.160 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.160 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.160 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.160 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.161 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.162 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.162 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.162 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.163 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.163 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.163 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.163 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.165 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.166 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.166 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.166 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.167 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.167 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.167 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.167 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.171 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.171 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.171 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.171 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.258 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.258 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.258 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.258 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.261 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.262 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.262 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.262 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.265 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.265 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.265 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.265 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.270 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.271 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.271 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.271 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:00.279 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.ArrayIndexOutOfBoundsException: Index 10 out of bounds for length 10
+	at app.freerouting.autoroute.MazeShoveTraceAlgo.check_shove_trace_line(MazeShoveTraceAlgo.java:123) ~[freerouting.jar:unspecified]
+	at app.freerouting.autoroute.MazeSearchAlgo.shove_trace_room(MazeSearchAlgo.java:1214) ~[freerouting.jar:unspecified]
+	at app.freerouting.autoroute.MazeSearchAlgo.expand_to_room_doors(MazeSearchAlgo.java:443) ~[freerouting.jar:unspecified]
+	at app.freerouting.autoroute.MazeSearchAlgo.occupy_next_element(MazeSearchAlgo.java:286) ~[freerouting.jar:unspecified]
+	at app.freerouting.autoroute.MazeSearchAlgo.find_connection(MazeSearchAlgo.java:206) ~[freerouting.jar:unspecified]
+	at app.freerouting.autoroute.AutorouteEngine.autoroute_connection(AutorouteEngine.java:155) [freerouting.jar:unspecified]
+	at app.freerouting.autoroute.BatchAutorouter.autoroute_item(BatchAutorouter.java:610) [freerouting.jar:unspecified]
+	at app.freerouting.autoroute.BatchAutorouter.autoroute_pass(BatchAutorouter.java:332) [freerouting.jar:unspecified]
+	at app.freerouting.autoroute.BatchAutorouter.runBatchLoop(BatchAutorouter.java:447) [freerouting.jar:unspecified]
+	at app.freerouting.management.RoutingJobSchedulerActionThread.thread_action(RoutingJobSchedulerActionThread.java:131) [freerouting.jar:unspecified]
+	at app.freerouting.core.StoppableThread.run(StoppableThread.java:26) [freerouting.jar:unspecified]
+2026-10-28 01:46:00.327 INFO   [552ADB\2571DD] Auto-router pass #18 on board '49c1aafdf7f914c03e7a1776bc383e8d' was completed in 4.44 seconds with the score of 949.85 (45 unrouted), using 9884.88 CPU seconds and 152804 MB memory.
+2026-10-28 01:46:01.521 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.522 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.522 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.522 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.603 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.603 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.606 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.606 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.619 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.620 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.620 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.620 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.620 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.620 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.680 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.680 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.680 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.681 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.682 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.682 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.683 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.683 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.684 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.684 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.684 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.684 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.686 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.686 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.686 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.687 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.688 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.688 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.688 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.689 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.689 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.690 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.692 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.692 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.694 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.694 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.734 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.734 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.743 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.743 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.753 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.754 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.755 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.755 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.756 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.756 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.758 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.758 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.758 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.758 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.759 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.759 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.759 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.759 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.760 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.760 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.760 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.760 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.762 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.762 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.762 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.762 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.771 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.771 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.772 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.772 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.772 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.772 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.772 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.773 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.778 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.778 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.788 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.788 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.788 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.788 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.789 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.789 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.789 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.789 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.789 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.791 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.792 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.792 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.799 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.799 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.800 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.800 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.800 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.800 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.888 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.888 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.888 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.888 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.889 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.889 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.889 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.889 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.948 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.948 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.949 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.949 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.954 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.954 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.954 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.954 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.955 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.955 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.955 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.955 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.955 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.955 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.955 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.957 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.957 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.957 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.957 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.958 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.959 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.959 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.960 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.960 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.960 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.960 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.961 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.961 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.992 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.992 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.992 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.993 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.994 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.995 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.995 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:01.995 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:02.046 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:02.046 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:02.046 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:02.046 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:02.098 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:02.099 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:02.099 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:02.100 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:02.111 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:02.112 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:02.112 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:02.112 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:02.113 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:02.113 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:02.116 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:02.117 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:02.124 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.ArrayIndexOutOfBoundsException: null
+2026-10-28 01:46:02.698 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:02.698 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:02.698 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:02.698 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:02.698 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:02.699 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:02.699 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:02.699 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:02.703 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:02.703 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:02.703 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:02.703 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:02.802 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:02.802 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:02.802 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:02.802 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:02.803 WARN   Polyline.corner_approx: p_no must be less than arr.length - 1
+2026-10-28 01:46:02.803 WARN   Polyline.corner_approx: p_no must be less than arr.length - 1
+2026-10-28 01:46:02.803 WARN   Polyline.corner_approx: p_no must be less than arr.length - 1
+2026-10-28 01:46:02.803 WARN   Polyline.corner_approx: p_no must be less than arr.length - 1
+2026-10-28 01:46:02.803 WARN   Polyline.corner_approx: p_no must be less than arr.length - 1
+2026-10-28 01:46:02.804 WARN   Polyline.corner_approx: p_no must be less than arr.length - 1
+2026-10-28 01:46:02.804 WARN   Polyline.corner_approx: p_no must be less than arr.length - 1
+2026-10-28 01:46:02.804 WARN   Polyline.corner_approx: p_no must be less than arr.length - 1
+2026-10-28 01:46:02.805 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:02.805 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:03.298 INFO   [552ADB\2571DD] Auto-router pass #19 on board 'c9d3e966a9f1226f102b33979eeabba6' was completed in 2.93 seconds with the score of 940.37 (54 unrouted), using 10308.02 CPU seconds and 156321 MB memory.
+2026-10-28 01:46:09.495 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.ArrayIndexOutOfBoundsException: null
+2026-10-28 01:46:13.670 INFO   [552ADB\2571DD] Restoring an earlier board that has the score of 954.96 (40 unrouted).
+2026-10-28 01:46:13.670 INFO   [552ADB\2571DD] Auto-router pass #20 on board '0fa62b4412ac185edf766dd80d6a1789' was completed in 10.34 seconds with the score of 954.27 (41 unrouted), using 11782.06 CPU seconds and 167475 MB memory.
+2026-10-28 01:46:19.980 INFO   [552ADB\2571DD] Auto-router pass #21 on board '5c16872f45293d1a3ef23a783ae9758f' was completed in 6.29 seconds with the score of 963.13 (32 unrouted), using 12713.61 CPU seconds and 173599 MB memory.
+2026-10-28 01:46:21.886 INFO   [552ADB\2571DD] Auto-router pass #22 on board '08dd7d5f85dce26a84f251b2aea896c5' was completed in 1.87 seconds with the score of 964.04 (31 unrouted), using 13032.03 CPU seconds and 175951 MB memory.
+2026-10-28 01:46:23.527 INFO   [552ADB\2571DD] Auto-router pass #23 on board '27672cd60fd662218db3d61b9b617be5' was completed in 1.60 seconds with the score of 964.84 (30 unrouted), using 13354.38 CPU seconds and 178371 MB memory.
+2026-10-28 01:46:37.079 WARN   LocateFoundConnectionAlgo45Degree.calculate_next_trace_corners: next_room is null
+2026-10-28 01:46:37.485 INFO   [552ADB\2571DD] Auto-router pass #24 on board '307ba707345a99ed7fb8ffe53f51ebf0' was completed in 13.92 seconds with the score of 971.48 (23 unrouted), using 15720.22 CPU seconds and 194917 MB memory.
+2026-10-28 01:46:39.219 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:39.219 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:39.457 INFO   [552ADB\2571DD] Auto-router pass #25 on board '67424e567569e7727a2a0e0d638abb69' was completed in 1.94 seconds with the score of 969.59 (25 unrouted), using 16073.73 CPU seconds and 197430 MB memory.
+2026-10-28 01:46:40.053 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.ArrayIndexOutOfBoundsException: null
+2026-10-28 01:46:41.028 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.ArrayIndexOutOfBoundsException: null
+2026-10-28 01:46:41.224 INFO   [552ADB\2571DD] Auto-router pass #26 on board 'f07fd1d1ffb942483e6495241e5ada35' was completed in 1.73 seconds with the score of 970.59 (24 unrouted), using 16251.98 CPU seconds and 198617 MB memory.
+2026-10-28 01:46:42.836 INFO   [552ADB\2571DD] Auto-router pass #27 on board 'a2f5fcae2bc527a62e1e2fd72116eead' was completed in 1.57 seconds with the score of 967.68 (27 unrouted), using 16611.45 CPU seconds and 201024 MB memory.
+2026-10-28 01:46:43.473 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:43.473 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:43.479 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.ArrayIndexOutOfBoundsException: null
+2026-10-28 01:46:48.647 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:48.647 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:48.660 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:48.660 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:48.685 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:48.685 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:52.715 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:52.717 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:52.734 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:52.734 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:52.762 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:52.762 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:56.405 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:56.406 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:56.420 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:56.420 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:56.448 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:56.448 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:56.450 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:56.450 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:59.496 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:59.497 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:59.497 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:59.497 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:59.497 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:59.498 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:59.498 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:46:59.498 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:00.052 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:00.052 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:00.055 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:00.056 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:00.075 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:00.075 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:00.075 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:00.075 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:00.550 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:00.551 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:00.858 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:00.858 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:02.616 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:02.616 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:03.035 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:03.035 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:03.069 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:03.069 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:03.264 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:03.264 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:05.441 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:05.441 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:05.445 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:05.446 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:05.479 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:05.480 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:05.496 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:05.498 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:05.535 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:05.536 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:05.557 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:05.557 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:05.570 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:05.570 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:05.640 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:05.640 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:05.813 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:05.813 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:05.871 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:05.872 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:06.015 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:06.015 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:06.015 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:06.016 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:06.016 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:06.017 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:06.035 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:06.036 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:06.039 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:06.040 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:06.064 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:06.064 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:06.696 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:06.696 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:06.697 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:06.697 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:06.702 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:06.702 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:06.713 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:06.713 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:06.733 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:06.733 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:06.826 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:06.827 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:06.828 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:06.829 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:06.857 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:06.858 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:06.879 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:06.879 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:06.892 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:06.892 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:06.915 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:06.915 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:14.259 WARN   LocateFoundConnectionAlgo45Degree.calculate_next_trace_corners: next_room is null
+2026-10-28 01:47:14.984 WARN   LocateFoundConnectionAlgo45Degree.calculate_next_trace_corners: next_room is null
+2026-10-28 01:47:17.216 INFO   [552ADB\2571DD] Restoring an earlier board that has the score of 971.48 (23 unrouted).
+2026-10-28 01:47:17.216 INFO   [552ADB\2571DD] Auto-router pass #28 on board 'e38bb45983a51233a00ab16c665055c6' was completed in 34.34 seconds with the score of 962.11 (33 unrouted), using 23324.44 CPU seconds and 240510 MB memory.
+2026-10-28 01:47:26.376 INFO   [552ADB\2571DD] Auto-router pass #29 on board '67424e567569e7727a2a0e0d638abb69' was completed in 9.14 seconds with the score of 969.63 (25 unrouted), using 25514.05 CPU seconds and 251339 MB memory.
+2026-10-28 01:47:27.600 INFO   [552ADB\2571DD] Auto-router pass #30 on board '5648fd5d19239d686e1b1f5cbd6d6ef6' was completed in 1.18 seconds with the score of 969.63 (25 unrouted), using 25738.42 CPU seconds and 252477 MB memory.
+2026-10-28 01:47:28.711 INFO   [552ADB\2571DD] Auto-router pass #31 on board '5648fd5d19239d686e1b1f5cbd6d6ef6' was completed in 1.10 seconds with the score of 969.63 (25 unrouted), using 25963.78 CPU seconds and 253684 MB memory.
+2026-10-28 01:47:51.196 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.196 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.196 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.198 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.200 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.200 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.201 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.201 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.201 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.203 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.203 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.203 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.204 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.204 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.204 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.204 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.204 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.204 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.205 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.205 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.206 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.206 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.206 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.206 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.208 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.208 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.208 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.208 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.208 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.208 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.208 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.210 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.210 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.210 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.210 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.211 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.211 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.211 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.212 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.213 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.213 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.213 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.213 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.214 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.214 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.214 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.214 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.214 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.215 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.215 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.215 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.216 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.216 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.218 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.218 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.218 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.219 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.220 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.220 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.221 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.221 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.221 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.234 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.234 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.234 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.234 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.234 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.234 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.235 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.235 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.236 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.236 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:47:51.963 INFO   [552ADB\2571DD] Restoring an earlier board that has the score of 971.48 (23 unrouted).
+2026-10-28 01:47:51.963 INFO   [552ADB\2571DD] Auto-router pass #32 on board '5648fd5d19239d686e1b1f5cbd6d6ef6' was completed in 23.24 seconds with the score of 968.95 (26 unrouted), using 31417.33 CPU seconds and 280579 MB memory.
+2026-10-28 01:48:02.133 INFO   [552ADB\2571DD] Auto-router pass #33 on board '67424e567569e7727a2a0e0d638abb69' was completed in 10.15 seconds with the score of 969.87 (25 unrouted), using 33949.38 CPU seconds and 290924 MB memory.
+2026-10-28 01:48:03.268 WARN   Polyline: must contain at least 2 different points
+2026-10-28 01:48:03.268 WARN   Polyline.corner: arr.length is < 2
+2026-10-28 01:48:03.268 WARN   Polyline.corner: arr.length is < 2
+2026-10-28 01:48:03.269 ERROR  [552ADB\2571DD] Error during autoroute_item
+java.lang.NullPointerException: Cannot invoke "Object.equals(Object)" because "from_corner" is null
+	at app.freerouting.board.RoutingBoard.insert_forced_trace_polyline(RoutingBoard.java:637) ~[freerouting.jar:unspecified]
+	at app.freerouting.autoroute.InsertFoundConnectionAlgo.insert_trace(InsertFoundConnectionAlgo.java:145) ~[freerouting.jar:unspecified]
+	at app.freerouting.autoroute.InsertFoundConnectionAlgo.get_instance(InsertFoundConnectionAlgo.java:55) ~[freerouting.jar:unspecified]
+	at app.freerouting.autoroute.AutorouteEngine.autoroute_connection(AutorouteEngine.java:239) ~[freerouting.jar:unspecified]
+	at app.freerouting.autoroute.BatchAutorouter.autoroute_item(BatchAutorouter.java:610) [freerouting.jar:unspecified]
+	at app.freerouting.autoroute.BatchAutorouter.autoroute_pass(BatchAutorouter.java:332) [freerouting.jar:unspecified]
+	at app.freerouting.autoroute.BatchAutorouter.runBatchLoop(BatchAutorouter.java:447) [freerouting.jar:unspecified]
+	at app.freerouting.management.RoutingJobSchedulerActionThread.thread_action(RoutingJobSchedulerActionThread.java:131) [freerouting.jar:unspecified]
+	at app.freerouting.core.StoppableThread.run(StoppableThread.java:26) [freerouting.jar:unspecified]
+2026-10-28 01:48:03.415 INFO   [552ADB\2571DD] Auto-router pass #34 on board '562aa5e6b47c121c6e7ee4063357aedf' was completed in 1.24 seconds with the score of 971.69 (23 unrouted), using 34467.58 CPU seconds and 293220 MB memory.
+2026-10-28 01:48:04.585 INFO   [552ADB\2571DD] Auto-router pass #35 on board '8169973f7911eea299c57d5807591594' was completed in 1.13 seconds with the score of 969.84 (25 unrouted), using 34728.12 CPU seconds and 294477 MB memory.
+2026-10-28 01:48:22.727 INFO   [552ADB\2571DD] Auto-router pass #36 on board '619e58717e29c8da5cc9589d0cfa1c28' was completed in 18.10 seconds with the score of 974.32 (20 unrouted), using 39585.52 CPU seconds and 315627 MB memory.
+2026-10-28 01:48:23.834 INFO   [552ADB\2571DD] Auto-router pass #37 on board 'e0e67bd9f0a1b4631a972987b4617a18' was completed in 1.07 seconds with the score of 975.22 (19 unrouted), using 39864.70 CPU seconds and 316891 MB memory.
+2026-10-28 01:48:24.760 INFO   [552ADB\2571DD] Auto-router pass #38 on board '2d4f046db0b57b961d87acc8cd4565ba' was completed in 0.89 seconds with the score of 974.32 (20 unrouted), using 40144.88 CPU seconds and 318100 MB memory.
+2026-10-28 01:48:25.760 INFO   [552ADB\2571DD] Auto-router pass #39 on board '68381ab8aa170ebfc4389ddb0a17bb2c' was completed in 0.96 seconds with the score of 972.55 (22 unrouted), using 40426.03 CPU seconds and 319316 MB memory.
+2026-10-28 01:48:27.659 INFO   [552ADB\2571DD] Restoring an earlier board that has the score of 975.22 (19 unrouted).
+2026-10-28 01:48:27.659 INFO   [552ADB\2571DD] Auto-router pass #40 on board '2d8f76fb2db87b02cec18f920c7a36ad' was completed in 1.86 seconds with the score of 974.34 (20 unrouted), using 40991.33 CPU seconds and 321853 MB memory.
+2026-10-28 01:48:31.994 WARN   Polyline.corner_approx: p_no must be less than arr.length - 1
+2026-10-28 01:48:31.994 WARN   Polyline.corner_approx: p_no must be less than arr.length - 1
+2026-10-28 01:48:31.995 WARN   Polyline.corner_approx: p_no must be less than arr.length - 1
+2026-10-28 01:48:31.995 WARN   Polyline.corner_approx: p_no must be less than arr.length - 1
+2026-10-28 01:48:34.451 INFO   [552ADB\2571DD] Auto-router pass #41 on board '2d4f046db0b57b961d87acc8cd4565ba' was completed in 6.78 seconds with the score of 973.51 (21 unrouted), using 43000.97 CPU seconds and 329622 MB memory.
+2026-10-28 01:48:35.021 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:48:35.022 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:48:35.022 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:48:35.022 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:48:35.022 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:48:35.022 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:48:35.023 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:48:35.023 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:48:35.606 INFO   [552ADB\2571DD] Auto-router pass #42 on board '9650fd18305bd70f67731542a103f8da' was completed in 1.12 seconds with the score of 973.51 (21 unrouted), using 43291.98 CPU seconds and 330849 MB memory.
+2026-10-28 01:48:36.583 INFO   [552ADB\2571DD] Auto-router pass #43 on board '9650fd18305bd70f67731542a103f8da' was completed in 0.96 seconds with the score of 973.51 (21 unrouted), using 43583.98 CPU seconds and 332030 MB memory.
+2026-10-28 01:48:36.679 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:48:36.679 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:48:55.521 INFO   [552ADB\2571DD] Restoring an earlier board that has the score of 975.22 (19 unrouted).
+2026-10-28 01:48:55.523 INFO   [552ADB\2571DD] Auto-router pass #44 on board '9650fd18305bd70f67731542a103f8da' was completed in 18.92 seconds with the score of 973.39 (21 unrouted), using 49318.97 CPU seconds and 355068 MB memory.
+2026-10-28 01:49:08.962 INFO   [552ADB\2571DD] Auto-router pass #45 on board '2d4f046db0b57b961d87acc8cd4565ba' was completed in 13.42 seconds with the score of 972.86 (22 unrouted), using 53446.42 CPU seconds and 370310 MB memory.
+2026-10-28 01:49:10.100 INFO   [552ADB\2571DD] Auto-router pass #46 on board 'cfe995534ec0a15125b6b7a0bddaac5a' was completed in 1.10 seconds with the score of 972.82 (22 unrouted), using 53770.80 CPU seconds and 371616 MB memory.
+2026-10-28 01:49:11.108 INFO   [552ADB\2571DD] Auto-router pass #47 on board '9bed1ea57046017532fb2a1c5d12fbf6' was completed in 0.97 seconds with the score of 972.83 (22 unrouted), using 54096.16 CPU seconds and 372902 MB memory.
+2026-10-28 01:49:36.528 INFO   [552ADB\2571DD] Restoring an earlier board that has the score of 975.22 (19 unrouted).
+2026-10-28 01:49:36.528 INFO   [552ADB\2571DD] Auto-router pass #48 on board '718ccd22f7e7bb6c00926d8e0e129ca7' was completed in 25.39 seconds with the score of 972.70 (22 unrouted), using 62899.64 CPU seconds and 404632 MB memory.
+2026-10-28 01:49:41.263 INFO   [552ADB\2571DD] Auto-router pass #49 on board '2d4f046db0b57b961d87acc8cd4565ba' was completed in 4.72 seconds with the score of 976.04 (18 unrouted), using 64312.92 CPU seconds and 408557 MB memory.
+2026-10-28 01:49:42.182 INFO   [552ADB\2571DD] Auto-router pass #50 on board 'a3df358dab5e5dfaded57423fcbe1c1c' was completed in 0.88 seconds with the score of 976.04 (18 unrouted), using 64668.72 CPU seconds and 409799 MB memory.
+2026-10-28 01:49:43.091 INFO   [552ADB\2571DD] Auto-router pass #51 on board '987416d4e5f0350d14a28d8ff6a9a49e' was completed in 0.87 seconds with the score of 976.09 (18 unrouted), using 65025.52 CPU seconds and 410999 MB memory.
+2026-10-28 01:50:07.515 INFO   [552ADB\2571DD] Restoring an earlier board that has the score of 976.09 (18 unrouted).
+2026-10-28 01:50:07.515 INFO   [552ADB\2571DD] Auto-router pass #52 on board 'c2a80fb0a6850cefb83b557980afe021' was completed in 24.39 seconds with the score of 970.92 (24 unrouted), using 74265.36 CPU seconds and 440669 MB memory.
+2026-10-28 01:50:14.206 INFO   [552ADB\2571DD] Auto-router pass #53 on board 'c2a80fb0a6850cefb83b557980afe021' was completed in 6.67 seconds with the score of 970.77 (24 unrouted), using 76574.12 CPU seconds and 447146 MB memory.
+2026-10-28 01:50:15.075 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:50:15.075 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:50:15.547 INFO   [552ADB\2571DD] Auto-router pass #54 on board 'a736eec8511b910df349c09486fc5a77' was completed in 1.31 seconds with the score of 968.97 (26 unrouted), using 77351.53 CPU seconds and 449722 MB memory.
+2026-10-28 01:50:16.071 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:50:16.071 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:50:16.114 WARN   PolylineTrace.get_trace_connection_shape p_index out of range
+2026-10-28 01:50:16.114 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.NullPointerException: null
+2026-10-28 01:50:16.376 WARN   PolylineTrace.get_trace_connection_shape p_index out of range
+2026-10-28 01:50:16.376 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.NullPointerException: null
+2026-10-28 01:50:16.918 INFO   [552ADB\2571DD] Auto-router pass #55 on board '1249aa074a2fd4ab1dd673c31760d60d' was completed in 1.33 seconds with the score of 967.11 (28 unrouted), using 77741.69 CPU seconds and 450941 MB memory.
+2026-10-28 01:50:41.587 INFO   [552ADB\2571DD] Restoring an earlier board that has the score of 976.09 (18 unrouted).
+2026-10-28 01:50:41.587 INFO   [552ADB\2571DD] Auto-router pass #56 on board '117c2ea4b61cb046307e432d947f40b4' was completed in 24.63 seconds with the score of 971.63 (23 unrouted), using 87814.70 CPU seconds and 478039 MB memory.
+2026-10-28 01:50:50.737 INFO   [552ADB\2571DD] Auto-router pass #57 on board 'c2a80fb0a6850cefb83b557980afe021' was completed in 9.12 seconds with the score of 962.73 (33 unrouted), using 91591.83 CPU seconds and 485972 MB memory.
+2026-10-28 01:50:54.490 INFO   [552ADB\2571DD] Auto-router pass #58 on board 'c836fd964a9a7caaa5b546a84308b88f' was completed in 3.70 seconds with the score of 966.37 (29 unrouted), using 93296.12 CPU seconds and 489219 MB memory.
+2026-10-28 01:50:57.457 INFO   [552ADB\2571DD] Auto-router pass #59 on board 'd1adb6afd8e1f33174fd16c28c25b4cc' was completed in 2.92 seconds with the score of 966.37 (29 unrouted), using 94154.12 CPU seconds and 490857 MB memory.
+2026-10-28 01:51:41.337 INFO   [552ADB\2571DD] Restoring an earlier board that has the score of 976.09 (18 unrouted).
+2026-10-28 01:51:41.337 INFO   [552ADB\2571DD] Auto-router pass #60 on board '9c1f1084dc6f75852dbcc6579bedb141' was completed in 43.84 seconds with the score of 971.76 (23 unrouted), using 114024.27 CPU seconds and 529207 MB memory.
+2026-10-28 01:51:53.451 INFO   [552ADB\2571DD] Auto-router pass #61 on board 'c2a80fb0a6850cefb83b557980afe021' was completed in 12.09 seconds with the score of 976.14 (18 unrouted), using 119773.84 CPU seconds and 539950 MB memory.
+2026-10-28 01:51:54.746 INFO   [552ADB\2571DD] Auto-router pass #62 on board '3821b832b63566f2781f01e62063f03f' was completed in 1.24 seconds with the score of 976.14 (18 unrouted), using 120745.98 CPU seconds and 541850 MB memory.
+2026-10-28 01:51:55.956 INFO   [552ADB\2571DD] Auto-router pass #63 on board '3821b832b63566f2781f01e62063f03f' was completed in 1.19 seconds with the score of 976.14 (18 unrouted), using 121233.53 CPU seconds and 542684 MB memory.
+2026-10-28 01:52:30.764 INFO   [552ADB\2571DD] Restoring an earlier board that has the score of 976.14 (18 unrouted).
+2026-10-28 01:52:30.765 INFO   [552ADB\2571DD] Auto-router pass #64 on board '3821b832b63566f2781f01e62063f03f' was completed in 34.79 seconds with the score of 974.45 (20 unrouted), using 138918.58 CPU seconds and 573311 MB memory.
+2026-10-28 01:52:41.376 INFO   [552ADB\2571DD] Auto-router pass #65 on board '3821b832b63566f2781f01e62063f03f' was completed in 10.59 seconds with the score of 973.48 (21 unrouted), using 144192.20 CPU seconds and 581427 MB memory.
+2026-10-28 01:52:43.485 INFO   [552ADB\2571DD] Auto-router pass #66 on board '8d895d8b035a497f4ca9ef5fbd2d8b2f' was completed in 2.06 seconds with the score of 973.48 (21 unrouted), using 145258.72 CPU seconds and 583161 MB memory.
+2026-10-28 01:52:43.703 WARN   PolylineTrace.get_trace_connection_shape p_index out of range
+2026-10-28 01:52:43.704 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.NullPointerException: null
+2026-10-28 01:52:45.219 WARN   PolylineTrace.get_trace_connection_shape p_index out of range
+2026-10-28 01:52:45.220 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.NullPointerException: null
+2026-10-28 01:52:45.277 INFO   [552ADB\2571DD] Auto-router pass #67 on board '4b04191765abe45b1e9a87a774108853' was completed in 1.74 seconds with the score of 974.50 (20 unrouted), using 146329.20 CPU seconds and 584794 MB memory.
+2026-10-28 01:53:19.801 INFO   [552ADB\2571DD] Restoring an earlier board that has the score of 976.14 (18 unrouted).
+2026-10-28 01:53:19.801 INFO   [552ADB\2571DD] Auto-router pass #68 on board 'f438ab75e952cadfa861feeab1d4a29b' was completed in 34.47 seconds with the score of 974.43 (20 unrouted), using 165698.89 CPU seconds and 616823 MB memory.
+2026-10-28 01:53:26.694 INFO   [552ADB\2571DD] Auto-router pass #69 on board '3821b832b63566f2781f01e62063f03f' was completed in 6.87 seconds with the score of 973.51 (21 unrouted), using 169717.41 CPU seconds and 622945 MB memory.
+2026-10-28 01:53:28.790 INFO   [552ADB\2571DD] Auto-router pass #70 on board 'd2be76e7b0d9dc08e5bc428a3026524a' was completed in 2.04 seconds with the score of 973.52 (21 unrouted), using 170874.41 CPU seconds and 624725 MB memory.
+2026-10-28 01:53:30.502 INFO   [552ADB\2571DD] Auto-router pass #71 on board '7ece56e88445a1b789581592647752da' was completed in 1.67 seconds with the score of 972.67 (22 unrouted), using 171454.36 CPU seconds and 625567 MB memory.
+2026-10-28 01:53:58.985 INFO   [552ADB\2571DD] Restoring an earlier board that has the score of 976.14 (18 unrouted).
+2026-10-28 01:53:58.986 INFO   [552ADB\2571DD] Auto-router pass #72 on board '75e3c43380c16ce008cf877315872a54' was completed in 28.43 seconds with the score of 972.67 (22 unrouted), using 188700.50 CPU seconds and 651569 MB memory.
+2026-10-28 01:54:07.289 INFO   [552ADB\2571DD] Auto-router pass #73 on board '3821b832b63566f2781f01e62063f03f' was completed in 8.29 seconds with the score of 976.94 (17 unrouted), using 193604.55 CPU seconds and 658441 MB memory.
+2026-10-28 01:54:08.429 INFO   [552ADB\2571DD] Auto-router pass #74 on board 'cae456516f81664467b7034dea85b5e7' was completed in 1.08 seconds with the score of 976.94 (17 unrouted), using 194221.94 CPU seconds and 659381 MB memory.
+2026-10-28 01:54:09.571 INFO   [552ADB\2571DD] Auto-router pass #75 on board 'cae456516f81664467b7034dea85b5e7' was completed in 1.12 seconds with the score of 976.94 (17 unrouted), using 194840.33 CPU seconds and 660236 MB memory.
+2026-10-28 01:54:38.035 INFO   [552ADB\2571DD] Restoring an earlier board that has the score of 976.94 (17 unrouted).
+2026-10-28 01:54:38.035 INFO   [552ADB\2571DD] Auto-router pass #76 on board 'cae456516f81664467b7034dea85b5e7' was completed in 28.45 seconds with the score of 976.09 (18 unrouted), using 213202.97 CPU seconds and 686998 MB memory.
+2026-10-28 01:54:47.135 INFO   [552ADB\2571DD] Auto-router pass #77 on board 'cae456516f81664467b7034dea85b5e7' was completed in 9.08 seconds with the score of 975.44 (19 unrouted), using 219070.86 CPU seconds and 694518 MB memory.
+2026-10-28 01:54:48.496 INFO   [552ADB\2571DD] Auto-router pass #78 on board 'b574146048a06bfa66ea64c36262259e' was completed in 1.30 seconds with the score of 975.44 (19 unrouted), using 219727.75 CPU seconds and 695363 MB memory.
+2026-10-28 01:54:49.733 INFO   [552ADB\2571DD] Auto-router pass #79 on board 'b574146048a06bfa66ea64c36262259e' was completed in 1.21 seconds with the score of 975.44 (19 unrouted), using 221044.47 CPU seconds and 697095 MB memory.
+2026-10-28 01:54:50.591 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:50.591 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:50.592 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:50.592 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:50.592 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:50.592 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:50.767 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:50.767 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:50.768 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:51.182 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:51.182 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:51.184 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:51.184 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:51.239 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:51.240 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:51.240 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:51.245 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:51.245 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:51.246 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:51.247 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:51.247 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:51.247 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:51.365 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:51.365 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:51.366 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:51.591 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:51.742 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:51.742 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:51.742 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:51.742 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:51.778 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:51.780 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:51.780 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:51.780 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:51.781 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:51.781 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:51.798 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:51.854 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.154 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.167 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.167 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.167 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.168 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.168 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.168 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.169 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.169 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.169 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.170 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.170 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.170 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.171 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.171 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.172 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.172 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.173 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.331 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.331 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.331 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.332 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.333 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.333 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.334 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.334 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.334 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.334 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.334 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.518 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.569 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.569 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.571 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.571 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.571 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.573 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.573 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.582 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.583 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.583 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.583 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.584 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.587 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.587 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.849 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.997 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:52.997 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:53.004 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:53.006 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:53.006 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:53.007 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:53.131 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:54:53.212 WARN   ItemAutorouteInfo.get_expansion_room: p_index out of range
+2026-10-28 01:55:13.346 INFO   [552ADB\2571DD] Restoring an earlier board that has the score of 976.94 (17 unrouted).
+2026-10-28 01:55:13.347 INFO   [552ADB\2571DD] Auto-router pass #80 on board 'b574146048a06bfa66ea64c36262259e' was completed in 23.59 seconds with the score of 971.99 (23 unrouted), using 236470.17 CPU seconds and 717417 MB memory.
+2026-10-28 01:55:24.501 INFO   [552ADB\2571DD] Auto-router pass #81 on board 'cae456516f81664467b7034dea85b5e7' was completed in 11.13 seconds with the score of 975.42 (19 unrouted), using 244032.03 CPU seconds and 727148 MB memory.
+2026-10-28 01:55:26.296 INFO   [552ADB\2571DD] Auto-router pass #82 on board 'f020cf7f6925d1e61b1b36d78ec603e9' was completed in 1.74 seconds with the score of 975.47 (19 unrouted), using 245419.62 CPU seconds and 729213 MB memory.
+2026-10-28 01:55:27.725 INFO   [552ADB\2571DD] Auto-router pass #83 on board 'fd3d3ceaf984928a458926962c1c038f' was completed in 1.37 seconds with the score of 975.47 (19 unrouted), using 246811.14 CPU seconds and 731073 MB memory.
+2026-10-28 01:55:54.186 INFO   [552ADB\2571DD] Restoring an earlier board that has the score of 976.94 (17 unrouted).
+2026-10-28 01:55:54.188 INFO   [552ADB\2571DD] Auto-router pass #84 on board 'fd3d3ceaf984928a458926962c1c038f' was completed in 26.45 seconds with the score of 970.92 (24 unrouted), using 265260.53 CPU seconds and 754668 MB memory.
+2026-10-28 01:56:02.763 INFO   [552ADB\2571DD] Auto-router pass #85 on board 'cae456516f81664467b7034dea85b5e7' was completed in 8.55 seconds with the score of 976.97 (17 unrouted), using 271801.56 CPU seconds and 762418 MB memory.
+2026-10-28 01:56:04.428 INFO   [552ADB\2571DD] Auto-router pass #86 on board '7d0d7cbffaaf5d34f35476a96e33f919' was completed in 1.63 seconds with the score of 976.97 (17 unrouted), using 272533.28 CPU seconds and 763315 MB memory.
+2026-10-28 01:56:05.957 INFO   [552ADB\2571DD] Auto-router pass #87 on board '1d1665c6172dcc579226db3bf39ee400' was completed in 1.48 seconds with the score of 976.97 (17 unrouted), using 273999.66 CPU seconds and 765082 MB memory.
+2026-10-28 01:56:27.009 INFO   [552ADB\2571DD] Restoring an earlier board that has the score of 976.97 (17 unrouted).
+2026-10-28 01:56:27.009 INFO   [552ADB\2571DD] Auto-router pass #88 on board '6a571fda0fddba233e8d93c3e501bb5e' was completed in 21.00 seconds with the score of 976.95 (17 unrouted), using 289633.53 CPU seconds and 785924 MB memory.
+2026-10-28 01:56:34.175 INFO   [552ADB\2571DD] Auto-router pass #89 on board '7d0d7cbffaaf5d34f35476a96e33f919' was completed in 7.15 seconds with the score of 973.52 (21 unrouted), using 294941.00 CPU seconds and 794696 MB memory.
+2026-10-28 01:56:35.173 INFO   [552ADB\2571DD] Auto-router pass #90 on board '25379c89c0f727e549b229b583fdb224' was completed in 0.95 seconds with the score of 973.52 (21 unrouted), using 295703.12 CPU seconds and 796051 MB memory.
+2026-10-28 01:56:36.137 INFO   [552ADB\2571DD] Auto-router pass #91 on board '25379c89c0f727e549b229b583fdb224' was completed in 0.95 seconds with the score of 973.52 (21 unrouted), using 296466.25 CPU seconds and 797263 MB memory.
+2026-10-28 01:56:57.989 INFO   [552ADB\2571DD] Restoring an earlier board that has the score of 976.97 (17 unrouted).
+2026-10-28 01:56:57.989 INFO   [552ADB\2571DD] Auto-router pass #92 on board '25379c89c0f727e549b229b583fdb224' was completed in 21.84 seconds with the score of 976.17 (18 unrouted), using 313502.44 CPU seconds and 824271 MB memory.
+2026-10-28 01:57:04.624 INFO   [552ADB\2571DD] Auto-router pass #93 on board '7d0d7cbffaaf5d34f35476a96e33f919' was completed in 6.62 seconds with the score of 972.53 (22 unrouted), using 318230.97 CPU seconds and 830893 MB memory.
+2026-10-28 01:57:05.681 INFO   [552ADB\2571DD] Auto-router pass #94 on board '25808a5070475c4d4daa491c6b419bdc' was completed in 1.02 seconds with the score of 975.17 (19 unrouted), using 319022.50 CPU seconds and 832158 MB memory.
+2026-10-28 01:57:06.617 INFO   [552ADB\2571DD] Auto-router pass #95 on board '04771a8e4da0180b2caa9d0623acdd67' was completed in 0.90 seconds with the score of 976.05 (18 unrouted), using 319815.00 CPU seconds and 833395 MB memory.
+2026-10-28 01:57:24.451 INFO   [552ADB\2571DD] Restoring an earlier board that has the score of 976.97 (17 unrouted).
+2026-10-28 01:57:24.451 INFO   [552ADB\2571DD] Auto-router pass #96 on board '1c085de9816236b5b91947c1ec6304f4' was completed in 17.80 seconds with the score of 970.75 (24 unrouted), using 334248.12 CPU seconds and 856123 MB memory.
+2026-10-28 01:57:32.988 INFO   [552ADB\2571DD] Auto-router pass #97 on board '7d0d7cbffaaf5d34f35476a96e33f919' was completed in 8.52 seconds with the score of 971.78 (23 unrouted), using 341583.97 CPU seconds and 866453 MB memory.
+2026-10-28 01:57:33.948 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.ArrayIndexOutOfBoundsException: null
+2026-10-28 01:57:34.242 INFO   [552ADB\2571DD] Auto-router pass #98 on board '31a6e1176d0bc87382ff6ca2f6fd27c2' was completed in 1.22 seconds with the score of 971.76 (23 unrouted), using 342404.00 CPU seconds and 867688 MB memory.
+2026-10-28 01:57:35.401 INFO   [552ADB\2571DD] Auto-router pass #99 on board 'a0e3ec3d0c80e2258c802dac0cc7f3b0' was completed in 1.12 seconds with the score of 971.74 (23 unrouted), using 343224.97 CPU seconds and 868923 MB memory.
+2026-10-28 01:57:48.953 INFO   [552ADB\2571DD] Restoring an earlier board that has the score of 976.97 (17 unrouted).
+2026-10-28 01:57:48.953 INFO   [552ADB\2571DD] Auto-router pass #100 on board '3575403531957eb1309793ff00d9a7be' was completed in 13.52 seconds with the score of 969.85 (25 unrouted), using 354822.12 CPU seconds and 886881 MB memory.
+2026-10-28 01:57:52.786 INFO   [552ADB\2571DD] Auto-router pass #101 on board '7d0d7cbffaaf5d34f35476a96e33f919' was completed in 3.82 seconds with the score of 972.74 (22 unrouted), using 358170.94 CPU seconds and 891473 MB memory.
+2026-10-28 01:57:53.014 WARN   Polyline: must contain at least 2 different points
+2026-10-28 01:57:53.014 WARN   Polyline.corner: arr.length is < 2
+2026-10-28 01:57:53.014 WARN   Polyline.corner: arr.length is < 2
+2026-10-28 01:57:53.015 ERROR  [552ADB\2571DD] Error during autoroute_item
+java.lang.NullPointerException: null
+2026-10-28 01:57:57.565 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:57:57.565 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:57:57.565 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:57:57.565 WARN   MazeShoveTraceAlgo.check_shove_trace_line: trace_corner_no to big
+2026-10-28 01:57:57.567 WARN   Polyline.corner_approx: p_no must be less than arr.length - 1
+2026-10-28 01:57:57.567 WARN   Polyline.corner_approx: p_no must be less than arr.length - 1
+2026-10-28 01:58:02.153 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.ArrayIndexOutOfBoundsException: null
+2026-10-28 01:58:02.591 INFO   [552ADB\2571DD] Auto-router pass #102 on board '5e7765a0bfceb758ff0c72b6a08e34d1' was completed in 9.77 seconds with the score of 969.93 (25 unrouted), using 365762.91 CPU seconds and 901288 MB memory.
+2026-10-28 01:58:03.985 INFO   [552ADB\2571DD] Auto-router pass #103 on board '378fc37cbb967381bbfab67a595867f6' was completed in 1.36 seconds with the score of 964.36 (31 unrouted), using 367460.69 CPU seconds and 903905 MB memory.
+2026-10-28 01:58:28.075 INFO   [552ADB\2571DD] Auto-router pass #104 on board '51d9820d0d6667abea348a3486b488a2' was completed in 24.05 seconds with the score of 977.78 (16 unrouted), using 388141.44 CPU seconds and 934853 MB memory.
+2026-10-28 01:58:28.458 WARN   Polyline.corner_approx: p_no must be less than arr.length - 1
+2026-10-28 01:58:28.459 WARN   Polyline.corner_approx: p_no must be less than arr.length - 1
+2026-10-28 01:58:28.467 WARN   PolylineTrace.get_trace_connection_shape p_index out of range
+2026-10-28 01:58:28.467 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.NullPointerException: null
+2026-10-28 01:43:50.092 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.NullPointerException: Cannot invoke "app.freerouting.geometry.planar.TileShape.nearest_point_approx(app.freerouting.geometry.planar.FloatPoint)" because "target_shape" is null
+	at app.freerouting.autoroute.MazeSearchAlgo.expand_to_target_doors(MazeSearchAlgo.java:534) ~[freerouting.jar:unspecified]
+	at app.freerouting.autoroute.MazeSearchAlgo.expand_to_room_doors(MazeSearchAlgo.java:398) ~[freerouting.jar:unspecified]
+	at app.freerouting.autoroute.MazeSearchAlgo.occupy_next_element(MazeSearchAlgo.java:286) ~[freerouting.jar:unspecified]
+	at app.freerouting.autoroute.MazeSearchAlgo.find_connection(MazeSearchAlgo.java:206) ~[freerouting.jar:unspecified]
+	at app.freerouting.autoroute.AutorouteEngine.autoroute_connection(AutorouteEngine.java:155) [freerouting.jar:unspecified]
+	at app.freerouting.autoroute.BatchAutorouter.autoroute_item(BatchAutorouter.java:610) [freerouting.jar:unspecified]
+	at app.freerouting.autoroute.BatchAutorouter.autoroute_pass(BatchAutorouter.java:332) [freerouting.jar:unspecified]
+	at app.freerouting.autoroute.BatchAutorouter.runBatchLoop(BatchAutorouter.java:447) [freerouting.jar:unspecified]
+	at app.freerouting.management.RoutingJobSchedulerActionThread.thread_action(RoutingJobSchedulerActionThread.java:131) [freerouting.jar:unspecified]
+	at app.freerouting.core.StoppableThread.run(StoppableThread.java:26) [freerouting.jar:unspecified]
+2026-10-28 01:43:51.536 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.NullPointerException: Cannot invoke "app.freerouting.geometry.planar.TileShape.nearest_point_approx(app.freerouting.geometry.planar.FloatPoint)" because "target_shape" is null
+	at app.freerouting.autoroute.MazeSearchAlgo.expand_to_target_doors(MazeSearchAlgo.java:534) ~[freerouting.jar:unspecified]
+	at app.freerouting.autoroute.MazeSearchAlgo.expand_to_room_doors(MazeSearchAlgo.java:398) ~[freerouting.jar:unspecified]
+	at app.freerouting.autoroute.MazeSearchAlgo.occupy_next_element(MazeSearchAlgo.java:286) ~[freerouting.jar:unspecified]
+	at app.freerouting.autoroute.MazeSearchAlgo.find_connection(MazeSearchAlgo.java:206) ~[freerouting.jar:unspecified]
+	at app.freerouting.autoroute.AutorouteEngine.autoroute_connection(AutorouteEngine.java:155) [freerouting.jar:unspecified]
+	at app.freerouting.autoroute.BatchAutorouter.autoroute_item(BatchAutorouter.java:610) [freerouting.jar:unspecified]
+	at app.freerouting.autoroute.BatchAutorouter.autoroute_pass(BatchAutorouter.java:332) [freerouting.jar:unspecified]
+	at app.freerouting.autoroute.BatchAutorouter.runBatchLoop(BatchAutorouter.java:447) [freerouting.jar:unspecified]
+	at app.freerouting.management.RoutingJobSchedulerActionThread.thread_action(RoutingJobSchedulerActionThread.java:131) [freerouting.jar:unspecified]
+	at app.freerouting.core.StoppableThread.run(StoppableThread.java:26) [freerouting.jar:unspecified]
+2026-10-28 01:45:03.723 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.NullPointerException: null
+2026-10-28 01:45:29.458 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.NullPointerException: null
+2026-10-28 01:45:32.063 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.NullPointerException: null
+2026-10-28 01:45:54.502 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.NullPointerException: null
+2026-10-28 01:46:00.279 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.ArrayIndexOutOfBoundsException: Index 10 out of bounds for length 10
+	at app.freerouting.autoroute.MazeShoveTraceAlgo.check_shove_trace_line(MazeShoveTraceAlgo.java:123) ~[freerouting.jar:unspecified]
+	at app.freerouting.autoroute.MazeSearchAlgo.shove_trace_room(MazeSearchAlgo.java:1214) ~[freerouting.jar:unspecified]
+	at app.freerouting.autoroute.MazeSearchAlgo.expand_to_room_doors(MazeSearchAlgo.java:443) ~[freerouting.jar:unspecified]
+	at app.freerouting.autoroute.MazeSearchAlgo.occupy_next_element(MazeSearchAlgo.java:286) ~[freerouting.jar:unspecified]
+	at app.freerouting.autoroute.MazeSearchAlgo.find_connection(MazeSearchAlgo.java:206) ~[freerouting.jar:unspecified]
+	at app.freerouting.autoroute.AutorouteEngine.autoroute_connection(AutorouteEngine.java:155) [freerouting.jar:unspecified]
+	at app.freerouting.autoroute.BatchAutorouter.autoroute_item(BatchAutorouter.java:610) [freerouting.jar:unspecified]
+	at app.freerouting.autoroute.BatchAutorouter.autoroute_pass(BatchAutorouter.java:332) [freerouting.jar:unspecified]
+	at app.freerouting.autoroute.BatchAutorouter.runBatchLoop(BatchAutorouter.java:447) [freerouting.jar:unspecified]
+	at app.freerouting.management.RoutingJobSchedulerActionThread.thread_action(RoutingJobSchedulerActionThread.java:131) [freerouting.jar:unspecified]
+	at app.freerouting.core.StoppableThread.run(StoppableThread.java:26) [freerouting.jar:unspecified]
+2026-10-28 01:46:02.124 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.ArrayIndexOutOfBoundsException: null
+2026-10-28 01:46:09.495 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.ArrayIndexOutOfBoundsException: null
+2026-10-28 01:46:40.053 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.ArrayIndexOutOfBoundsException: null
+2026-10-28 01:46:41.028 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.ArrayIndexOutOfBoundsException: null
+2026-10-28 01:46:43.479 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.ArrayIndexOutOfBoundsException: null
+2026-10-28 01:48:03.269 ERROR  [552ADB\2571DD] Error during autoroute_item
+java.lang.NullPointerException: Cannot invoke "Object.equals(Object)" because "from_corner" is null
+	at app.freerouting.board.RoutingBoard.insert_forced_trace_polyline(RoutingBoard.java:637) ~[freerouting.jar:unspecified]
+	at app.freerouting.autoroute.InsertFoundConnectionAlgo.insert_trace(InsertFoundConnectionAlgo.java:145) ~[freerouting.jar:unspecified]
+	at app.freerouting.autoroute.InsertFoundConnectionAlgo.get_instance(InsertFoundConnectionAlgo.java:55) ~[freerouting.jar:unspecified]
+	at app.freerouting.autoroute.AutorouteEngine.autoroute_connection(AutorouteEngine.java:239) ~[freerouting.jar:unspecified]
+	at app.freerouting.autoroute.BatchAutorouter.autoroute_item(BatchAutorouter.java:610) [freerouting.jar:unspecified]
+	at app.freerouting.autoroute.BatchAutorouter.autoroute_pass(BatchAutorouter.java:332) [freerouting.jar:unspecified]
+	at app.freerouting.autoroute.BatchAutorouter.runBatchLoop(BatchAutorouter.java:447) [freerouting.jar:unspecified]
+	at app.freerouting.management.RoutingJobSchedulerActionThread.thread_action(RoutingJobSchedulerActionThread.java:131) [freerouting.jar:unspecified]
+	at app.freerouting.core.StoppableThread.run(StoppableThread.java:26) [freerouting.jar:unspecified]
+2026-10-28 01:50:16.114 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.NullPointerException: null
+2026-10-28 01:50:16.376 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.NullPointerException: null
+2026-10-28 01:52:43.704 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.NullPointerException: null
+2026-10-28 01:52:45.220 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.NullPointerException: null
+2026-10-28 01:57:33.948 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.ArrayIndexOutOfBoundsException: null
+2026-10-28 01:57:53.015 ERROR  [552ADB\2571DD] Error during autoroute_item
+java.lang.NullPointerException: null
+2026-10-28 01:58:02.153 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.ArrayIndexOutOfBoundsException: null
+2026-10-28 01:58:28.467 ERROR  AutorouteEngine.autoroute_connection: Exception in maze_search_algo.find_connection
+java.lang.NullPointerException: null

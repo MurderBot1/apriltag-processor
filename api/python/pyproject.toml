@@ -1,0 +1,16 @@
+[project]
+name = "apriltag-camera"
+version = "0.1.0"
+description = "Client API for the AprilTag camera USB CDC protocol"
+requires-python = ">=3.9"
+dependencies = []
+
+[project.optional-dependencies]
+serial = ["pyserial"]
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["apriltag_camera"]

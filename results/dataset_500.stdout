@@ -1,0 +1,25 @@
+2026-10-28 11:42:57 0/400 raw frames present, 400 pending
+2026-10-28 11:44:58 batch 1/10 (dist_x000..yaw_x004) device=HIP rc=0 ok=True 120s
+2026-10-28 11:45:00 progress 40/400 frames; elapsed 123s; eta 1106s
+2026-10-28 11:46:55 batch 2/10 (yaw_x005..pitch_x009) device=HIP rc=0 ok=True 115s
+2026-10-28 11:46:57 progress 80/400 frames; elapsed 240s; eta 959s
+2026-10-28 11:48:47 batch 3/10 (pitch_x010..roll_x034) device=HIP rc=0 ok=True 110s
+2026-10-28 11:48:49 progress 120/400 frames; elapsed 352s; eta 821s
+2026-10-28 11:50:40 batch 4/10 (dark_x000..bright_x019) device=HIP rc=0 ok=True 111s
+2026-10-28 11:50:42 progress 160/400 frames; elapsed 464s; eta 697s
+2026-10-28 11:52:31 batch 5/10 (grad_x000..shadow_x019) device=HIP rc=0 ok=True 110s
+2026-10-28 11:52:33 progress 200/400 frames; elapsed 576s; eta 576s
+2026-10-28 11:54:26 batch 6/10 (shadow_x020..side_x014) device=HIP rc=0 ok=True 113s
+2026-10-28 11:54:29 progress 240/400 frames; elapsed 692s; eta 461s
+2026-10-28 11:56:22 batch 7/10 (floor_x000..occl_x024) device=HIP rc=0 ok=True 113s
+2026-10-28 11:56:24 progress 280/400 frames; elapsed 807s; eta 346s
+2026-10-28 11:58:20 batch 8/10 (occl_x025..clutter_x004) device=HIP rc=0 ok=True 115s
+2026-10-28 11:58:22 progress 320/400 frames; elapsed 925s; eta 231s
+2026-10-28 12:00:19 batch 9/10 (clutter_x005..rand_x019) device=HIP rc=0 ok=True 116s
+2026-10-28 12:00:21 progress 360/400 frames; elapsed 1044s; eta 116s
+2026-10-28 12:02:13 batch 10/10 (rand_x020..empty_x007) device=HIP rc=0 ok=True 112s
+2026-10-28 12:02:16 progress 400/400 frames; elapsed 1158s; eta 0s
+D:\apriltag-proccessor\tools\dataset_gt.py:106: RuntimeWarning: invalid value encountered in cast
+  q = np.round(np.array(corners)).astype(np.int32)
+2026-10-28 12:08:11 ground truth written: 500 images
+2026-10-28 12:08:11 done

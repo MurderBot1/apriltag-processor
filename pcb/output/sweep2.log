@@ -1,0 +1,20 @@
+VC=6 SEED=1: DONE 135.1s: 3413 segments, 357 vias, unrouted jobs 0 (of 106), remaining violations (signals) 247
+VC=6 SEED=2: DONE 135.2s: 3566 segments, 370 vias, unrouted jobs 0 (of 106), remaining violations (signals) 191
+VC=6 SEED=3: DONE 116.8s: 3627 segments, 355 vias, unrouted jobs 0 (of 106), remaining violations (signals) 143
+VC=6 SEED=4: DONE 135.1s: 3627 segments, 372 vias, unrouted jobs 0 (of 106), remaining violations (signals) 193
+VC=6 SEED=5: DONE 117.5s: 3508 segments, 357 vias, unrouted jobs 0 (of 106), remaining violations (signals) 151
+VC=6 SEED=6: DONE 108.7s: 3361 segments, 361 vias, unrouted jobs 0 (of 106), remaining violations (signals) 134
+VC=6 SEED=7: DONE 119.8s: 3508 segments, 354 vias, unrouted jobs 0 (of 106), remaining violations (signals) 165
+VC=6 SEED=8:   viol 10  net FPGA_DONE (plane=0) at 116.60,98.55
+     layer 1 static -1 claimed also by: FPGA_DONE 
+DONE 109.9s: 3517 segments, 360 vias, unrouted jobs 0 (of 106), remaining violations (signals) 72
+VC=9 SEED=1: DONE 80.7s: 3221 segments, 323 vias, unrouted jobs 0 (of 106), remaining violations (signals) 16
+VC=9 SEED=2: DONE 132.1s: 3310 segments, 341 vias, unrouted jobs 0 (of 106), remaining violations (signals) 182
+VC=9 SEED=3:   viol 27  net FPGA_DONE (plane=0) at 117.10,99.80
+DONE 135.5s: 3473 segments, 332 vias, unrouted jobs 0 (of 106), remaining violations (signals) 427
+VC=9 SEED=4: DONE 135.0s: 3319 segments, 331 vias, unrouted jobs 0 (of 106), remaining violations (signals) 214
+VC=9 SEED=5: DONE 123.3s: 3470 segments, 330 vias, unrouted jobs 0 (of 106), remaining violations (signals) 90
+VC=9 SEED=6: DONE 135.2s: 3504 segments, 332 vias, unrouted jobs 0 (of 106), remaining violations (signals) 195
+VC=9 SEED=7: DONE 135.1s: 3426 segments, 344 vias, unrouted jobs 0 (of 106), remaining violations (signals) 158
+VC=9 SEED=8: DONE 120.1s: 3395 segments, 340 vias, unrouted jobs 0 (of 106), remaining violations (signals) 143
+ALLDONE

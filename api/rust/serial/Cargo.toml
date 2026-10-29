@@ -1,0 +1,11 @@
+[package]
+name = "apriltag_camera_serial"
+version = "0.1.0"
+edition = "2021"
+description = "Serial port transport for apriltag_camera"
+
+[dependencies]
+apriltag_camera = { path = ".." }
+serialport = { version = "4", default-features = false }
+
+[workspace]

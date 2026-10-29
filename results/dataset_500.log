@@ -1,0 +1,986 @@
+2026-10-28 11:40:26 generated 400 extension cases -> D:\apriltag-proccessor\test_images\cases_500.json
+2026-10-28 11:41:47 generated 400 extension cases -> D:\apriltag-proccessor\test_images\cases_500.json
+2026-10-28 11:42:54 generated 400 extension cases -> D:\apriltag-proccessor\test_images\cases_500.json
+2026-10-28 11:42:57 0/400 raw frames present, 400 pending
+00:00.953  cycles           | WARNING CUEW initialization failed: Error opening the library
+D:\apriltag-proccessor\tools\blender_render.py:35: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new(name); m.use_nodes = True
+D:\apriltag-proccessor\tools\blender_render.py:78: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new(f"tag{t['id']}"); m.use_nodes = True
+D:\apriltag-proccessor\tools\blender_render.py:99: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  world = bpy.data.worlds.new('w'); world.use_nodes = True; sc.world = world
+00:04.281  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dist_x000.part.png'
+[INFO ] services.locationservice ...............: Not adding link to MakeHuman user data, since neither explicit path nor auto-discovery is set in preferences.
+[INFO ] mpfb.init ..............................: Build info 20261010
+[INFO ] mpfb.init ..............................: MPFB initialization has finished.
+addon_utils.disable: bl_ext.lab_blender_org.mcp not enabled
+rendered dist_x000
+D:\apriltag-proccessor\tools\blender_render.py:106: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new('bg_' + kind); m.use_nodes = True
+00:06.734  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dist_x001.part.png'
+rendered dist_x001
+00:09.828  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dist_x002.part.png'
+rendered dist_x002
+00:12.515  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dist_x003.part.png'
+rendered dist_x003
+00:15.375  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dist_x004.part.png'
+rendered dist_x004
+00:18.234  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dist_x005.part.png'
+rendered dist_x005
+00:21.187  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dist_x006.part.png'
+rendered dist_x006
+00:24.140  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dist_x007.part.png'
+rendered dist_x007
+00:27.125  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dist_x008.part.png'
+rendered dist_x008
+00:30.843  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dist_x009.part.png'
+rendered dist_x009
+00:34.734  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dist_x010.part.png'
+rendered dist_x010
+00:37.359  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dist_x011.part.png'
+rendered dist_x011
+00:39.953  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dist_x012.part.png'
+rendered dist_x012
+00:42.765  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dist_x013.part.png'
+rendered dist_x013
+00:46.609  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dist_x014.part.png'
+rendered dist_x014
+00:49.687  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dist_x015.part.png'
+rendered dist_x015
+00:52.578  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dist_x016.part.png'
+rendered dist_x016
+00:56.109  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dist_x017.part.png'
+rendered dist_x017
+00:59.218  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dist_x018.part.png'
+rendered dist_x018
+01:02.234  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dist_x019.part.png'
+rendered dist_x019
+01:05.031  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dist_x020.part.png'
+rendered dist_x020
+01:07.843  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dist_x021.part.png'
+rendered dist_x021
+01:10.797  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dist_x022.part.png'
+rendered dist_x022
+01:13.672  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dist_x023.part.png'
+rendered dist_x023
+01:16.593  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dist_x024.part.png'
+rendered dist_x024
+01:19.828  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dist_x025.part.png'
+rendered dist_x025
+01:22.718  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dist_x026.part.png'
+rendered dist_x026
+01:25.718  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dist_x027.part.png'
+rendered dist_x027
+01:28.625  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dist_x028.part.png'
+rendered dist_x028
+01:31.484  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dist_x029.part.png'
+rendered dist_x029
+01:33.531  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dist_x030.part.png'
+rendered dist_x030
+01:36.312  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dist_x031.part.png'
+rendered dist_x031
+01:39.234  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dist_x032.part.png'
+rendered dist_x032
+01:42.093  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dist_x033.part.png'
+rendered dist_x033
+01:44.922  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dist_x034.part.png'
+rendered dist_x034
+01:47.734  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\yaw_x000.part.png'
+rendered yaw_x000
+01:50.593  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\yaw_x001.part.png'
+rendered yaw_x001
+01:53.828  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\yaw_x002.part.png'
+rendered yaw_x002
+01:57.015  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\yaw_x003.part.png'
+rendered yaw_x003
+01:59.812  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\yaw_x004.part.png'
+rendered yaw_x004
+Blender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 01:37:34)
+
+Blender quit
+2026-10-28 11:44:58 batch 1/10 (dist_x000..yaw_x004) device=HIP rc=0 ok=True 120s
+2026-10-28 11:45:00 progress 40/400 frames; elapsed 123s; eta 1106s
+00:01.031  cycles           | WARNING CUEW initialization failed: Error opening the library
+D:\apriltag-proccessor\tools\blender_render.py:35: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new(name); m.use_nodes = True
+D:\apriltag-proccessor\tools\blender_render.py:78: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new(f"tag{t['id']}"); m.use_nodes = True
+D:\apriltag-proccessor\tools\blender_render.py:99: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  world = bpy.data.worlds.new('w'); world.use_nodes = True; sc.world = world
+00:04.516  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\yaw_x005.part.png'
+[INFO ] services.locationservice ...............: Not adding link to MakeHuman user data, since neither explicit path nor auto-discovery is set in preferences.
+[INFO ] mpfb.init ..............................: Build info 20261010
+[INFO ] mpfb.init ..............................: MPFB initialization has finished.
+addon_utils.disable: bl_ext.lab_blender_org.mcp not enabled
+rendered yaw_x005
+D:\apriltag-proccessor\tools\blender_render.py:106: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new('bg_' + kind); m.use_nodes = True
+00:08.016  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\yaw_x006.part.png'
+rendered yaw_x006
+00:10.969  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\yaw_x007.part.png'
+rendered yaw_x007
+00:13.875  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\yaw_x008.part.png'
+rendered yaw_x008
+00:16.719  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\yaw_x009.part.png'
+rendered yaw_x009
+00:19.656  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\yaw_x010.part.png'
+rendered yaw_x010
+00:22.547  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\yaw_x011.part.png'
+rendered yaw_x011
+00:25.844  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\yaw_x012.part.png'
+rendered yaw_x012
+00:28.781  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\yaw_x013.part.png'
+rendered yaw_x013
+00:31.734  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\yaw_x014.part.png'
+rendered yaw_x014
+00:34.578  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\yaw_x015.part.png'
+rendered yaw_x015
+00:37.391  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\yaw_x016.part.png'
+rendered yaw_x016
+00:40.188  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\yaw_x017.part.png'
+rendered yaw_x017
+00:43.000  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\yaw_x018.part.png'
+rendered yaw_x018
+00:44.969  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\yaw_x019.part.png'
+rendered yaw_x019
+00:47.969  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\yaw_x020.part.png'
+rendered yaw_x020
+00:50.828  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\yaw_x021.part.png'
+rendered yaw_x021
+00:53.672  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\yaw_x022.part.png'
+rendered yaw_x022
+00:56.594  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\yaw_x023.part.png'
+rendered yaw_x023
+00:59.453  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\yaw_x024.part.png'
+rendered yaw_x024
+01:02.313  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\yaw_x025.part.png'
+rendered yaw_x025
+01:05.016  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\yaw_x026.part.png'
+rendered yaw_x026
+01:07.813  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\yaw_x027.part.png'
+rendered yaw_x027
+01:10.641  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\yaw_x028.part.png'
+rendered yaw_x028
+01:13.672  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\yaw_x029.part.png'
+rendered yaw_x029
+01:16.484  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\yaw_x030.part.png'
+rendered yaw_x030
+01:19.250  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\yaw_x031.part.png'
+rendered yaw_x031
+01:22.000  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\yaw_x032.part.png'
+rendered yaw_x032
+01:24.891  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\yaw_x033.part.png'
+rendered yaw_x033
+01:27.656  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\yaw_x034.part.png'
+rendered yaw_x034
+01:30.344  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\pitch_x000.part.png'
+rendered pitch_x000
+01:32.734  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\pitch_x001.part.png'
+rendered pitch_x001
+01:35.406  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\pitch_x002.part.png'
+rendered pitch_x002
+01:38.188  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\pitch_x003.part.png'
+rendered pitch_x003
+01:40.188  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\pitch_x004.part.png'
+rendered pitch_x004
+01:43.234  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\pitch_x005.part.png'
+rendered pitch_x005
+01:46.156  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\pitch_x006.part.png'
+rendered pitch_x006
+01:48.906  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\pitch_x007.part.png'
+rendered pitch_x007
+01:51.813  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\pitch_x008.part.png'
+rendered pitch_x008
+01:54.609  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\pitch_x009.part.png'
+rendered pitch_x009
+Blender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 01:37:34)
+
+Blender quit
+2026-10-28 11:46:55 batch 2/10 (yaw_x005..pitch_x009) device=HIP rc=0 ok=True 115s
+2026-10-28 11:46:57 progress 80/400 frames; elapsed 240s; eta 959s
+00:00.968  cycles           | WARNING CUEW initialization failed: Error opening the library
+D:\apriltag-proccessor\tools\blender_render.py:35: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new(name); m.use_nodes = True
+D:\apriltag-proccessor\tools\blender_render.py:78: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new(f"tag{t['id']}"); m.use_nodes = True
+D:\apriltag-proccessor\tools\blender_render.py:99: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  world = bpy.data.worlds.new('w'); world.use_nodes = True; sc.world = world
+D:\apriltag-proccessor\tools\blender_render.py:106: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new('bg_' + kind); m.use_nodes = True
+00:05.031  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\pitch_x010.part.png'
+[INFO ] services.locationservice ...............: Not adding link to MakeHuman user data, since neither explicit path nor auto-discovery is set in preferences.
+[INFO ] mpfb.init ..............................: Build info 20261010
+[INFO ] mpfb.init ..............................: MPFB initialization has finished.
+addon_utils.disable: bl_ext.lab_blender_org.mcp not enabled
+rendered pitch_x010
+00:07.718  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\pitch_x011.part.png'
+rendered pitch_x011
+00:09.734  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\pitch_x012.part.png'
+rendered pitch_x012
+00:12.468  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\pitch_x013.part.png'
+rendered pitch_x013
+00:15.203  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\pitch_x014.part.png'
+rendered pitch_x014
+00:17.922  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\roll_x000.part.png'
+rendered roll_x000
+00:20.093  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\roll_x001.part.png'
+rendered roll_x001
+00:22.625  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\roll_x002.part.png'
+rendered roll_x002
+00:25.375  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\roll_x003.part.png'
+rendered roll_x003
+00:28.156  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\roll_x004.part.png'
+rendered roll_x004
+00:30.093  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\roll_x005.part.png'
+rendered roll_x005
+00:32.781  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\roll_x006.part.png'
+rendered roll_x006
+00:35.500  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\roll_x007.part.png'
+rendered roll_x007
+00:38.140  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\roll_x008.part.png'
+rendered roll_x008
+00:40.906  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\roll_x009.part.png'
+rendered roll_x009
+00:43.593  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\roll_x010.part.png'
+rendered roll_x010
+00:46.312  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\roll_x011.part.png'
+rendered roll_x011
+00:49.031  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\roll_x012.part.png'
+rendered roll_x012
+00:51.390  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\roll_x013.part.png'
+rendered roll_x013
+00:54.093  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\roll_x014.part.png'
+rendered roll_x014
+00:56.812  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\roll_x015.part.png'
+rendered roll_x015
+00:59.515  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\roll_x016.part.png'
+rendered roll_x016
+01:02.328  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\roll_x017.part.png'
+rendered roll_x017
+01:04.968  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\roll_x018.part.png'
+rendered roll_x018
+01:07.687  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\roll_x019.part.png'
+rendered roll_x019
+01:10.422  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\roll_x020.part.png'
+rendered roll_x020
+01:13.125  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\roll_x021.part.png'
+rendered roll_x021
+01:15.765  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\roll_x022.part.png'
+rendered roll_x022
+01:18.500  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\roll_x023.part.png'
+rendered roll_x023
+01:21.203  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\roll_x024.part.png'
+rendered roll_x024
+01:24.000  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\roll_x025.part.png'
+rendered roll_x025
+01:27.203  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\roll_x026.part.png'
+rendered roll_x026
+01:30.031  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\roll_x027.part.png'
+rendered roll_x027
+01:32.734  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\roll_x028.part.png'
+rendered roll_x028
+01:35.453  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\roll_x029.part.png'
+rendered roll_x029
+01:37.781  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\roll_x030.part.png'
+rendered roll_x030
+01:40.468  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\roll_x031.part.png'
+rendered roll_x031
+01:43.687  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\roll_x032.part.png'
+rendered roll_x032
+01:46.422  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\roll_x033.part.png'
+rendered roll_x033
+01:49.703  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\roll_x034.part.png'
+rendered roll_x034
+Blender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 01:37:34)
+
+Blender quit
+2026-10-28 11:48:47 batch 3/10 (pitch_x010..roll_x034) device=HIP rc=0 ok=True 110s
+2026-10-28 11:48:49 progress 120/400 frames; elapsed 352s; eta 821s
+00:00.969  cycles           | WARNING CUEW initialization failed: Error opening the library
+D:\apriltag-proccessor\tools\blender_render.py:35: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new(name); m.use_nodes = True
+D:\apriltag-proccessor\tools\blender_render.py:78: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new(f"tag{t['id']}"); m.use_nodes = True
+D:\apriltag-proccessor\tools\blender_render.py:99: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  world = bpy.data.worlds.new('w'); world.use_nodes = True; sc.world = world
+00:04.203  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dark_x000.part.png'
+[INFO ] services.locationservice ...............: Not adding link to MakeHuman user data, since neither explicit path nor auto-discovery is set in preferences.
+[INFO ] mpfb.init ..............................: Build info 20261010
+[INFO ] mpfb.init ..............................: MPFB initialization has finished.
+addon_utils.disable: bl_ext.lab_blender_org.mcp not enabled
+rendered dark_x000
+00:06.937  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dark_x001.part.png'
+rendered dark_x001
+00:09.641  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dark_x002.part.png'
+rendered dark_x002
+00:12.375  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dark_x003.part.png'
+rendered dark_x003
+00:15.094  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dark_x004.part.png'
+rendered dark_x004
+00:17.781  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dark_x005.part.png'
+rendered dark_x005
+00:20.531  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dark_x006.part.png'
+rendered dark_x006
+00:23.266  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dark_x007.part.png'
+rendered dark_x007
+00:25.984  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dark_x008.part.png'
+rendered dark_x008
+00:28.703  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dark_x009.part.png'
+rendered dark_x009
+00:31.375  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dark_x010.part.png'
+rendered dark_x010
+D:\apriltag-proccessor\tools\blender_render.py:106: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new('bg_' + kind); m.use_nodes = True
+00:34.078  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dark_x011.part.png'
+rendered dark_x011
+00:36.781  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dark_x012.part.png'
+rendered dark_x012
+00:39.547  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dark_x013.part.png'
+rendered dark_x013
+00:42.234  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dark_x014.part.png'
+rendered dark_x014
+00:44.625  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dark_x015.part.png'
+rendered dark_x015
+00:47.359  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dark_x016.part.png'
+rendered dark_x016
+00:50.297  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dark_x017.part.png'
+rendered dark_x017
+00:53.844  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dark_x018.part.png'
+rendered dark_x018
+00:57.484  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\dark_x019.part.png'
+rendered dark_x019
+01:00.141  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\bright_x000.part.png'
+rendered bright_x000
+01:02.844  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\bright_x001.part.png'
+rendered bright_x001
+01:05.562  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\bright_x002.part.png'
+rendered bright_x002
+01:08.281  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\bright_x003.part.png'
+rendered bright_x003
+01:10.219  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\bright_x004.part.png'
+rendered bright_x004
+01:13.125  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\bright_x005.part.png'
+rendered bright_x005
+01:15.906  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\bright_x006.part.png'
+rendered bright_x006
+01:18.656  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\bright_x007.part.png'
+rendered bright_x007
+01:20.641  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\bright_x008.part.png'
+rendered bright_x008
+01:23.359  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\bright_x009.part.png'
+rendered bright_x009
+01:26.000  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\bright_x010.part.png'
+rendered bright_x010
+01:28.687  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\bright_x011.part.png'
+rendered bright_x011
+01:31.641  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\bright_x012.part.png'
+rendered bright_x012
+01:34.297  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\bright_x013.part.png'
+rendered bright_x013
+01:37.016  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\bright_x014.part.png'
+rendered bright_x014
+01:39.750  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\bright_x015.part.png'
+rendered bright_x015
+01:42.453  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\bright_x016.part.png'
+rendered bright_x016
+01:45.250  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\bright_x017.part.png'
+rendered bright_x017
+01:47.953  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\bright_x018.part.png'
+rendered bright_x018
+01:50.672  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\bright_x019.part.png'
+rendered bright_x019
+Blender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 01:37:34)
+
+Blender quit
+2026-10-28 11:50:40 batch 4/10 (dark_x000..bright_x019) device=HIP rc=0 ok=True 111s
+2026-10-28 11:50:42 progress 160/400 frames; elapsed 464s; eta 697s
+00:01.000  cycles           | WARNING CUEW initialization failed: Error opening the library
+D:\apriltag-proccessor\tools\blender_render.py:35: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new(name); m.use_nodes = True
+D:\apriltag-proccessor\tools\blender_render.py:78: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new(f"tag{t['id']}"); m.use_nodes = True
+D:\apriltag-proccessor\tools\blender_render.py:99: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  world = bpy.data.worlds.new('w'); world.use_nodes = True; sc.world = world
+D:\apriltag-proccessor\tools\blender_render.py:106: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new('bg_' + kind); m.use_nodes = True
+00:03.672  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\grad_x000.part.png'
+[INFO ] services.locationservice ...............: Not adding link to MakeHuman user data, since neither explicit path nor auto-discovery is set in preferences.
+[INFO ] mpfb.init ..............................: Build info 20261010
+[INFO ] mpfb.init ..............................: MPFB initialization has finished.
+addon_utils.disable: bl_ext.lab_blender_org.mcp not enabled
+rendered grad_x000
+00:06.359  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\grad_x001.part.png'
+rendered grad_x001
+00:08.672  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\grad_x002.part.png'
+rendered grad_x002
+00:11.375  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\grad_x003.part.png'
+rendered grad_x003
+00:13.922  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\grad_x004.part.png'
+rendered grad_x004
+00:16.750  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\grad_x005.part.png'
+rendered grad_x005
+00:19.312  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\grad_x006.part.png'
+rendered grad_x006
+00:21.984  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\grad_x007.part.png'
+rendered grad_x007
+00:24.687  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\grad_x008.part.png'
+rendered grad_x008
+00:27.344  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\grad_x009.part.png'
+rendered grad_x009
+00:30.047  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\grad_x010.part.png'
+rendered grad_x010
+00:32.750  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\grad_x011.part.png'
+rendered grad_x011
+00:34.750  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\grad_x012.part.png'
+rendered grad_x012
+00:37.266  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\grad_x013.part.png'
+rendered grad_x013
+00:39.922  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\grad_x014.part.png'
+rendered grad_x014
+00:42.687  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\grad_x015.part.png'
+rendered grad_x015
+00:45.359  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\grad_x016.part.png'
+rendered grad_x016
+00:47.984  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\grad_x017.part.png'
+rendered grad_x017
+00:51.109  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\grad_x018.part.png'
+rendered grad_x018
+00:53.891  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\grad_x019.part.png'
+rendered grad_x019
+00:56.844  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\shadow_x000.part.png'
+rendered shadow_x000
+00:59.672  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\shadow_x001.part.png'
+rendered shadow_x001
+01:02.375  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\shadow_x002.part.png'
+rendered shadow_x002
+01:05.078  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\shadow_x003.part.png'
+rendered shadow_x003
+01:07.812  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\shadow_x004.part.png'
+rendered shadow_x004
+01:10.531  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\shadow_x005.part.png'
+rendered shadow_x005
+01:13.312  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\shadow_x006.part.png'
+rendered shadow_x006
+01:16.781  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\shadow_x007.part.png'
+rendered shadow_x007
+01:19.500  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\shadow_x008.part.png'
+rendered shadow_x008
+01:22.187  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\shadow_x009.part.png'
+rendered shadow_x009
+01:24.906  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\shadow_x010.part.png'
+rendered shadow_x010
+01:27.641  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\shadow_x011.part.png'
+rendered shadow_x011
+01:30.578  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\shadow_x012.part.png'
+rendered shadow_x012
+01:33.187  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\shadow_x013.part.png'
+rendered shadow_x013
+01:35.859  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\shadow_x014.part.png'
+rendered shadow_x014
+01:38.578  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\shadow_x015.part.png'
+rendered shadow_x015
+01:41.250  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\shadow_x016.part.png'
+rendered shadow_x016
+01:43.891  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\shadow_x017.part.png'
+rendered shadow_x017
+01:46.641  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\shadow_x018.part.png'
+rendered shadow_x018
+01:49.312  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\shadow_x019.part.png'
+rendered shadow_x019
+Blender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 01:37:34)
+
+Blender quit
+2026-10-28 11:52:31 batch 5/10 (grad_x000..shadow_x019) device=HIP rc=0 ok=True 110s
+2026-10-28 11:52:33 progress 200/400 frames; elapsed 576s; eta 576s
+00:00.953  cycles           | WARNING CUEW initialization failed: Error opening the library
+D:\apriltag-proccessor\tools\blender_render.py:35: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new(name); m.use_nodes = True
+D:\apriltag-proccessor\tools\blender_render.py:78: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new(f"tag{t['id']}"); m.use_nodes = True
+D:\apriltag-proccessor\tools\blender_render.py:99: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  world = bpy.data.worlds.new('w'); world.use_nodes = True; sc.world = world
+D:\apriltag-proccessor\tools\blender_render.py:106: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new('bg_' + kind); m.use_nodes = True
+00:04.453  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\shadow_x020.part.png'
+[INFO ] services.locationservice ...............: Not adding link to MakeHuman user data, since neither explicit path nor auto-discovery is set in preferences.
+[INFO ] mpfb.init ..............................: Build info 20261010
+[INFO ] mpfb.init ..............................: MPFB initialization has finished.
+addon_utils.disable: bl_ext.lab_blender_org.mcp not enabled
+rendered shadow_x020
+00:07.157  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\shadow_x021.part.png'
+rendered shadow_x021
+00:09.875  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\shadow_x022.part.png'
+rendered shadow_x022
+00:12.516  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\shadow_x023.part.png'
+rendered shadow_x023
+00:15.282  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\shadow_x024.part.png'
+rendered shadow_x024
+00:18.000  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\glare_x000.part.png'
+rendered glare_x000
+00:20.782  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\glare_x001.part.png'
+rendered glare_x001
+00:22.985  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\glare_x002.part.png'
+rendered glare_x002
+00:25.735  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\glare_x003.part.png'
+rendered glare_x003
+00:28.438  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\glare_x004.part.png'
+rendered glare_x004
+00:30.907  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\glare_x005.part.png'
+rendered glare_x005
+00:33.766  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\glare_x006.part.png'
+rendered glare_x006
+00:36.516  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\glare_x007.part.png'
+rendered glare_x007
+00:39.407  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\glare_x008.part.png'
+rendered glare_x008
+00:42.266  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\glare_x009.part.png'
+rendered glare_x009
+00:45.141  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\glare_x010.part.png'
+rendered glare_x010
+00:48.063  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\glare_x011.part.png'
+rendered glare_x011
+00:50.141  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\glare_x012.part.png'
+rendered glare_x012
+00:52.844  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\glare_x013.part.png'
+rendered glare_x013
+00:55.735  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\glare_x014.part.png'
+rendered glare_x014
+00:59.266  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\glare_x015.part.png'
+rendered glare_x015
+01:02.141  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\glare_x016.part.png'
+rendered glare_x016
+01:04.985  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\glare_x017.part.png'
+rendered glare_x017
+01:07.813  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\glare_x018.part.png'
+rendered glare_x018
+01:10.766  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\glare_x019.part.png'
+rendered glare_x019
+01:13.250  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\side_x000.part.png'
+rendered side_x000
+01:16.157  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\side_x001.part.png'
+rendered side_x001
+01:18.907  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\side_x002.part.png'
+rendered side_x002
+01:21.641  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\side_x003.part.png'
+rendered side_x003
+01:24.453  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\side_x004.part.png'
+rendered side_x004
+01:27.313  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\side_x005.part.png'
+rendered side_x005
+01:30.016  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\side_x006.part.png'
+rendered side_x006
+01:32.844  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\side_x007.part.png'
+rendered side_x007
+01:35.657  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\side_x008.part.png'
+rendered side_x008
+01:38.453  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\side_x009.part.png'
+rendered side_x009
+01:41.282  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\side_x010.part.png'
+rendered side_x010
+01:43.703  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\side_x011.part.png'
+rendered side_x011
+01:46.688  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\side_x012.part.png'
+rendered side_x012
+01:49.547  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\side_x013.part.png'
+rendered side_x013
+01:52.344  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\side_x014.part.png'
+rendered side_x014
+Blender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 01:37:34)
+
+Blender quit
+2026-10-28 11:54:26 batch 6/10 (shadow_x020..side_x014) device=HIP rc=0 ok=True 113s
+2026-10-28 11:54:29 progress 240/400 frames; elapsed 692s; eta 461s
+00:00.938  cycles           | WARNING CUEW initialization failed: Error opening the library
+D:\apriltag-proccessor\tools\blender_render.py:35: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new(name); m.use_nodes = True
+D:\apriltag-proccessor\tools\blender_render.py:78: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new(f"tag{t['id']}"); m.use_nodes = True
+D:\apriltag-proccessor\tools\blender_render.py:99: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  world = bpy.data.worlds.new('w'); world.use_nodes = True; sc.world = world
+00:04.110  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\floor_x000.part.png'
+[INFO ] services.locationservice ...............: Not adding link to MakeHuman user data, since neither explicit path nor auto-discovery is set in preferences.
+[INFO ] mpfb.init ..............................: Build info 20261010
+[INFO ] mpfb.init ..............................: MPFB initialization has finished.
+addon_utils.disable: bl_ext.lab_blender_org.mcp not enabled
+rendered floor_x000
+00:06.782  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\floor_x001.part.png'
+rendered floor_x001
+00:09.594  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\floor_x002.part.png'
+rendered floor_x002
+00:12.329  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\floor_x003.part.png'
+rendered floor_x003
+00:15.219  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\floor_x004.part.png'
+rendered floor_x004
+D:\apriltag-proccessor\tools\blender_render.py:106: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new('bg_' + kind); m.use_nodes = True
+00:17.672  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\floor_x005.part.png'
+rendered floor_x005
+00:20.407  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\floor_x006.part.png'
+rendered floor_x006
+00:23.188  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\floor_x007.part.png'
+rendered floor_x007
+00:25.313  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\floor_x008.part.png'
+rendered floor_x008
+00:28.047  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\floor_x009.part.png'
+rendered floor_x009
+00:30.375  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\floor_x010.part.png'
+rendered floor_x010
+00:33.235  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\floor_x011.part.png'
+rendered floor_x011
+00:36.079  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\floor_x012.part.png'
+rendered floor_x012
+00:38.719  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\floor_x013.part.png'
+rendered floor_x013
+00:41.375  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\floor_x014.part.png'
+rendered floor_x014
+00:44.157  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\occl_x000.part.png'
+rendered occl_x000
+00:47.094  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\occl_x001.part.png'
+rendered occl_x001
+00:49.797  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\occl_x002.part.png'
+rendered occl_x002
+00:52.704  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\occl_x003.part.png'
+rendered occl_x003
+00:55.641  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\occl_x004.part.png'
+rendered occl_x004
+00:58.391  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\occl_x005.part.png'
+rendered occl_x005
+01:01.344  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\occl_x006.part.png'
+rendered occl_x006
+01:04.360  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\occl_x007.part.png'
+rendered occl_x007
+01:07.219  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\occl_x008.part.png'
+rendered occl_x008
+01:10.032  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\occl_x009.part.png'
+rendered occl_x009
+01:12.922  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\occl_x010.part.png'
+rendered occl_x010
+01:16.016  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\occl_x011.part.png'
+rendered occl_x011
+01:19.047  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\occl_x012.part.png'
+rendered occl_x012
+01:21.157  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\occl_x013.part.png'
+rendered occl_x013
+01:23.985  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\occl_x014.part.png'
+rendered occl_x014
+01:26.860  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\occl_x015.part.png'
+rendered occl_x015
+01:30.875  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\occl_x016.part.png'
+rendered occl_x016
+01:33.688  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\occl_x017.part.png'
+rendered occl_x017
+01:36.391  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\occl_x018.part.png'
+rendered occl_x018
+01:39.188  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\occl_x019.part.png'
+rendered occl_x019
+01:41.297  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\occl_x020.part.png'
+rendered occl_x020
+01:44.094  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\occl_x021.part.png'
+rendered occl_x021
+01:46.875  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\occl_x022.part.png'
+rendered occl_x022
+01:49.672  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\occl_x023.part.png'
+rendered occl_x023
+01:52.594  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\occl_x024.part.png'
+rendered occl_x024
+Blender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 01:37:34)
+
+Blender quit
+2026-10-28 11:56:22 batch 7/10 (floor_x000..occl_x024) device=HIP rc=0 ok=True 113s
+2026-10-28 11:56:24 progress 280/400 frames; elapsed 807s; eta 346s
+00:01.000  cycles           | WARNING CUEW initialization failed: Error opening the library
+D:\apriltag-proccessor\tools\blender_render.py:35: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new(name); m.use_nodes = True
+D:\apriltag-proccessor\tools\blender_render.py:78: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new(f"tag{t['id']}"); m.use_nodes = True
+D:\apriltag-proccessor\tools\blender_render.py:99: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  world = bpy.data.worlds.new('w'); world.use_nodes = True; sc.world = world
+D:\apriltag-proccessor\tools\blender_render.py:106: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new('bg_' + kind); m.use_nodes = True
+00:03.562  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\occl_x025.part.png'
+[INFO ] services.locationservice ...............: Not adding link to MakeHuman user data, since neither explicit path nor auto-discovery is set in preferences.
+[INFO ] mpfb.init ..............................: Build info 20261010
+[INFO ] mpfb.init ..............................: MPFB initialization has finished.
+addon_utils.disable: bl_ext.lab_blender_org.mcp not enabled
+rendered occl_x025
+00:06.234  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\occl_x026.part.png'
+rendered occl_x026
+00:09.500  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\occl_x027.part.png'
+rendered occl_x027
+00:12.266  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\occl_x028.part.png'
+rendered occl_x028
+00:15.406  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\occl_x029.part.png'
+rendered occl_x029
+00:17.672  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\occl_x030.part.png'
+rendered occl_x030
+00:20.891  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\occl_x031.part.png'
+rendered occl_x031
+00:23.766  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\occl_x032.part.png'
+rendered occl_x032
+00:26.625  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\occl_x033.part.png'
+rendered occl_x033
+00:29.406  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\occl_x034.part.png'
+rendered occl_x034
+00:32.250  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\edge_x000.part.png'
+rendered edge_x000
+00:35.375  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\edge_x001.part.png'
+rendered edge_x001
+00:38.187  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\edge_x002.part.png'
+rendered edge_x002
+00:40.906  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\edge_x003.part.png'
+rendered edge_x003
+00:43.578  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\edge_x004.part.png'
+rendered edge_x004
+00:46.344  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\edge_x005.part.png'
+rendered edge_x005
+00:49.187  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\edge_x006.part.png'
+rendered edge_x006
+00:52.016  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\edge_x007.part.png'
+rendered edge_x007
+00:54.062  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\edge_x008.part.png'
+rendered edge_x008
+00:56.797  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\edge_x009.part.png'
+rendered edge_x009
+00:59.859  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\edge_x010.part.png'
+rendered edge_x010
+01:02.609  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\edge_x011.part.png'
+rendered edge_x011
+01:05.469  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\edge_x012.part.png'
+rendered edge_x012
+01:08.266  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\edge_x013.part.png'
+rendered edge_x013
+01:11.047  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\edge_x014.part.png'
+rendered edge_x014
+01:14.109  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\edge_x015.part.png'
+rendered edge_x015
+01:16.922  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\edge_x016.part.png'
+rendered edge_x016
+01:19.812  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\edge_x017.part.png'
+rendered edge_x017
+01:22.641  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\edge_x018.part.png'
+rendered edge_x018
+01:25.516  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\edge_x019.part.png'
+rendered edge_x019
+01:28.562  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\edge_x020.part.png'
+rendered edge_x020
+01:31.344  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\edge_x021.part.png'
+rendered edge_x021
+01:34.203  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\edge_x022.part.png'
+rendered edge_x022
+01:36.891  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\edge_x023.part.png'
+rendered edge_x023
+01:39.609  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\edge_x024.part.png'
+rendered edge_x024
+01:42.766  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\clutter_x000.part.png'
+rendered clutter_x000
+01:45.562  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\clutter_x001.part.png'
+rendered clutter_x001
+01:49.437  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\clutter_x002.part.png'
+rendered clutter_x002
+01:52.219  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\clutter_x003.part.png'
+rendered clutter_x003
+01:55.047  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\clutter_x004.part.png'
+rendered clutter_x004
+Blender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 01:37:34)
+
+Blender quit
+2026-10-28 11:58:20 batch 8/10 (occl_x025..clutter_x004) device=HIP rc=0 ok=True 115s
+2026-10-28 11:58:22 progress 320/400 frames; elapsed 925s; eta 231s
+00:00.937  cycles           | WARNING CUEW initialization failed: Error opening the library
+D:\apriltag-proccessor\tools\blender_render.py:35: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new(name); m.use_nodes = True
+D:\apriltag-proccessor\tools\blender_render.py:78: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new(f"tag{t['id']}"); m.use_nodes = True
+D:\apriltag-proccessor\tools\blender_render.py:99: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  world = bpy.data.worlds.new('w'); world.use_nodes = True; sc.world = world
+D:\apriltag-proccessor\tools\blender_render.py:106: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new('bg_' + kind); m.use_nodes = True
+00:05.390  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\clutter_x005.part.png'
+[INFO ] services.locationservice ...............: Not adding link to MakeHuman user data, since neither explicit path nor auto-discovery is set in preferences.
+[INFO ] mpfb.init ..............................: Build info 20261010
+[INFO ] mpfb.init ..............................: MPFB initialization has finished.
+addon_utils.disable: bl_ext.lab_blender_org.mcp not enabled
+rendered clutter_x005
+00:08.015  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\clutter_x006.part.png'
+rendered clutter_x006
+00:11.172  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\clutter_x007.part.png'
+rendered clutter_x007
+00:14.093  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\clutter_x008.part.png'
+rendered clutter_x008
+00:16.890  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\clutter_x009.part.png'
+rendered clutter_x009
+00:20.312  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\clutter_x010.part.png'
+rendered clutter_x010
+00:23.797  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\clutter_x011.part.png'
+rendered clutter_x011
+00:26.093  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\clutter_x012.part.png'
+rendered clutter_x012
+00:29.687  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\clutter_x013.part.png'
+rendered clutter_x013
+00:32.265  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\clutter_x014.part.png'
+rendered clutter_x014
+00:34.375  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\clutter_x015.part.png'
+rendered clutter_x015
+00:37.578  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\clutter_x016.part.png'
+rendered clutter_x016
+00:41.172  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\clutter_x017.part.png'
+rendered clutter_x017
+00:44.250  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\clutter_x018.part.png'
+rendered clutter_x018
+00:47.093  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\clutter_x019.part.png'
+rendered clutter_x019
+00:49.718  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\clutter_x020.part.png'
+rendered clutter_x020
+00:53.078  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\clutter_x021.part.png'
+rendered clutter_x021
+00:56.047  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\clutter_x022.part.png'
+rendered clutter_x022
+01:00.156  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\clutter_x023.part.png'
+rendered clutter_x023
+01:03.062  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\clutter_x024.part.png'
+rendered clutter_x024
+01:05.750  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x000.part.png'
+rendered rand_x000
+01:08.406  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x001.part.png'
+rendered rand_x001
+01:11.109  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x002.part.png'
+rendered rand_x002
+01:13.843  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x003.part.png'
+rendered rand_x003
+01:16.640  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x004.part.png'
+rendered rand_x004
+01:20.031  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x005.part.png'
+rendered rand_x005
+01:22.047  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x006.part.png'
+rendered rand_x006
+01:24.375  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x007.part.png'
+rendered rand_x007
+01:26.359  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x008.part.png'
+rendered rand_x008
+01:29.187  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x009.part.png'
+rendered rand_x009
+01:31.984  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x010.part.png'
+rendered rand_x010
+01:34.172  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x011.part.png'
+rendered rand_x011
+01:36.937  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x012.part.png'
+rendered rand_x012
+01:39.328  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x013.part.png'
+rendered rand_x013
+01:42.156  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x014.part.png'
+rendered rand_x014
+01:44.797  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x015.part.png'
+rendered rand_x015
+01:47.359  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x016.part.png'
+rendered rand_x016
+01:50.265  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x017.part.png'
+rendered rand_x017
+01:53.250  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x018.part.png'
+rendered rand_x018
+01:56.203  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x019.part.png'
+rendered rand_x019
+Blender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 01:37:34)
+
+Blender quit
+2026-10-28 12:00:19 batch 9/10 (clutter_x005..rand_x019) device=HIP rc=0 ok=True 116s
+2026-10-28 12:00:21 progress 360/400 frames; elapsed 1044s; eta 116s
+00:00.938  cycles           | WARNING CUEW initialization failed: Error opening the library
+D:\apriltag-proccessor\tools\blender_render.py:35: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new(name); m.use_nodes = True
+D:\apriltag-proccessor\tools\blender_render.py:78: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new(f"tag{t['id']}"); m.use_nodes = True
+D:\apriltag-proccessor\tools\blender_render.py:99: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  world = bpy.data.worlds.new('w'); world.use_nodes = True; sc.world = world
+00:04.235  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x020.part.png'
+[INFO ] services.locationservice ...............: Not adding link to MakeHuman user data, since neither explicit path nor auto-discovery is set in preferences.
+[INFO ] mpfb.init ..............................: Build info 20261010
+[INFO ] mpfb.init ..............................: MPFB initialization has finished.
+addon_utils.disable: bl_ext.lab_blender_org.mcp not enabled
+rendered rand_x020
+00:07.063  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x021.part.png'
+rendered rand_x021
+00:09.797  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x022.part.png'
+rendered rand_x022
+00:12.688  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x023.part.png'
+rendered rand_x023
+00:15.485  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x024.part.png'
+rendered rand_x024
+00:18.313  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x025.part.png'
+rendered rand_x025
+D:\apriltag-proccessor\tools\blender_render.py:106: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new('bg_' + kind); m.use_nodes = True
+00:21.375  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x026.part.png'
+rendered rand_x026
+00:24.094  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x027.part.png'
+rendered rand_x027
+00:26.907  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x028.part.png'
+rendered rand_x028
+00:29.735  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x029.part.png'
+rendered rand_x029
+00:32.688  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x030.part.png'
+rendered rand_x030
+00:35.500  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x031.part.png'
+rendered rand_x031
+00:38.266  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x032.part.png'
+rendered rand_x032
+00:41.000  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x033.part.png'
+rendered rand_x033
+00:43.969  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x034.part.png'
+rendered rand_x034
+00:46.703  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x035.part.png'
+rendered rand_x035
+00:49.516  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x036.part.png'
+rendered rand_x036
+00:52.203  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x037.part.png'
+rendered rand_x037
+00:54.828  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x038.part.png'
+rendered rand_x038
+00:57.657  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x039.part.png'
+rendered rand_x039
+01:00.578  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x040.part.png'
+rendered rand_x040
+01:02.625  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x041.part.png'
+rendered rand_x041
+01:05.469  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x042.part.png'
+rendered rand_x042
+01:07.938  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x043.part.png'
+rendered rand_x043
+01:10.828  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x044.part.png'
+rendered rand_x044
+01:13.500  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x045.part.png'
+rendered rand_x045
+01:16.297  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x046.part.png'
+rendered rand_x046
+01:19.000  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x047.part.png'
+rendered rand_x047
+01:21.766  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x048.part.png'
+rendered rand_x048
+01:25.110  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x049.part.png'
+rendered rand_x049
+01:27.985  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x050.part.png'
+rendered rand_x050
+01:30.328  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\rand_x051.part.png'
+rendered rand_x051
+01:33.157  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\empty_x000.part.png'
+rendered empty_x000
+01:36.047  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\empty_x001.part.png'
+rendered empty_x001
+01:38.813  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\empty_x002.part.png'
+rendered empty_x002
+01:41.094  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\empty_x003.part.png'
+rendered empty_x003
+01:44.110  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\empty_x004.part.png'
+rendered empty_x004
+01:46.391  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\empty_x005.part.png'
+rendered empty_x005
+01:48.907  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\empty_x006.part.png'
+rendered empty_x006
+01:51.828  render           | Saved: 'D:\apriltag-proccessor\test_images\raw\empty_x007.part.png'
+rendered empty_x007
+Blender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 01:37:34)
+
+Blender quit
+2026-10-28 12:02:13 batch 10/10 (rand_x020..empty_x007) device=HIP rc=0 ok=True 112s
+2026-10-28 12:02:16 progress 400/400 frames; elapsed 1158s; eta 0s
+2026-10-28 12:08:11 ground truth written: 500 images
+2026-10-28 12:08:11 done

@@ -1,0 +1,68 @@
+/* gallery frame viewer, interactive charts, RTL cross-links (assets/gallery.js, charts.js, rtlview.js) */
+/* ---- gallery */
+.gitem{position:relative;transition:transform .12s,border-color .12s}.gitem:hover,.gitem:focus-visible{transform:translateY(-2px);border-color:var(--accent);outline:none}
+.gitem .muted{font-size:.9em}
+#g-show{max-width:240px}
+.gv-box{max-width:1500px}
+.gv-bar{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center;margin:0 0 8px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--navbg)}
+.gv-grp{display:flex;flex-wrap:wrap;gap:4px 6px;align-items:center}
+.gv-lab{font-size:.85em;display:inline-flex;gap:4px;align-items:center}
+.gv-lab select,.gv-bar select{font-size:.85em;padding:1px 4px;max-width:220px}
+.gv-zv{min-width:3.4em;text-align:center;font-size:.85em;font-variant-numeric:tabular-nums}
+.gv-bar button{padding:1px 8px}
+.gv-main{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(280px,1fr);gap:14px}
+.gv-stage{position:relative;background:#0b0d10;border-radius:8px;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;outline:none;display:flex;height:480px}
+.gv-stage:focus-visible{box-shadow:0 0 0 2px var(--accent)}
+.gv-pane{position:relative;flex:1 1 0;min-width:0;overflow:hidden;cursor:grab}
+.gv-m-side .gv-pane+.gv-pane{border-left:2px solid #000}
+.gv-pane.grab{cursor:grabbing}
+.gv-world{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
+.gv-world img{position:absolute;left:0;top:0;max-width:none;display:block;background:#000;-webkit-user-drag:none}
+.gv-ov{position:absolute;left:0;top:0;pointer-events:none}
+.gv-tag{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.6);color:#fff;font-size:.74em;padding:1px 8px;border-radius:10px;pointer-events:none;z-index:2}
+.gv-tagr{left:auto;right:8px}.gv-m-side .gv-pane .gv-tag{left:8px}
+.gv-wipe{position:absolute;top:0;bottom:0;width:22px;margin-left:-11px;cursor:ew-resize;z-index:3;touch-action:none}
+.gv-wipe span{position:absolute;left:10px;top:0;bottom:0;width:2px;background:#ffd25a;box-shadow:0 0 4px #000}
+.gv-wipe::after{content:"\2194";position:absolute;left:1px;top:50%;margin-top:-10px;width:20px;height:20px;border-radius:50%;background:#ffd25a;color:#000;text-align:center;line-height:20px;font-size:13px}
+.gv-tip{position:absolute;z-index:5;pointer-events:none;background:rgba(14,16,20,.92);color:#eef;border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:5px 9px;font-size:.78em;line-height:1.4;max-width:240px}
+.gv-tip .tag-ok{color:#5fcf80}.gv-tip .tag-miss{color:#ff7b7b}.gv-tip .muted{color:#aab}
+.gv-legend{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center;margin-top:8px;font-size:.82em}
+.gv-legend .chk{white-space:nowrap}.gv-legend input[type=range]{width:90px;vertical-align:middle;accent-color:var(--accent)}
+.gv-sw{display:inline-block;width:11px;height:11px;border-radius:2px;margin:0 3px 0 2px;border:1px solid rgba(128,128,128,.5)}
+.gv-note{font-size:.78em;flex-basis:100%}
+.gv-hint{border:1px solid var(--line);border-radius:6px;margin-top:8px}
+.gv-row{cursor:pointer}.gv-row:hover,.gv-row.on{background:var(--hl)}
+@media (max-width:860px){.gv-main{grid-template-columns:1fr}.gv-stage{height:62vw;min-height:260px}.gv-m-side{flex-direction:column}.gv-m-side .gv-pane+.gv-pane{border-left:0;border-top:2px solid #000}.gv-bar{gap:6px 10px}}
+
+/* ---- charts */
+.chartwrap{position:relative;overflow-x:auto;overflow-y:hidden;max-width:100%}
+.chartwrap>svg.chart{max-width:900px;width:100%;min-width:560px}
+.chart .axl{fill:var(--muted);font-size:11px;font-style:italic}
+.chart .bar{transition:opacity .15s,filter .15s}
+.chart .bar.dim{opacity:.35}.chart .bar.hl{filter:brightness(1.18) drop-shadow(0 0 2px rgba(0,0,0,.4))}
+.chart .legend-hit{fill:transparent;cursor:pointer}.chart .legend-hit:focus-visible{outline:2px solid var(--accent)}
+.chart .off{opacity:.18}.chart .legend-item.off{opacity:.4}
+.chart .rowhit{fill:transparent}.chart .rowhit:hover{fill:rgba(128,160,220,.12)}
+.chart .catlink{cursor:pointer}.chart .catlink:hover{fill:var(--accent);text-decoration:underline}
+.ch-tip{position:fixed;z-index:200;pointer-events:none;background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:5px 10px;font-size:.82em;line-height:1.45;box-shadow:0 6px 20px rgba(0,0,0,.28);max-width:260px}
+.ch-tip b{display:block}.ch-tip i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px}.ch-tip img{display:block;width:150px;margin-top:4px;border-radius:4px;background:#000}
+.ch-tip .muted{color:var(--muted)}
+.errstrip{margin:16px 0}
+.errstrip .esbar{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin:6px 0;font-size:.88em}
+.errstrip .esbar label{display:inline-flex;gap:4px;align-items:center}
+.errstrip svg{display:block;width:100%;height:auto;touch-action:pan-y}
+.errstrip svg text{fill:var(--fg);font:11px system-ui,sans-serif}.errstrip svg .ca{fill:var(--muted)}.errstrip svg .ct{font-weight:600;font-size:13px}
+.errstrip svg .grid{stroke:var(--line)}.errstrip .eb{fill:var(--c1);cursor:pointer}.errstrip .eb.hl{fill:var(--accent);filter:brightness(1.2)}.errstrip .ed{fill:var(--c2);stroke:var(--card);stroke-width:1}
+.errstrip .emed{stroke:var(--c3);stroke-dasharray:5 4;stroke-width:1.2}.errstrip .eclip{fill:var(--c3)}
+.errstrip .escur{stroke:var(--fg);stroke-width:1;opacity:.5}
+.errstrip .eslg{cursor:pointer}.errstrip .eslg.off{opacity:.4}
+.errstrip:focus-visible,.errstrip [tabindex]:focus-visible{outline:2px solid var(--accent)}
+
+/* ---- RTL cross links */
+a.modlink{color:inherit;text-decoration:underline dotted;text-underline-offset:2px;cursor:pointer}a.modlink:hover{color:var(--accent);text-decoration:underline}
+.src a.modlink{color:#2478b5}
+:root[data-theme="dark"] .src a.modlink{color:#7fbfff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .src a.modlink{color:#7fbfff}}
+@keyframes ln-flash{0%{box-shadow:inset 0 0 0 100px rgba(255,200,40,.55)}100%{box-shadow:inset 0 0 0 100px rgba(255,200,40,0)}}
+.src .ln.flash{animation:ln-flash 1.4s ease-out 1}
+@media (prefers-reduced-motion:reduce){.src .ln.flash{animation:none}.gitem{transition:none}}

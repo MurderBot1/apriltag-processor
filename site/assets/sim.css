@@ -1,0 +1,64 @@
+/* Chip simulation pages (waveform viewer, pipeline visualiser, block diagram) */
+.seg{display:inline-flex}.seg button{border-radius:0;margin-left:-1px;padding:4px 10px}.seg button:first-child{border-radius:6px 0 0 6px;margin-left:0}.seg button:last-child{border-radius:0 6px 6px 0}
+.seg button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.wv-bar,.pv-bar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin:10px 0}
+.wv-bar label,.pv-bar label{display:inline-flex;align-items:center;gap:6px;max-width:100%;min-width:0}.wv-bar select,.pv-bar select{max-width:100%;min-width:0;text-overflow:ellipsis}
+.wv-h{margin-top:.6em}
+.wv-steps{margin:.4em 0 .6em;padding-left:1.3em}.wv-steps li{margin:2px 0}
+#wv-pre{font-size:.78em;line-height:1.15;max-height:340px}
+.wv-layout{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:14px;align-items:start}
+@media (max-width:1100px){.wv-layout{grid-template-columns:minmax(0,1fr)}}
+.wv-body{display:flex;border:1px solid var(--line);border-radius:8px;background:var(--card);overflow:hidden}
+.wv-names{flex:0 0 clamp(190px,26%,300px);border-right:1px solid var(--line);background:var(--card);font-size:12px}
+.wn-rul{height:30px;border-bottom:1px solid var(--line)}
+.wn{height:26px;display:flex;align-items:center;gap:2px;padding:0 4px 0 2px;white-space:nowrap;overflow:hidden}
+.wn:nth-child(odd){background:color-mix(in srgb,var(--code) 35%,transparent)}
+.wn .nm{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;font-family:ui-monospace,Consolas,monospace}
+.wn .nm i{color:var(--muted);font-style:normal;font-size:.85em;margin-left:2px}
+.wn .vv{flex:0 0 auto;min-width:3.2em;max-width:9em;overflow:hidden;text-overflow:ellipsis;text-align:right;font-family:ui-monospace,Consolas,monospace;color:var(--c3);font-weight:600}
+.wn button{border:0;background:none;padding:0 3px;line-height:1;color:var(--muted);font-size:11px;border-radius:3px}
+.wn button.x{font-size:15px}.wn button:hover{color:var(--accent);background:var(--code)}
+.wv-cvwrap{position:relative;flex:1 1 auto;min-width:0;cursor:crosshair}
+.wv-cvwrap canvas{display:block;touch-action:pan-y}
+.wv-tip{position:absolute;z-index:5;pointer-events:none;background:var(--navbg);border:1px solid var(--line);border-radius:6px;padding:5px 8px;font-size:12px;max-width:340px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.wv-status{font-size:.85em;margin:4px 2px;min-height:1.4em;font-family:ui-monospace,Consolas,monospace}
+.wv-markbar{margin:6px 0;font-size:.9em}
+.chip{margin:2px 4px 2px 0;padding:2px 8px;font-size:.85em;border-radius:12px}
+.wv-right{border:1px solid var(--line);border-radius:8px;background:var(--card);padding:8px;max-height:640px;overflow:auto}
+.wv-right input[type=search]{width:100%;margin:6px 0}
+.wv-pbtn{display:flex;gap:6px;margin-bottom:6px}.wv-pbtn button{padding:2px 8px;font-size:.85em}
+.wv-pick details{margin:4px 0}.wv-pick summary{cursor:pointer;font-size:.85em;color:var(--muted)}
+.chk.pk{display:flex;font-size:.85em;padding:1px 0 1px 6px;font-family:ui-monospace,Consolas,monospace}
+/* pipeline */
+.pv-ovl{display:inline-flex;gap:10px;flex-wrap:wrap}
+.pv-stages{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.pv-stages button{padding:5px 10px}.pv-stages button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.pv-stages .sn{display:inline-block;min-width:1.4em;text-align:center;border-radius:10px;background:var(--code);color:var(--fg);margin-right:3px;font-size:.85em}
+.pv-stages button.on .sn{background:rgba(255,255,255,.25);color:#fff}
+.pv-slider{width:100%;margin:2px 0 6px}
+.pv-wrap{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#111}
+.pv-wrap canvas{display:block;touch-action:none;cursor:grab}
+.pv-cap{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:2px 16px 8px;margin-top:10px}
+.pv-cap h3{margin:.6em 0 .2em}.stnote{border-left:3px solid var(--accent);padding:2px 10px;background:var(--code)}
+.pv-info table{margin:8px 0}.good{color:var(--ok)}.bad{color:var(--c3)}
+/* block diagram */
+svg.bd{width:100%;height:auto;max-width:1340px;display:block;margin:10px 0}
+svg.bd text{fill:var(--fg);font:12px system-ui,sans-serif}
+svg.bd .chipbox{fill:none;stroke:var(--muted);stroke-width:1.5;stroke-dasharray:6 4}
+svg.bd .chipt{font-weight:600;font-size:13px;fill:var(--muted)}
+svg.bd .dom{stroke:none}.dom-sensor{fill:var(--c2);opacity:.16}.dom-core{fill:var(--c1);opacity:.10}.dom-spi{fill:var(--ok);opacity:.18}
+svg.bd .domt{font-size:11px;fill:var(--muted)}
+svg.bd .blk rect{fill:var(--card);stroke:var(--c1);stroke-width:1.5}
+svg.bd .blk.sens rect{stroke:var(--c2)}svg.bd .blk.hot rect{stroke:var(--c3);stroke-width:2.2}svg.bd .blk.mem rect{stroke:var(--ok);stroke-dasharray:none;fill:color-mix(in srgb,var(--ok) 8%,var(--card))}
+svg.bd .blk.ext rect{stroke:var(--muted);stroke-dasharray:5 3}
+svg.bd .blk a{cursor:pointer}svg.bd .blk a:hover rect{fill:var(--code);stroke-width:2.5}
+svg.bd .bt{font-weight:700;font-size:13px}svg.bd .bf{font-family:ui-monospace,Consolas,monospace;font-size:11px;fill:var(--accent)}
+svg.bd .bl{font-size:11px;fill:var(--muted)}
+svg.bd .arw{fill:none;stroke:var(--muted);stroke-width:1.6}svg.bd .arh{fill:var(--muted)}
+svg.bd .al{font-size:10.5px;fill:var(--muted)}
+.bd-leg{font-size:.85em;color:var(--muted);margin:6px 0}
+.bd-leg .lg{display:inline-block;width:12px;height:12px;border-radius:3px;margin:0 4px 0 12px;vertical-align:-1px;border:1.5px solid var(--c1)}
+.lg.sens{background:var(--c2);opacity:.5;border-color:var(--c2)}.lg.core{background:var(--c1);opacity:.4}.lg.spi{background:var(--ok);opacity:.5;border-color:var(--ok)}
+.lg.hot{border-color:var(--c3)}.lg.mem{border-color:var(--ok)}.lg.ext{border:1.5px dashed var(--muted)}
+/* use the full window width on the wide pages (the generic main column is narrower) */
+main:has(#page-wave:not([hidden])),main:has(#page-pipeline:not([hidden])),main:has(#page-blocks:not([hidden])){max-width:min(1600px,100%) !important}

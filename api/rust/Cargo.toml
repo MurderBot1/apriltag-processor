@@ -1,0 +1,8 @@
+[package]
+name = "apriltag_camera"
+version = "0.1.0"
+edition = "2021"
+description = "Client API for the AprilTag camera USB CDC protocol"
+
+[workspace]
+exclude = ["serial"]

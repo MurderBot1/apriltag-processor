@@ -1,0 +1,106 @@
+{
+  "_comment": "Mechanical contract between the PCB generator, the housing and the docs. Coordinates in mm, origin at the board centre, +X right, +Y up when looking at the LENS side (top) of the board.",
+  "board": {
+    "width": 48.0,
+    "height": 48.0,
+    "thickness": 1.6,
+    "corner_radius": 2.0,
+    "layers": 4
+  },
+  "mounting_holes": {
+    "diameter": 2.2,
+    "pad_diameter": 4.2,
+    "positions": [
+      [
+        -20.5,
+        20.5
+      ],
+      [
+        20.5,
+        20.5
+      ],
+      [
+        -20.5,
+        -20.5
+      ],
+      [
+        20.5,
+        -20.5
+      ]
+    ]
+  },
+  "sensor": {
+    "part": "OV9281 CSP",
+    "center": [
+      0.0,
+      9.0
+    ],
+    "side": "top",
+    "package": [
+      5.3,
+      4.5
+    ],
+    "optical_axis_height_above_board": 0.7
+  },
+  "lens_holder": {
+    "part": "M12 board-mount lens holder (20x20 footprint, 2 screws)",
+    "footprint": [
+      20.0,
+      20.0
+    ],
+    "height_above_board": 6.0,
+    "screw_positions": [
+      [
+        -10.0,
+        9.0
+      ],
+      [
+        10.0,
+        9.0
+      ]
+    ],
+    "lens_barrel_diameter": 14.0,
+    "lens_total_height_above_holder": 14.0,
+    "hfov_deg": 90.0,
+    "focal_length_mm": 1.92
+  },
+  "usb_c": {
+    "part": "USB-C 16-pin receptacle (HRO TYPE-C-31-M-12)",
+    "side": "bottom",
+    "edge": "left",
+    "center": [
+      -24.0,
+      -8.0
+    ],
+    "opening_width": 8.94,
+    "opening_height": 3.26,
+    "body_height_above_board": 3.2,
+    "protrusion_past_edge": 0.0
+  },
+  "bottom_side_max_component_height": 3.2,
+  "top_side_max_component_height_outside_lens_holder": 2.0,
+  "status_leds": [
+    {
+      "name": "PWR",
+      "pos": [
+        9.0,
+        21.5
+      ]
+    },
+    {
+      "name": "STAT",
+      "pos": [
+        12.0,
+        21.5
+      ]
+    }
+  ],
+  "boot_button": {
+    "pos": [
+      20.5,
+      2.5
+    ],
+    "side": "bottom"
+  },
+  "keepout_note": "FPGA (17x17 BGA, bottom, centre (0,-8)), RP2350, flash, regulators and passives are on the bottom side. Only the sensor, lens holder, two status LEDs and the USB-C shield tabs are on the top side."
+}

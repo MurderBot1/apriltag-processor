@@ -1,0 +1,16 @@
+D:\apriltag-proccessor\tools\blender_render.py:28: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new(name); m.use_nodes = True
+D:\apriltag-proccessor\tools\blender_render.py:69: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new(f"tag{t['id']}"); m.use_nodes = True
+D:\apriltag-proccessor\tools\blender_render.py:89: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  world = bpy.data.worlds.new('w'); world.use_nodes = True; sc.world = world
+Traceback (most recent call last):
+  File "D:\apriltag-proccessor\tools\make_dataset.py", line 108, in <module>
+    main()
+  File "D:\apriltag-proccessor\tools\make_dataset.py", line 82, in main
+    mx, my = distortion_maps()
+             ^^^^^^^^^^^^^^^^^
+  File "D:\apriltag-proccessor\tools\make_dataset.py", line 58, in distortion_maps
+    und = cv2.undistortPointsIter(pts, K, DIST_TRUE, None, None,
+          ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'cv2' has no attribute 'undistortPointsIter'

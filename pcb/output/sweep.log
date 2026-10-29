@@ -1,0 +1,9 @@
+PFMAX=6 HINC=1.5 HGROW=0: DONE 52.8s: 2660 segments, 265 vias, unrouted jobs 0 (of 106), remaining violations (signals) 159
+PFMAX=6 HINC=1.0 HGROW=0.3: DONE 49.0s: 3489 segments, 260 vias, unrouted jobs 0 (of 106), remaining violations (signals) 530
+PFMAX=12 HINC=2 HGROW=0.5:      layer 1 static -1 claimed also by: FPGA_DONE 
+DONE 42.4s: 3526 segments, 275 vias, unrouted jobs 0 (of 106), remaining violations (signals) 357
+PFMAX=3 HINC=1 HGROW=0.2:      layer 0 static -1 claimed also by: FPGA_DONE 
+     layer 0 static -1 claimed also by: FPGA_DONE 
+DONE 67.8s: 4331 segments, 265 vias, unrouted jobs 0 (of 106), remaining violations (signals) 1195
+PFMAX=8 HINC=3 HGROW=0:      layer 1 static -1 claimed also by: FPGA_DONE 
+DONE 70.6s: 3174 segments, 272 vias, unrouted jobs 0 (of 106), remaining violations (signals) 184
