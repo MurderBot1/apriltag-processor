@@ -31,7 +31,7 @@ jobs:
       - name: Run category ${{ inputs.category }}
         run: python tests/ci_category.py "${{ inputs.category }}" --out "results/ci/${{ inputs.category }}.md" --json "results/ci/${{ inputs.category }}.json"
       - name: Job summary and PR comment
-        if: always()
+        if: ${{ !cancelled() }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |

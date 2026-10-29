@@ -40,7 +40,7 @@ jobs:
         id: tests
         run: python tools/ci_all_tests.py --out results/ci/all_tests.md
       - name: Job summary and PR comment
-        if: always()
+        if: ${{ !cancelled() }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
