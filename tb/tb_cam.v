@@ -29,6 +29,20 @@ module tb_cam;
         end
     end
 
+`ifdef TRACE
+    // per-frame CCL / TPU-start trace (step-0 diagnostics): build with -DTRACE
+    always @(posedge clk) begin
+        if (dut.ccl_done) $display("TRACE t=%0d ccl_done flags=%b(cand,lab,run,row) count=%0d max_row_cycles=%0d nlab=%0d cancel=%b tpu_busy=%b",
+            cyc, dut.ccl_flags, dut.ccl_count, dut.ccl_maxrow, dut.ccl.nlab, dut.cancel, dut.tpu_busy);
+        if (dut.tpu_start) $display("TRACE t=%0d tpu_start count=%0d", cyc, dut.tpu_count);
+        if (dut.tpu_done) $display("TRACE t=%0d tpu_done cycles=%0d", cyc, dut.t_cycles);
+        if (dut.csi_fe) $display("TRACE t=%0d csi_fe frame_ok=%b cancel=%b ovf_row=%b ovf_run=%b ovf_lab=%b ovf_cand=%b ccl.S=%0d pend=%0d", cyc, dut.csi_frame_ok, dut.cancel, dut.ccl.ovf_row, dut.ccl.ovf_run, dut.ccl.ovf_lab, dut.ccl.ovf_cand, dut.ccl.S, dut.ccl.pend);
+    end
+    integer rowdrop = 0;
+    always @(posedge clk) if (dut.ccl.tail_cyc && dut.ccl.pend >= 2) rowdrop <= rowdrop + 1;
+    always @(posedge clk) if (dut.csi_fe) $display("TRACE rows_dropped_for_backpressure=%0d", rowdrop);
+`endif
+
     // ------------------------------------------------------------ SPI master (SCK = clk/8 -> 12.5 MHz)
     reg [31:0] rd_words [0:1023];
     task spi_byte; input [7:0] tx; output [7:0] rx;
