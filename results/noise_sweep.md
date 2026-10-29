@@ -21,4 +21,6 @@ Capacity needed (no overflow rejection): runs/row 192 (64 today: 80 frames over)
 Conclusion: smoothing is not the fix (the earlier recommendation is withdrawn). The fix is (1) never abandon the frame on a CCL overflow,
 (2) raise runs/row to 192, (3) rank candidates by area and keep the best 64 (or 32 for the cycle budget). TPU worst case is ~1.5M cycles
 (> one 832,800-clock frame), so heavy-clutter frames would be dropped in a stream, but each processed frame is complete.
-Not yet implemented in RTL.
+Implemented in `rtl/run_ccl.v` (see `results/ccl_failure_mechanism.md` for why the three capacity limits alone were not enough: the labeller also had to
+become ~7x faster per run because `ovf_row` was binding). RTL chain result on the same 500 frames: **2651 / 2825 (93.8 %), 0 false positives**
+(`results/rtl_chain_results.json`), identical to the 'top 64 by area' model line above; before: 2158 / 2825 with the same readback harness.
