@@ -29,9 +29,9 @@ def parse(path):
         l = lines[i]
         if l.startswith('RESULT'):
             d = dict(x.split('=') for x in l.split()[1:])
-            words = [int(x, 16) for x in lines[i + 1:i + 1 + 16 + 16 * 8]]
+            words = [int(x, 16) for x in lines[i + 1:i + 1 + 16 + 16 * 31]]
             results.append(dict(seq=int(d['seq']), bank=int(d['bank']), tags=int(d['tags']), cyc=int(d['cyc']), words=words))
-            i += 1 + 16 + 16 * 8
+            i += 1 + 16 + 16 * 31
         elif l.startswith('STATS'):
             stats = dict(x.split('=') for x in l.split()[1:]); i += 1
         else: i += 1

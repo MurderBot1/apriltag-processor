@@ -106,8 +106,9 @@ module tb_cam;
         nt = st[15:8];
         fd = $fopen(f, "a");
         $fdisplay(fd, "RESULT seq=%0d bank=%0d tags=%0d cyc=%0d", st[31:16], st[1], nt, cyc);
-        spi_read(st[1] ? 24'h002000 : 24'h001000, 16 + 16 * 8);
-        for (i = 0; i < 16 + 16 * 8; i = i + 1) $fdisplay(fd, "%08x", rd_words[i]);
+        if (nt > 31) nt = 31;                                   // result RAM holds 31 records; the MCU reads exactly `count` of them
+        spi_read(st[1] ? 24'h002000 : 24'h001000, 16 + 16 * nt);
+        for (i = 0; i < 16 + 16 * 31; i = i + 1) $fdisplay(fd, "%08x", (i < 16 + 16 * nt) ? rd_words[i] : 32'd0);
         $fclose(fd);
         nres = nres + 1;
     end
