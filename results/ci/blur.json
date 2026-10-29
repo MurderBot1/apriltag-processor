@@ -1,0 +1,116 @@
+{
+ "category": "blur",
+ "ok": 9,
+ "total": 10,
+ "images": [
+  {
+   "image": "blur_000",
+   "ok": true,
+   "detectable": 8,
+   "detected": 8,
+   "false_ids": 0,
+   "corner_mean_px": 0.2658470796889247,
+   "t_err_mm": 0.6891002626280338,
+   "missed": []
+  },
+  {
+   "image": "blur_001",
+   "ok": true,
+   "detectable": 3,
+   "detected": 3,
+   "false_ids": 0,
+   "corner_mean_px": 0.24822481525537288,
+   "t_err_mm": 1.3187369161729028,
+   "missed": []
+  },
+  {
+   "image": "blur_002",
+   "ok": true,
+   "detectable": 8,
+   "detected": 8,
+   "false_ids": 0,
+   "corner_mean_px": 0.28436812519575194,
+   "t_err_mm": 0.40843940935468037,
+   "missed": []
+  },
+  {
+   "image": "blur_003",
+   "ok": true,
+   "detectable": 6,
+   "detected": 6,
+   "false_ids": 0,
+   "corner_mean_px": 0.30898204691813946,
+   "t_err_mm": 0.45986281354855796,
+   "missed": []
+  },
+  {
+   "image": "blur_004",
+   "ok": true,
+   "detectable": 8,
+   "detected": 8,
+   "false_ids": 0,
+   "corner_mean_px": 0.32093543984888584,
+   "t_err_mm": 1.1565523380628513,
+   "missed": []
+  },
+  {
+   "image": "blur_005",
+   "ok": true,
+   "detectable": 6,
+   "detected": 6,
+   "false_ids": 0,
+   "corner_mean_px": 0.30850844476337075,
+   "t_err_mm": 0.7947830133910553,
+   "missed": []
+  },
+  {
+   "image": "blur_006",
+   "ok": true,
+   "detectable": 2,
+   "detected": 2,
+   "false_ids": 0,
+   "corner_mean_px": 0.28446787577728705,
+   "t_err_mm": 2.7771418945445365,
+   "missed": []
+  },
+  {
+   "image": "blur_007",
+   "ok": true,
+   "detectable": 2,
+   "detected": 2,
+   "false_ids": 0,
+   "corner_mean_px": 0.34584866073159887,
+   "t_err_mm": 4.165615383522142,
+   "missed": []
+  },
+  {
+   "image": "blur_008",
+   "ok": true,
+   "detectable": 8,
+   "detected": 8,
+   "false_ids": 0,
+   "corner_mean_px": 0.49496752557936036,
+   "t_err_mm": 0.716353192114995,
+   "missed": []
+  },
+  {
+   "image": "blur_009",
+   "ok": false,
+   "detectable": 8,
+   "detected": 0,
+   "false_ids": 0,
+   "corner_mean_px": null,
+   "t_err_mm": null,
+   "missed": [
+    3,
+    17,
+    42,
+    58,
+    77,
+    101,
+    133,
+    202
+   ]
+  }
+ ]
+}

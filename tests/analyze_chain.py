@@ -9,8 +9,7 @@ ROOT = geom.ROOT
 def load():
     gt = json.load(open(os.path.join(ROOT, 'test_images', 'ground_truth.json')))['images']
     rtl = json.load(open(os.path.join(ROOT, 'results', 'rtl_chain_results.json')))
-    rp = os.path.join(ROOT, 'results', 'reference_baseline_500.json')       # full 500-frame baseline when it exists
-    ref = json.load(open(rp if (os.path.exists(rp) and len(gt) > 100) else os.path.join(ROOT, 'results', 'reference_baseline.json')))
+    ref = json.load(open(os.path.join(ROOT, 'results', 'reference_baseline.json')))        # 100-image baseline (tools/reference_pipeline.py)
     return gt, rtl, ref
 
 

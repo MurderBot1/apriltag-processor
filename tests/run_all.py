@@ -21,6 +21,7 @@ GROUPS = [
     ('D-PHY receiver (bit level)', ['tests/test_dphy.py'],                                     False),
     ('despeckle RTL',           ['tests/test_rtl_despeckle.py'],                               False),
     ('CCL RTL',                 ['tests/test_rtl_ccl.py'],                                     False),
+    ('device clock RTL (tb_clock)', ['tests/test_clock.py'],                                   False),
     ('CSI-2 RTL',               ['tests/test_csi2.py'],                                        True),
     ('system: cam_core @120fps', ['tests/test_chain.py'],                                      True),
 ]

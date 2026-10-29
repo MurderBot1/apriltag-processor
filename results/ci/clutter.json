@@ -1,0 +1,107 @@
+{
+ "category": "clutter",
+ "ok": 10,
+ "total": 10,
+ "images": [
+  {
+   "image": "clutter_000",
+   "ok": true,
+   "detectable": 5,
+   "detected": 5,
+   "false_ids": 0,
+   "corner_mean_px": 0.2409318926124043,
+   "t_err_mm": 0.538604701578731,
+   "missed": []
+  },
+  {
+   "image": "clutter_001",
+   "ok": true,
+   "detectable": 3,
+   "detected": 3,
+   "false_ids": 0,
+   "corner_mean_px": 0.23692985136015696,
+   "t_err_mm": 2.48319727830628,
+   "missed": []
+  },
+  {
+   "image": "clutter_002",
+   "ok": true,
+   "detectable": 5,
+   "detected": 5,
+   "false_ids": 0,
+   "corner_mean_px": 0.25830225609440827,
+   "t_err_mm": 0.40400691398784555,
+   "missed": []
+  },
+  {
+   "image": "clutter_003",
+   "ok": true,
+   "detectable": 6,
+   "detected": 6,
+   "false_ids": 0,
+   "corner_mean_px": 0.24513600043496528,
+   "t_err_mm": 0.41677456255868184,
+   "missed": []
+  },
+  {
+   "image": "clutter_004",
+   "ok": true,
+   "detectable": 2,
+   "detected": 2,
+   "false_ids": 0,
+   "corner_mean_px": 0.34453800720984623,
+   "t_err_mm": 2.9079565093433155,
+   "missed": []
+  },
+  {
+   "image": "clutter_005",
+   "ok": true,
+   "detectable": 7,
+   "detected": 7,
+   "false_ids": 0,
+   "corner_mean_px": 0.26430133895081925,
+   "t_err_mm": 0.7719842577011559,
+   "missed": []
+  },
+  {
+   "image": "clutter_006",
+   "ok": true,
+   "detectable": 10,
+   "detected": 10,
+   "false_ids": 0,
+   "corner_mean_px": 0.24829369133538065,
+   "t_err_mm": 0.7803391742945267,
+   "missed": []
+  },
+  {
+   "image": "clutter_007",
+   "ok": true,
+   "detectable": 8,
+   "detected": 8,
+   "false_ids": 0,
+   "corner_mean_px": 0.2383627839863948,
+   "t_err_mm": 0.20195369181032158,
+   "missed": []
+  },
+  {
+   "image": "clutter_008",
+   "ok": true,
+   "detectable": 7,
+   "detected": 7,
+   "false_ids": 0,
+   "corner_mean_px": 0.24331165659336915,
+   "t_err_mm": 0.6895802215694687,
+   "missed": []
+  },
+  {
+   "image": "clutter_009",
+   "ok": true,
+   "detectable": 6,
+   "detected": 6,
+   "false_ids": 0,
+   "corner_mean_px": 0.22016846337258075,
+   "t_err_mm": 0.23665443540856548,
+   "missed": []
+  }
+ ]
+}

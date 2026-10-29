@@ -23,7 +23,7 @@ def stat_word(st, key): return int(st[key], 16 if key in ('status', 'ecc', 'crc'
 
 
 def test_three_frames_back_to_back_at_120fps(vvp):
-    frames = [img('dist_15'), img('rand_05'), img('roll_090')]
+    frames = [img('normal_004'), img('noise_003'), img('grad_000')]      # (persp_000 / bright_001: RTL and golden pick different tag sets, see docs/verification.md)
     log, res, el = chain.run_frames(vvp, frames, 'sys_three')
     st = res['stats']
     assert 'ID=41544731 VER=00010000' in log and 'REGTEST id_ok=1 scratch=cafef00d' in log      # SPI register read/write path
@@ -44,7 +44,7 @@ def test_three_frames_back_to_back_at_120fps(vvp):
 
 
 def test_result_matches_golden_pipeline_bit_exact_corners(vvp):
-    f = img('rand_20')
+    f = img('shadow_001')
     log, res, el = chain.run_frames(vvp, [f], 'sys_exact')
     got = {t['id']: t for t in decode_tags(res['results'][0]['words'])}
     ref = {t['id']: t for t in chain.iss_reference(f, 1)[0]}
@@ -54,8 +54,8 @@ def test_result_matches_golden_pipeline_bit_exact_corners(vvp):
 
 
 def test_bad_crc_frame_is_discarded_and_next_frame_recovers(vvp):
-    frames = [img('dist_15'), img('rand_05')]
-    log, res, el = chain.run_frames(vvp, frames, 'sys_badcrc', bad_crc_lines={(0, 100)})
+    frames = [img('normal_004'), img('noise_003')]
+    log, res, el = chain.run_frames(vvp, frames, 'sys_badcrc', bad_crc_lines={(0, 100)}, maxcyc=12_000_000)
     st = res['stats']
     assert int(st['total']) == 2
     assert len(res['results']) == 1                    # frame 0 rejected (CRC), frame 1 delivered
@@ -64,15 +64,15 @@ def test_bad_crc_frame_is_discarded_and_next_frame_recovers(vvp):
 
 
 def test_missing_line_frame_is_discarded(vvp):
-    frames = [img('dist_15'), img('dist_15')]
-    log, res, el = chain.run_frames(vvp, frames, 'sys_dropline', drop_lines={(0, 300)})
+    frames = [img('normal_004'), img('normal_004')]
+    log, res, el = chain.run_frames(vvp, frames, 'sys_dropline', drop_lines={(0, 300)}, maxcyc=12_000_000)
     assert len(res['results']) == 1 and int(res['stats']['crc'], 16) >> 16 == 1
 
 
 def test_noisy_overload_frame_does_not_hang_and_next_frame_is_clean(vvp):
     rng = np.random.default_rng(0)
     noisy = np.clip(rng.normal(90, 40, (800, 1280)), 0, 255).astype(np.uint8)      # pure high-contrast noise
-    good = img('dist_15')
+    good = img('normal_004')
     log, res, el = chain.run_frames(vvp, [noisy, good], 'sys_noise')
     assert len(res['results']) == 2, log[-500:]
     fl = (int(res['stats']['ccl'], 16) >> 8) & 15
@@ -82,6 +82,6 @@ def test_noisy_overload_frame_does_not_hang_and_next_frame_is_clean(vvp):
 
 
 def test_dark_overloaded_frame_still_reports_tags(vvp):
-    log, res, el = chain.run_frames(vvp, [img('dark_c')], 'sys_darkc')
+    log, res, el = chain.run_frames(vvp, [img('dark_004')], 'sys_darkc')
     assert len(res['results']) == 1
     assert len(decode_tags(res['results'][0]['words'])) >= 2

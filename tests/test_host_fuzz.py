@@ -138,7 +138,7 @@ def test_everything_at_once():
 
 
 def test_stream_survives_corrupted_link():
-    names = ['dist_15', 'dist_20', 'yaw_30', 'bright', 'dist_10'] * 8
+    names = ['normal_004', 'normal_006', 'persp_002', 'bright_001', 'normal_002'] * 8
     cam, st, ft = faulty_cam(7, frames=load_rtl_frames(names), drop_rx=0.003, flip_rx=0.002, garbage_rx=0.1, split_rx=5)
     configure(cam)
     poses = list(cam.stream(timeout=0.2, on_timeout='stop'))

@@ -1,15 +1,15 @@
 """Run every dataset image through the full RTL chain (CSI-2 @120fps -> cam_core -> SPI results) in parallel.
 Writes results/rtl_chain_results.json: per image the tag estimates the MCU would receive over SPI.
 
-Full 500-frame set (the long job):   py -3.12 tests/run_chain_dataset.py          (WORKERS=12 by default; env WORKERS=n to change)
+Full 100-frame set (the long job):   py -3.12 tests/run_chain_dataset.py          (WORKERS=12 by default; env WORKERS=n to change)
   Expected runtime: measured 377 s wall-clock for the original 100 frames with 12 workers (~30-40 s per frame per worker, see
-  results/chain_dataset.log) => ~32 min for all 500, ~25 min for just the 400 new ones (--merge); allow 35-60 min if other CPU-heavy
-  jobs (autorouter) are running.  The 400 new frames only:  py -3.12 tests/run_chain_dataset.py --merge
+  results/chain_dataset.log) => ~6-8 min for all 100 with 10-12 workers; allow longer if other CPU-heavy jobs are running.
+  NOT run in CI (too slow); CI scores the dataset at reference-detector level, see docs/verification.md.
 Subset / resume:  py -3.12 tests/run_chain_dataset.py name1 name2 ...   (only those frames; NOTE: the output file is overwritten with
   just that subset - merge with a previous run yourself, or use --merge below)
   py -3.12 tests/run_chain_dataset.py --merge [names...]   keep existing entries of results/rtl_chain_results.json, simulate only
   the frames that are missing from it (or the names given) and write the union: this is how to resume an interrupted full run.
-Score it with tests/analyze_chain.py (detection is scored over GT `detectable` tags; reference = results/reference_baseline_500.json)."""
+Score it with tests/analyze_chain.py (detection is scored over GT `detectable` tags; reference = results/reference_baseline.json)."""
 import os, sys, json, time, cv2, numpy as np
 from multiprocessing import Pool
 sys.path.insert(0, os.path.dirname(__file__)); sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'tools'))
