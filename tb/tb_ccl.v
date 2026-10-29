@@ -15,7 +15,10 @@ module tb_ccl;
 `define P_NLAB 1024
 `define P_LB 10
 `endif
-    run_ccl #(.NLAB(`P_NLAB), .LB(`P_LB)) dut(.clk(clk), .rst(rst), .cfg_min_area(min_area), .cfg_max_area(max_area), .cfg_min_dim(min_dim),
+`ifndef P_BB
+`define P_BB 2
+`endif
+    run_ccl #(.NLAB(`P_NLAB), .LB(`P_LB), .BB(`P_BB)) dut(.clk(clk), .rst(rst), .cfg_min_area(min_area), .cfg_max_area(max_area), .cfg_min_dim(min_dim),
         .cfg_reject_border(rej), .v(v), .b0(b0), .b1(b1), .first(first), .last(last), .fstart(fstart), .fend(fend),
         .cand_we(cand_we), .cand_waddr(cand_waddr), .cand_wdata(cand_wdata), .done(done), .cand_count(cand_count),
         .flags(flags), .max_row_cycles(max_row_cycles));

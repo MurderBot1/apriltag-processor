@@ -58,13 +58,16 @@ module run_ccl #(
     localparam LABW = LB;
     localparam STW  = 214;                      // {area[21:0], dir[7:0][23:0]}
     localparam IW   = 33;                       // info word {done, last_row[9:0], area[21:0]}: narrow mirror used by the termination check
-    localparam PD   = 4;                        // prev-run FIFO depth
+    localparam PD   = 4;                        // current-run FIFO depth
+    localparam PFB  = 3;                        // log2 prev-run FIFO depth
+    localparam PF   = 1 << PFB;
     localparam OQ   = 4;                        // stats op queue depth
     localparam MB   = 6;                        // log2(MAXC)
+    localparam AB   = 10;                       // log2(size of the absorbed-label list); at most 2 rows of unions (<= 2*MAXR) are pending
 
     // ------------------------------------------------------------------ run detector
-    reg [10:0] runs_s_mem [0:NB*MAXR-1];
-    reg [10:0] runs_e_mem [0:NB*MAXR-1];
+    reg [21:0] runse [0:NB*MAXR-1];            // {end, start} of every run, one write port, two read ports (current / previous row)
+    reg        rw_we; reg [BB+RB-1:0] rw_a; reg [21:0] rw_d;
     reg [LABW-1:0] runlab [0:NB*MAXR-1];
     reg [RB:0] cnt [0:NB-1];
 
@@ -89,14 +92,14 @@ module run_ccl #(
     task wr_run; input [10:0] s; input [10:0] e;
         begin
             if (wcnt < MAXR) begin
-                runs_s_mem[{wb, wcnt[RB-1:0]}] <= s;
-                runs_e_mem[{wb, wcnt[RB-1:0]}] <= e;
+                rw_we = 1; rw_a = {wb, wcnt[RB-1:0]}; rw_d = {e, s};
                 wcnt <= wcnt + 1;
             end else ovf_run <= 1;
         end
     endtask
 
     always @(posedge clk) begin
+        rw_we = 0; rw_a = 0; rw_d = 0;
         tail_cyc <= 0;
         fend_dly <= {fend_dly[2:0], fend};
         if (fend_dly[3]) fend_lat <= 1;
@@ -112,8 +115,7 @@ module run_ccl #(
                 wcnt_t = wcnt;
                 if (tail_v) begin
                     if (wcnt < MAXR) begin
-                        runs_s_mem[{wb, wcnt[RB-1:0]}] <= tail_s;
-                        runs_e_mem[{wb, wcnt[RB-1:0]}] <= tail_e;
+                        rw_we = 1; rw_a = {wb, wcnt[RB-1:0]}; rw_d = {tail_e, tail_s};
                         wcnt_t = wcnt + 1;
                     end else ovf_run <= 1;
                 end
@@ -147,6 +149,7 @@ module run_ccl #(
                 end
             end
         end
+        if (rw_we) runse[rw_a] <= rw_d;
     end
 
     // ------------------------------------------------------------------ memories
@@ -155,21 +158,21 @@ module run_ccl #(
     reg [STW-1:0]  stats   [0:NLAB-1];
     reg [IW-1:0]   info    [0:NLAB-1];          // {done, last_row, area} mirror of stats
     reg [LABW-1:0] flmem   [0:NLAB-1];          // free-label FIFO
-    reg [LABW-1:0] abmem   [0:2*NLAB-1];        // labels absorbed by unions, freed one row later
-    reg [STW-1:0]  pool    [0:MAXC-1];          // finished candidates
+    reg [LABW-1:0] abmem   [0:(1<<AB)-1];       // labels absorbed by unions, freed one row later
+    (* ram_style = "distributed" *) reg [STW-1:0] pool [0:MAXC-1];   // finished candidates (LUT RAM: saves 6 block RAMs)
     reg [21:0]     tarea   [0:MAXC-1];          // their areas
     reg [LABW-1:0] tlab    [0:MAXC-1];          // their labels (information only)
     reg [LABW-1:0] orph    [0:MAXR-1];          // roots to check for termination at the end of the row
 
     // ------------------------------------------------------------------ state
     localparam [5:0]
-        S_IDLE = 0, S_R0 = 1, S_CMP = 2, S_FSET = 3, S_FW = 4, S_FU = 5,
+        S_IDLE = 0, S_R0 = 1, S_CMP = 2, S_FSET = 3, S_FW = 4, S_FU = 5, S_FW2 = 32, S_TF1B = 33,
         S_U0 = 6, S_UA1 = 7, S_UA2 = 8, S_UA3 = 9, S_UB1 = 10, S_UB2 = 11, S_UB3 = 12,
         S_FIN = 13, S_FLUSH = 14, S_DRAIN = 15,
         S_T = 16, S_TF0 = 17, S_TF1 = 18, S_TF2 = 19, S_TR1 = 20, S_TR2 = 21, S_TR3 = 22, S_TC0 = 23, S_TC1 = 24,
         S_TOP = 25, S_MS = 26, S_TN = 27,
         S_REL = 28, S_REL1 = 29, S_REL2 = 30, S_ROWEND = 31,
-        S_EM0 = 32, S_EM1 = 33, S_EM2 = 34, S_EM3 = 35, S_WR = 36, S_DONE = 37, S_WAITNEXT = 38;
+        S_EM0 = 34, S_EM1 = 35, S_EM2 = 36, S_WR = 37, S_DONE = 38, S_WAITNEXT = 39;
     reg [5:0]  S;
 
     reg [BB-1:0] rp_bank, pf_bank;
@@ -201,30 +204,29 @@ module run_ccl #(
 
     // ---- current-row run FIFO (head = the run being labelled)
     reg [BB+RB-1:0] ca;
-    reg [10:0] cq_s, cq_e;
+    reg [21:0] cq;
     reg        cv0, cv1, cf_run;
-    always @(posedge clk) begin
-        cq_s <= runs_s_mem[ca];
-        cq_e <= runs_e_mem[ca];
-    end
+    always @(posedge clk) cq <= runse[ca];
     reg [10:0] c_s [0:PD-1]; reg [10:0] c_e [0:PD-1];
     reg [1:0] c_rd, c_wr; reg [2:0] c_cnt;
     wire cvalid = (c_cnt != 0);
     wire [10:0] cs = c_s[c_rd], ce = c_e[c_rd];
 
     // ---- previous-row prefetch pipeline
+    // stages: v0 address -> v1 run data + raw label -> v2 parent of raw label -> v3 candidate root (parent read again) -> v4 push
     reg [BB+RB-1:0] pf_a;
-    reg [10:0] rq_s, rq_e, s2_s, s2_e;
-    reg [LABW-1:0] rlq, s2_l, parqA;
-    reg        v0, v1, v2, pf_run;
+    reg [21:0] rq; reg [10:0] s2_s, s2_e, s3_s, s3_e, s4_s, s4_e;
+    reg [LABW-1:0] rlq, s2_l, parqA, s3_r, s4_r, parqA2;
+    reg        s3_chk, s4_chk;
+    reg        v0, v1, v2, v3, v4, pf_run;
     always @(posedge clk) begin
-        rq_s <= runs_s_mem[pf_a];
-        rq_e <= runs_e_mem[pf_a];
+        rq   <= runse[pf_a];
         rlq  <= runlab[pf_a];
         parqA <= parentA[rlq];
+        parqA2 <= parentA[s3_r];
     end
-    reg [10:0] f_s [0:PD-1]; reg [10:0] f_e [0:PD-1]; reg [LABW-1:0] f_r [0:PD-1]; reg f_nf [0:PD-1];
-    reg [1:0] f_rd, f_wr; reg [2:0] f_cnt;
+    reg [10:0] f_s [0:PF-1]; reg [10:0] f_e [0:PF-1]; reg [LABW-1:0] f_r [0:PF-1]; reg f_nf [0:PF-1];
+    reg [PFB-1:0] f_rd, f_wr; reg [PFB:0] f_cnt;
     wire head_v = (f_cnt != 0);
     wire [10:0] hs = f_s[f_rd], he = f_e[f_rd];
     wire [LABW-1:0] hr = f_r[f_rd];
@@ -234,8 +236,9 @@ module run_ccl #(
     reg [LABW-1:0] pa;
     reg [LABW-1:0] par_q;
     reg [IW-1:0]   inf_q;
-    always @(posedge clk) begin par_q <= parentB[pa]; inf_q <= info[pa]; end
-    wire [10:0] mq = inf_q[32:22];
+    reg [LABW-1:0] par_r;                                       // second register stage for the multi-cycle find loops
+    always @(posedge clk) begin par_q <= parentB[pa]; inf_q <= info[pa]; par_r <= par_q; end
+    wire [10:0] mq = inf_q[32:22]; reg [10:0] mq_r;
     wire [21:0] aq = inf_q[21:0];
 
     // ---- stats port
@@ -248,16 +251,16 @@ module run_ccl #(
     reg [LB-1:0] fr_rd, fr_wr; reg [LB:0] fr_cnt;
     reg [LABW-1:0] fq; reg fq_ok;
     always @(posedge clk) fq <= flmem[fr_rd];
-    reg [LB:0] ab_head, ab_mid, ab_tail;
+    reg [AB:0] ab_head, ab_mid, ab_tail;
     reg [LABW-1:0] ab_q;
-    always @(posedge clk) ab_q <= abmem[ab_head];
+    always @(posedge clk) ab_q <= abmem[ab_head[AB-1:0]];
 
     // ---- candidate pool read
-    reg [MB-1:0] pool_a; reg [STW-1:0] pool_q; reg [LABW-1:0] tlab_q;
-    always @(posedge clk) begin pool_q <= pool[pool_a]; tlab_q <= tlab[pool_a]; end
+    reg [MB-1:0] pool_a;
 
     // ---- pipelined termination check
-    reg        g1v, g2v, lr_v; reg [LABW-1:0] g1_l, g2_l, lr; reg [RB:0] g1_i, g2_i;
+    reg        g1v, g2v, g3v, lr1_v, lr2_v; reg [LABW-1:0] g1_l, g2_l, g3_l, lr1, lr2, g3_hint; reg [RB:0] g1_i, g2_i, g3_i;
+    reg        g3_root, g3_done, g3_small; reg [21:0] g3_aq;
 
     // helper functions on the packed stats vector -------------------------
     function [23:0] cand;
@@ -328,12 +331,12 @@ module run_ccl #(
     wire signed [13:0] bbw = bsx1 + bsxm + 14'sd1, bbh = bsy1 + bsym + 14'sd1;
 
     // ------------------------------------------------------------------ sequencer
-    reg        pop, cpop, oq_push, oq_kind, pf_flush, par_we, fl_push, ab_push, free_pop, tm_we;
-    reg [LABW-1:0] par_wa, par_wd, fl_d, ab_d, oq_lab, tm_a;
+    reg        pop, cpop, oq_push, oq_kind, pf_flush, par_we, fl_push, ab_push, free_pop, tm_we, pl_we;
+    reg [LABW-1:0] par_wa, par_wd, fl_d, ab_d, oq_lab, tm_a; reg [MB-1:0] pl_wa;
     reg [IW-1:0] tm_d;
     reg [RB:0] pj_n;
     reg [LABW-1:0] Lh; reg haz, issue;
-    reg [2:0]  infl, cinfl; reg can_issue, c_issue; reg [LABW-1:0] pr_r; reg pr_nf;
+    reg [3:0]  infl; reg [2:0] cinfl; reg can_issue, c_issue; reg [LABW-1:0] pr_r; reg pr_nf;
     reg [LABW-1:0] ol;
     reg        fin_req, fin_ok, fin_kind, t_slow, t_term;
     reg [LABW-1:0] fin_L, fin_lab;
@@ -342,21 +345,18 @@ module run_ccl #(
     always @(posedge clk) begin
         cand_we <= 0; done <= 0;
         wr_pend <= 0;
-        if (wr_pend) begin
-            stats[wr_addr] <= wr_data;
-            info[wr_addr] <= {1'b0, wr_meta, wr_data[213:192]};
-        end
+        if (wr_pend) stats[wr_addr] <= wr_data;
         pop = 0; cpop = 0; oq_push = 0; oq_kind = 0; oq_lab = 0; pf_flush = 0; par_we = 0; fl_push = 0; ab_push = 0;
-        free_pop = 0; tm_we = 0; tm_a = 0; tm_d = 0; pj_n = pj; fin_req = 0; fin_L = 0; t_slow = 0; t_term = 0;
+        free_pop = 0; tm_we = 0; pl_we = 0; pl_wa = 0; tm_a = 0; tm_d = 0; pj_n = pj; fin_req = 0; fin_L = 0; t_slow = 0; t_term = 0;
         par_wa = 0; par_wd = 0; fl_d = 0; ab_d = 0;
         if (rst || fstart) begin
             S <= S_IDLE; rp_bank <= 0; has_prev <= 0; processed <= 0; nlab <= 1; ovf_lab <= 0; ovf_cand <= 0;
             cand_count <= 0; max_row_cycles <= 0; row_cycles <= 0; flags <= 0; final_pass <= 0;
-            f_cnt <= 0; f_rd <= 0; f_wr <= 0; v0 <= 0; v1 <= 0; v2 <= 0; pf_run <= 0; fi <= 0; pj <= 0;
+            f_cnt <= 0; f_rd <= 0; f_wr <= 0; v0 <= 0; v1 <= 0; v2 <= 0; v3 <= 0; v4 <= 0; pf_run <= 0; fi <= 0; pj <= 0;
             c_cnt <= 0; c_rd <= 0; c_wr <= 0; cv0 <= 0; cv1 <= 0; cf_run <= 0; cfi <= 0;
             oq_cnt <= 0; oq_rd <= 0; oq_wr <= 0; hv1 <= 0; hv2 <= 0; hv3 <= 0; p2v <= 0; p3v <= 0;
             fr_rd <= 0; fr_wr <= 0; fr_cnt <= 0; fq_ok <= 0; ab_head <= 0; ab_mid <= 0; ab_tail <= 0;
-            t_cnt <= 0; t_min_area <= 22'h3FFFFF; t_min_idx <= 0; norph <= 0; g1v <= 0; g2v <= 0; lr_v <= 0;
+            t_cnt <= 0; t_min_area <= 22'h3FFFFF; t_min_idx <= 0; norph <= 0; g1v <= 0; g2v <= 0; g3v <= 0; lr1_v <= 0; lr2_v <= 0;
         end else begin
             if (S != S_IDLE && S < S_EM0 && !final_pass) row_cycles <= row_cycles + 1;
 
@@ -404,35 +404,34 @@ module run_ccl #(
                             if (!adj || he < cs) begin                   // previous run ends before the current one: consume
                                 if (!pm && hr != 0) begin orph[norph] <= hr; norph <= norph + 1'b1; end
                                 pop = 1; pj_n = pj + 1'b1; pm <= 0;
-                            end else if (hs > ce) begin fin_req = 1; fin_L = L; end   // previous run starts after the current one
+                            end else if (hs > ce) S <= S_FIN;                // previous run starts after the current one
                             else if (hnf) begin fl <= hr; hops <= 0; S <= S_FSET; end
                             else begin                                   // overlap
                                 if (hr != 0 && L != 0 && hr != L) begin
                                     u_r <= hr; u_gt <= (he > ce); S <= S_U0;
                                 end else begin
                                     if (hr != 0 && L == 0) L <= hr;
-                                    if (he > ce) begin pm <= 1; fin_req = 1; fin_L = (L != 0) ? L : hr; end
+                                    if (he > ce) begin pm <= 1; S <= S_FIN; end
                                     else begin pop = 1; pj_n = pj + 1'b1; pm <= 0; end
                                 end
                             end
-                        end else if (pj >= np) begin fin_req = 1; fin_L = L; end
+                        end else if (pj >= np) S <= S_FIN;
                     end
                 end
                 // ---- slow root search for the FIFO head
                 S_FSET: begin pa <= fl; S <= S_FW; end
-                S_FW: S <= S_FU;
+                S_FW: S <= S_FW2;
+                S_FW2: S <= S_FU;
                 S_FU: begin
-                    if (par_q == fl) begin f_r[f_rd] <= fl; f_nf[f_rd] <= 0; S <= S_CMP; end
+                    if (par_r == fl) begin f_r[f_rd] <= fl; f_nf[f_rd] <= 0; S <= S_CMP; end
                     else if (hops == 5'd31) begin f_r[f_rd] <= 0; f_nf[f_rd] <= 0; S <= S_CMP; end
-                    else begin fl <= par_q; hops <= hops + 1'b1; S <= S_FSET; end
+                    else begin fl <= par_r; hops <= hops + 1'b1; S <= S_FSET; end
                 end
                 // ---- union: root u_r is absorbed into L
                 S_U0: if (stats_idle) begin sa <= L; S <= S_UA1; end
-                S_UA1: S <= S_UA2;
+                S_UA1: begin sa <= u_r; S <= S_UA2; end
                 S_UA2: S <= S_UA3;
-                S_UA3: begin acc <= st_r; sa <= u_r; S <= S_UB1; end
-                S_UB1: S <= S_UB2;
-                S_UB2: S <= S_UB3;
+                S_UA3: begin acc <= st_r; S <= S_UB3; end
                 S_UB3: begin
                     par_we = 1; par_wa = u_r; par_wd = L;
                     wr_pend <= 1; wr_addr <= L; wr_meta <= cur_y; wr_data <= st_merge(acc, st_r);
@@ -449,43 +448,50 @@ module run_ccl #(
                         pop = 1; pj_n = pj + 1'b1; pm <= 0;
                     end else if (pj >= np) S <= S_DRAIN;
                 end
-                S_DRAIN: if (stats_idle) begin oi <= 0; g1v <= 0; g2v <= 0; lr_v <= 0; S <= S_T; end
+                S_DRAIN: if (stats_idle) begin oi <= 0; g1v <= 0; g2v <= 0; g3v <= 0; lr1_v <= 0; lr2_v <= 0; S <= S_T; end
                 // ---- termination check of the orphan roots: 1 root per clock when the root is known and the component is small
                 S_T: begin
-                    if (g2v && g2_l != 0) begin
-                        if (par_q != g2_l) begin                         // stale label: find its root the slow way
-                            t_slow = 1; fl <= par_q; hops <= 1; S <= S_TF0;
-                        end else if (!(mq[10] || (!final_pass && mq[9:0] == cur_y) || (lr_v && lr == g2_l))) begin
-                            if (aq < cfg_min_area[21:0] || aq > cfg_max_area[21:0]) begin
-                                t_term = 1; fl_push = 1; fl_d = g2_l;    // finished and rejected by size: free it
-                                tm_we = 1; tm_a = g2_l; tm_d = {1'b1, 10'd0, aq};
+                    // stage 3 (act on the flags registered by stage 2)
+                    if (g3v && g3_l != 0) begin
+                        if (!g3_root) begin                              // stale label: find its root the slow way
+                            t_slow = 1; fl <= g3_hint; hops <= 1; S <= S_TF0;
+                        end else if (!(g3_done || (lr1_v && lr1 == g3_l) || (lr2_v && lr2 == g3_l))) begin
+                            if (g3_small) begin
+                                t_term = 1; fl_push = 1; fl_d = g3_l;    // finished and rejected by size: free it
+                                tm_we = 1; tm_a = g3_l; tm_d = {1'b1, 10'd0, g3_aq};
                             end else begin                               // needs the bounding box: read the full statistics
-                                t_slow = 1; rroot <= g2_l; sa <= g2_l; pa <= g2_l; S <= S_TR1;
+                                t_slow = 1; rroot <= g3_l; sa <= g3_l; pa <= g3_l; S <= S_TR1;
                             end
                         end
                     end
-                    lr_v <= t_term; lr <= g2_l;
-                    if (t_slow) begin g1v <= 0; g2v <= 0; rs_idx <= g2_i + 1'b1; end
+                    lr2_v <= lr1_v; lr2 <= lr1; lr1_v <= t_term; lr1 <= g3_l;   // a label finished 1-2 clocks ago may still read as alive
+                    if (t_slow) begin g1v <= 0; g2v <= 0; g3v <= 0; rs_idx <= g3_i + 1'b1; end
                     else begin
+                        // stage 2 -> 3: flags from the parent / info read of g2_l
+                        g3v <= g2v; g3_l <= g2_l; g3_i <= g2_i; g3_hint <= par_q; g3_aq <= aq;
+                        g3_root <= (par_q == g2_l);
+                        g3_done <= mq[10] || (!final_pass && mq[9:0] == cur_y);
+                        g3_small <= (aq < cfg_min_area[21:0]) || (aq > cfg_max_area[21:0]);
                         g2v <= g1v; g2_l <= g1_l; g2_i <= g1_i;
                         if (oi < norph) begin
                             ol = orph[oi]; pa <= ol; g1v <= 1; g1_l <= ol; g1_i <= oi; oi <= oi + 1'b1;
                         end else g1v <= 0;
-                        if (oi >= norph && !g1v && !g2v) S <= final_pass ? S_EM0 : S_REL;
+                        if (oi >= norph && !g1v && !g2v && !g3v) S <= final_pass ? S_EM0 : S_REL;
                     end
                 end
                 S_TF0: begin pa <= fl; S <= S_TF1; end
-                S_TF1: S <= S_TF2;
+                S_TF1: S <= S_TF1B;
+                S_TF1B: S <= S_TF2;
                 S_TF2: begin
-                    if (par_q == fl) begin rroot <= fl; sa <= fl; S <= S_TR1; end
+                    if (par_r == fl) begin rroot <= fl; sa <= fl; S <= S_TR1; end
                     else if (hops == 5'd31) S <= S_TN;
-                    else begin fl <= par_q; hops <= hops + 1'b1; S <= S_TF0; end
+                    else begin fl <= par_r; hops <= hops + 1'b1; S <= S_TF0; end
                 end
                 S_TR1: S <= S_TR2;
                 S_TR2: S <= S_TR3;
-                S_TR3: begin sr <= st_r; S <= S_TC0; end
+                S_TR3: begin sr <= st_r; mq_r <= mq; S <= S_TC0; end
                 S_TC0: begin
-                    if (mq[10] || (!final_pass && mq[9:0] == cur_y)) S <= S_TN;     // done already / extended by this row
+                    if (mq_r[10] || (!final_pass && mq_r[9:0] == cur_y)) S <= S_TN;     // done already / extended by this row
                     else begin
                         ok_a <= (sr[213:192] >= cfg_min_area[21:0]) && (sr[213:192] <= cfg_max_area[21:0]);
                         ok_d <= (bbw >= cfg_min_dim) && (bbh >= cfg_min_dim);
@@ -499,23 +505,22 @@ module run_ccl #(
                     S <= (ok_a && ok_d && ok_b) ? S_TOP : S_TN;
                 end
                 S_TOP: begin
+                    pl_we = 1;
                     if (t_cnt < MAXC) begin
-                        pool[t_cnt[MB-1:0]] <= sr; tlab[t_cnt[MB-1:0]] <= rroot;
-                        tarea[t_cnt[MB-1:0]] <= sr[213:192];
+                        pl_wa = t_cnt[MB-1:0];
                         if (t_cnt == 0 || sr[213:192] < t_min_area) begin t_min_area <= sr[213:192]; t_min_idx <= t_cnt[MB-1:0]; end
                         t_cnt <= t_cnt + 1'b1; S <= S_TN;
                     end else if (sr[213:192] > t_min_area) begin           // replace the smallest kept candidate
-                        pool[t_min_idx] <= sr; tlab[t_min_idx] <= rroot;
-                        tarea[t_min_idx] <= sr[213:192];
+                        pl_wa = t_min_idx;
                         ovf_cand <= 1; scan_i <= 0; t_min_area <= 22'h3FFFFF; S <= S_MS;
-                    end else begin ovf_cand <= 1; S <= S_TN; end
+                    end else begin pl_we = 0; ovf_cand <= 1; S <= S_TN; end
                 end
                 S_MS: begin                                              // find the new minimum (one entry per clock)
                     if (tarea[scan_i] < t_min_area) begin t_min_area <= tarea[scan_i]; t_min_idx <= scan_i; end
                     scan_i <= scan_i + 1'b1;
                     if (scan_i == MAXC - 1) S <= S_TN;
                 end
-                S_TN: begin oi <= rs_idx; g1v <= 0; g2v <= 0; lr_v <= 0; S <= S_T; end
+                S_TN: begin oi <= rs_idx; g1v <= 0; g2v <= 0; g3v <= 0; lr1_v <= 0; lr2_v <= 0; S <= S_T; end
                 // ---- free the labels absorbed during the previous row
                 S_REL: begin
                     if (ab_head == ab_mid) begin ab_mid <= ab_tail; S <= S_ROWEND; end
@@ -534,8 +539,7 @@ module run_ccl #(
                     if (ei >= t_cnt) S <= S_DONE;
                     else begin pool_a <= ei[MB-1:0]; S <= S_EM2; end
                 end
-                S_EM2: S <= S_EM3;
-                S_EM3: begin sr <= pool_q; rroot <= tlab_q; cw <= 0; S <= S_WR; end
+                S_EM2: begin sr <= pool[pool_a]; rroot <= tlab[pool_a]; cw <= 0; S <= S_WR; end
                 S_WR: begin
                     cand_we <= 1; cand_waddr <= {ei[5:0], cw};
                     case (cw)
@@ -585,38 +589,46 @@ module run_ccl #(
             end
             oq_cnt <= oq_cnt + oq_push - issue;
             if (par_we) begin parentA[par_wa] <= par_wd; parentB[par_wa] <= par_wd; end
-            if (tm_we) info[tm_a] <= tm_d;
+            if (wr_pend || tm_we)                                          // one write port: a unit/union write, else a "finished" mark
+                info[wr_pend ? wr_addr : tm_a] <= wr_pend ? {1'b0, wr_meta, wr_data[213:192]} : tm_d;
+            if (pl_we) begin pool[pl_wa] <= sr; tlab[pl_wa] <= rroot; tarea[pl_wa] <= sr[213:192]; end
             if (fl_push) begin flmem[fr_wr] <= fl_d; fr_wr <= fr_wr + 1'b1; end
             if (free_pop) fr_rd <= fr_rd + 1'b1;
             fr_cnt <= fr_cnt + fl_push - free_pop;
             fq_ok <= !(free_pop || (fl_push && fr_cnt == 0));
-            if (ab_push) begin abmem[ab_tail] <= ab_d; ab_tail <= ab_tail + 1'b1; end
+            if (ab_push) begin abmem[ab_tail[AB-1:0]] <= ab_d; ab_tail <= ab_tail + 1'b1; end
 
             // current-row run fetch
             cinfl = cv0 + cv1;
             c_issue = cf_run && (cfi < nc) && ((c_cnt + cinfl) < PD);
             cv0 <= c_issue; cv1 <= cv0;
             if (c_issue) begin ca <= {rp_bank, cfi[RB-1:0]}; cfi <= cfi + 1'b1; end
-            if (cv1) begin c_s[c_wr] <= cq_s; c_e[c_wr] <= cq_e; c_wr <= c_wr + 1'b1; end
+            if (cv1) begin c_s[c_wr] <= cq[10:0]; c_e[c_wr] <= cq[21:11]; c_wr <= c_wr + 1'b1; end
             c_cnt <= c_cnt + cv1 - cpop;
             if (cpop) c_rd <= c_rd + 1'b1;
             if (S == S_R0) begin c_cnt <= 0; c_rd <= 0; c_wr <= 0; cv0 <= 0; cv1 <= 0; cfi <= 0; end
 
             // previous-row prefetch pipeline
-            infl = v0 + v1 + v2;
-            can_issue = pf_run && (fi < np) && ((f_cnt + infl) < PD);
-            v0 <= can_issue; v1 <= v0; v2 <= v1;
+            infl = v0 + v1 + v2 + v3 + v4;
+            can_issue = pf_run && (fi < np) && ((f_cnt + infl) < PF);
+            v0 <= can_issue; v1 <= v0; v2 <= v1; v3 <= v2; v4 <= v3;
             if (can_issue) begin pf_a <= {pf_bank, fi[RB-1:0]}; fi <= fi + 1'b1; end
-            s2_s <= rq_s; s2_e <= rq_e; s2_l <= rlq;
-            pr_nf = (s2_l != 0) && (parqA != s2_l);
-            pr_r  = (s2_l == 0) ? {LABW{1'b0}} : (parqA == s2_l) ? s2_l : parqA;
-            if (v2) begin
-                f_s[f_wr] <= s2_s; f_e[f_wr] <= s2_e; f_r[f_wr] <= pr_r; f_nf[f_wr] <= pr_nf; f_wr <= f_wr + 1'b1;
+            s2_s <= rq[10:0]; s2_e <= rq[21:11]; s2_l <= rlq;
+            // stage 2 -> 3: candidate root = raw label if it is its own parent, else its parent (verified one stage later)
+            s3_s <= s2_s; s3_e <= s2_e;
+            s3_chk <= (s2_l != 0) && (parqA != s2_l);
+            s3_r <= (s2_l == 0) ? {LABW{1'b0}} : (parqA == s2_l) ? s2_l : parqA;
+            s4_s <= s3_s; s4_e <= s3_e; s4_r <= s3_r; s4_chk <= s3_chk;
+            // stage 4: the parent of the candidate (parqA2) confirms it, or gives a better hint (root of a longer chain -> slow find)
+            pr_nf = s4_chk && (parqA2 != s4_r);
+            pr_r  = (s4_chk && parqA2 != s4_r) ? parqA2 : s4_r;
+            if (v4) begin
+                f_s[f_wr] <= s4_s; f_e[f_wr] <= s4_e; f_r[f_wr] <= pr_r; f_nf[f_wr] <= pr_nf; f_wr <= f_wr + 1'b1;
             end
-            f_cnt <= f_cnt + v2 - pop;
+            f_cnt <= f_cnt + v4 - pop;
             if (pop) f_rd <= f_rd + 1'b1;
             if (pf_flush) begin
-                v0 <= 0; v1 <= 0; v2 <= 0; f_cnt <= 0; f_rd <= 0; f_wr <= 0; fi <= pj_n;
+                v0 <= 0; v1 <= 0; v2 <= 0; v3 <= 0; v4 <= 0; f_cnt <= 0; f_rd <= 0; f_wr <= 0; fi <= pj_n;
             end
         end
     end
