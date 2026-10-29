@@ -79,19 +79,20 @@
   },
   "bottom_side_max_component_height": 3.2,
   "top_side_max_component_height_outside_lens_holder": 2.0,
+  "status_leds_note": "Status LEDs sit on the flat part of the front-cover roof (more than 18.5 mm from the lens axis; inside that radius the roof is a 45 deg cone), above the USB-C receptacle, so the 2.0 mm light-pipe bores are perpendicular to the roof.",
   "status_leds": [
     {
       "name": "PWR",
       "pos": [
-        9.0,
-        21.5
+        -21.5,
+        -6.5
       ]
     },
     {
       "name": "STAT",
       "pos": [
-        12.0,
-        21.5
+        -21.5,
+        -9.5
       ]
     }
   ],

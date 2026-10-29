@@ -13,7 +13,7 @@ Tests: `py -3.12 -m pytest tests/test_housing.py -q`.
 
 ## Design summary
 * BACK shell: floor 2.4, walls 2.4, four 6 mm posts at (+-20.5, +-20.5) (4.0 mm tall) whose top faces are the PCB seating plane (0.8 mm under the 3.2 mm bottom-side parts). M2 clearance holes (2.4) with 4.4 x 1.4 head counterbores in the underside, USB-C cut-out (9.34 x 3.66, centre y = -8) in the left wall, 2.5 mm boot-button access hole at (20,4), five 1.6 x 14 vent slots under the FPGA (centre (0,-8)), inner 1.0 x 1.5 lap tongue.
-* FRONT cover: 45 degree conical roof (no supports when printed rim-down), 15 mm lens bore in a 19 mm OD hood centred on the sensor axis (0, 9); the cone roof and outer shell are clipped to the walls, corner bosses with 1.8 mm self-tapping pilots that press on the PCB top, lap groove, LED well plus two 2.0 mm bores for 1.75 mm clear-filament light pipes (cut to ~7.5 mm, glue flush).
+* FRONT cover: 45 degree conical roof (no supports when printed rim-down), 15 mm lens bore in a 19 mm OD hood centred on the sensor axis (0, 9); the cone roof and outer shell are clipped to the walls, corner bosses with 1.8 mm self-tapping pilots that press on the PCB top, lap groove, LED well plus two 2.0 mm bores for 1.75 mm clear-filament light pipes (cut to ~4.5 mm, glue flush). The bores run straight up (+Z) through the FLAT part of the roof (outside the 18.5 mm cone start radius) so they are perpendicular to the surface they exit; the LEDs are at (-21.5, -6.5) and (-21.5, -9.5), above the USB-C receptacle (they used to be at (9, 21.5) and (12, 21.5), where the roof is the 45 degree cone).
 * PCB is captured: lateral 0.2 mm clearance in the cavity (+ screw shanks in the 2.2 mm holes), vertical clamp between the four post shoulders and the four front bosses; top parts (lens holder 6 mm) have 0.9 mm headroom under the cone roof, bottom parts 0.8 mm.
 * Snap fits vs screws: screws chosen. The front is a rigid cone and the PCB must be clamped without play; snaps on 2.4 mm PLA walls would be reworkable only with risk of cracking and give no clamp force. The lap joint also blocks light.
 
@@ -25,7 +25,7 @@ PLA or PETG, 0.4 mm nozzle, 0.2 mm layers, 3 perimeters, 20 % gyroid, no support
 |---|---|
 | 4 | M2 x 10 pan/cap head screws (see note), 3.8 mm head max |
 | 4 (optional) | M2 heat-set inserts OD 3.2 x 4 mm into front bosses; set `pilot_d = 3.2` |
-| 2 | 1.75 mm clear filament, ~7.5 mm long (LED light pipes) |
+| 2 | 1.75 mm clear filament, ~4.5 mm long (LED light pipes) |
 Note: M2 x 8 was requested but the stack (head seat to boss) is 6.2 mm + 1.6 mm PCB, so M2 x 8 would engage only 1.8 mm in the front boss. M2 x 10 gives 3.4 mm engagement (pilot depth 4.0). Use M2 x 10.
 
 ## Assembly
@@ -64,6 +64,6 @@ These are checked in `tests/test_housing.py` by sampling the cone against the fr
 ## Assumptions / issues for the PCB engineer
 * USB-C body assumed 3.2 mm tall, spanning x -24 to -16.7; opening centred at z = PCB bottom - 1.6.
 * FPGA centre (0,-8) taken from keepout_note.
-* LEDs at (9, 21.5) and (12, 21.5) sit 0.4 mm beyond the lens-holder edge (y = 19); the light-pipe block fits in that gap.
+* LEDs D1 PWR (-21.5, -6.5) and D2 STAT (-21.5, -9.5) (their 1k resistors R14/R15 are on the top side next to them, at x = -18.7) are 21.5 mm from the lens axis (0, 9), i.e. beyond the 18.5 mm cone start radius (boss edge at 19.4 mm), so the roof above them is flat (5.0 mm above the split plane) and the 2.0 mm bores are perpendicular to it. The LED well under the roof is a hull of two 2.4 x 1.6 mm pockets. Checked in `tests/test_housing.py::test_led_light_pipe_bores_go_through_flat_roof`.
 * No STEP/STL of the board existed in `pcb/output`, so interference uses boxes from params (tests).
 * Screw heads must be <= 4.4 mm dia and <= 1.4 mm tall (pan head M2: 3.8 x 1.3).

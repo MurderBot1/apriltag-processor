@@ -196,6 +196,27 @@ def test_aperture_and_fov_cone(front):
     assert margin > 1.5
 
 
+def test_led_light_pipe_bores_go_through_flat_roof(front):
+    """The 2.0 mm LED bores must pierce the flat part of the roof (not the 45 deg cone / hood), perpendicular to it."""
+    roof_top = ZPT + 2.6 + 2.4  # flat outer roof height (roof_in + roof_t)
+    cone_r0 = 18.5
+    for l in PARAMS["status_leds"]:
+        lx, ly = l["pos"]
+        # the whole boss around the bore (r = 2.1) lies outside the cone start radius -> roof is flat there
+        assert math.hypot(lx - AX[0], ly - AX[1]) - 2.1 > cone_r0, l["name"]
+        ang = np.linspace(0, 2 * np.pi, 8, endpoint=False)
+        ring = np.c_[lx + 1.5 * np.cos(ang), ly + 1.5 * np.sin(ang)]          # roof material beside the bore
+        pts_in = np.c_[ring, np.full(len(ring), roof_top - 0.1)]
+        pts_out = np.c_[ring, np.full(len(ring), roof_top + 0.1)]
+        assert inside(front, pts_in).all(), "roof must be solid beside the bore"
+        assert not inside(front, pts_out).any(), "roof top beside the bore must be flat at the roof height"
+        axis = np.array([[lx, ly, z] for z in np.linspace(ZPT + 2.8, roof_top + 0.5, 6)])
+        assert not inside(front, axis).any(), "bore must be open along its axis"
+        for dx in (-0.9, 0.9):   # bore wall at 2.0 mm diameter, vertical: solid just outside it at every height
+            side = np.array([[lx + dx * 1.15, ly, z] for z in np.linspace(ZPT + 2.8, roof_top - 0.3, 4)])
+            assert inside(front, side).all()
+
+
 def test_pcb_components_do_not_interfere(back, front):
     """Sample points inside simple boxes of the PCB parts; none may be inside the shells."""
     pts = []

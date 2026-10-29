@@ -1,11 +1,11 @@
 {
  "violations": {
-  "via_dangling": 29,
+  "via_dangling": 28,
   "track_dangling": 1,
   "lib_footprint_issues": 2,
   "silk_overlap": 9,
   "silk_over_copper": 32
  },
- "unconnected_items": 13,
- "total_violations": 73
+ "unconnected_items": 12,
+ "total_violations": 72
 }

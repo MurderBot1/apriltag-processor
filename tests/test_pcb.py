@@ -131,9 +131,9 @@ def test_mechanical_contract():
     assert (s['x'], s['y']) == tuple(P['sensor']['center']) and s['side'] == 'top'
     leds = {p['value']: (p['x'], p['y']) for p in D.parts if p['value'] in ('PWR', 'STAT')}
     for l in P['status_leds']: assert leds[l['name']] == tuple(l['pos'])
-    # everything except the sensor, the lens holder, LEDs and mounting holes is on the bottom side
+    # everything except the sensor, the lens holder, LEDs (+ their 1k resistors R14, R15) and mounting holes is on the bottom side
     for p in D.parts:
-        if p['side'] == 'top': assert p['ref'] in ('U10', 'LH1') or p['value'] in ('PWR', 'STAT') or p['ref'].startswith('MH'), p['ref']
+        if p['side'] == 'top': assert p['ref'] in ('U10', 'LH1') or p['value'] in ('PWR', 'STAT') or p['ref'] in ('R14', 'R15') or p['ref'].startswith('MH'), p['ref']
     # all parts inside the outline
     for p in D.parts:
         assert abs(p['x']) <= D.BW / 2 + 0.01 and abs(p['y']) <= D.BH / 2 + 0.01, p['ref']
