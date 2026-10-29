@@ -20,7 +20,7 @@ estimates (id + sub-pixel corners), never an image.
 | `rtl/` | the chip: D-PHY + CSI-2 receiver, adaptive threshold, despeckle, connected components, **TPU** (custom processor + baked tag36h11 ROM), SPI/I2C, top levels, pin constraints (`apriltag_cam.lpf`), generated TPU program (`tpu_prog.hex`) |
 | `tools/` | golden Python models of every block, TPU assembler + instruction-set simulator + the baked program (`tpu_prog.py`), Blender scene/dataset generator, reference detector, sensor init generator, FPGA flow scripts |
 | `tb/`, `tests/` | Verilog testbenches and 226 pytest tests (see `docs/verification.md`) |
-| `test_images/` | **100 rendered 1280x800 test frames** (Blender Cycles, lens distortion + sensor noise model) with ground-truth poses (`ground_truth.json`) |
+| `test_images/` | **100 rendered 1280x800 test frames in 10 categories of 10** (normal, bright, dark, low-contrast, gradient light, shadow, noise, clutter, blur, perspective; Blender Cycles, lens distortion + sensor noise model) with ground-truth poses (`ground_truth.json`) |
 | `firmware/core`, `firmware/rp2350` | MCU firmware: pose solver, USB protocol, flash storage, auto exposure; RP2350 (Pico SDK) port |
 | `host/` | Python library + CLI (`atcam.py`) with a simulated device so everything runs without hardware |
 | `pcb/` | 4-layer 48 x 48 mm board generated from code (`design.py`, `build_pcb.py`), routed, fabrication outputs |
@@ -47,7 +47,7 @@ Protocol: `docs/protocol.md`. Conventions (world, tag, camera frames, corner ord
 
 ```
 py -3.12 tools/make_tags.py               # tag images + the 587-code ROM table
-py -3.12 tools/make_dataset.py            # Blender renders (needs Blender 5.x) -> test_images/
+py -3.12 tools/make_dataset_100.py        # the 100-image dataset: Blender renders (needs Blender 5.x) -> test_images/ (deterministic, see docs/verification.md)
 py -3.12 tools/tpu_prog.py                # assemble the TPU program ROM (rtl/tpu_prog.hex)
 py -3.12 tests/run_all.py                 # the whole verification suite
 bash tools/fpga_flow.sh                   # yosys + nextpnr-ecp5 (+ ecppack bitstream)
@@ -56,14 +56,30 @@ bash tools/fpga_flow.sh                   # yosys + nextpnr-ecp5 (+ ecppack bits
 Tools used: Icarus Verilog 13, Yosys 0.66, nextpnr-ecp5 0.7, KiCad 10, Freerouting 2.1, OpenSCAD 2021, Blender 5.1,
 arm-none-eabi-gcc, Pico SDK (all installed during the build; see `docs/`).
 
+## Build and release (deploy)
+
+`bash tools/build_all.sh [--strict] [--skip-tests] [--skip-fpga]` builds every buildable output into `products/` (git-ignored) and writes
+`products/MANIFEST.json` / `MANIFEST.txt` (commit, build date, tool versions, per-step ok/skipped/failed with notes, and file name, size and sha256).
+Products: FPGA bitstream + netlist/config + timing/utilisation reports (yosys, nextpnr-ecp5, ecppack), RP2350 firmware (`.uf2/.elf/.bin`, needs
+arm-none-eabi-gcc + Pico SDK via `PICO_SDK_PATH`), native firmware-sim library, host bundle + configs, Python wheel, C++ static lib + headers,
+Java jar, Rust `.crate`/rlib, docs tarball and the committed PCB gerbers/BOM (copied, not regenerated; needs KiCad). A step whose toolchain is
+missing is recorded as `skipped` in the manifest (never faked); set `REQUIRE="fpga firmware ..."` to make that an error. A timing miss in the FPGA
+flow is recorded as a `warning`, and the bitstream is still produced.
+
+**Releasing:** pushing to the `deploy` branch (`git push origin main:deploy`, or merge `main` into `deploy`) runs `.github/workflows/release.yml`.
+It installs the toolchains, runs `tools/build_all.sh --strict`, uploads `products/` as a workflow artifact, and creates a NEW GitHub Release
+tagged `deploy-<run_number>-<short sha>` with the products and manifest attached and notes listing the commit, date, tool versions and
+build/test results. Earlier releases are never overwritten. `main` does not trigger releases. The workflow can also be started manually
+(workflow_dispatch) from any ref. It uses `GITHUB_TOKEN` with `contents: write`.
+
 ## Headline results (details and caveats in `docs/verification.md`, `docs/fpga.md`, `docs/hardware.md`)
 
 * **120.08 fps** sustained in full-chip simulation at true sensor timing (832,800 clocks per frame at 100 MHz), no dropped
   frames, two frame banks so capture never stalls.
-* 100 rendered frames through the simulated chip + the MCU's solver: **median camera position error about 1-2 mm and
-  0.02-0.04 deg**; 93 % of visible tags detected in normal-light frames (the reference AprilTag library: 96 %).
-* On the 500-frame set (clutter, glare, dark, noise-only, ...): **2651 of 2825 detectable tags (93.8 %), 0 false positives**
-  (reference library 2739 = 96.9 %). The noise-robust labeller raised this from 2158 (76.4 %); see `results/ccl_failure_mechanism.md`.
+* 100 rendered frames (10 conditions x 10) through the simulated chip + the MCU's solver: **median camera position error about
+  1-3 mm and 0.02-0.05 deg** where tags are found; 70 % of the detectable tags overall (the reference AprilTag library: 97 %) -
+  95 % on the clean baseline but 0 % on the low-contrast and 14 % on the cluttered category, see `docs/verification.md`.
+* GitHub Actions: one check per dataset category (`N/10 detected`, reference detector) plus an all-tests workflow, see `docs/verification.md`.
 * RTL is verified bit-exact against Python golden models (threshold, despeckle, labelling, the custom CPU), and the whole
   chain is exercised with real CSI-2 packets and a bit-level D-PHY model with lane skew and clock offsets.
 * Open-source place-and-route onto the real ECP5-85F pins, with measured resource use and timing (`docs/fpga.md`).
@@ -78,9 +94,6 @@ arm-none-eabi-gcc, Pico SDK (all installed during the build; see `docs/`).
 3. **Timing closure**: see `docs/fpga.md` for the measured fmax of each clock domain against the 100 MHz / 200 MHz
    targets. Anything reported as failing there must be fixed (more pipelining) before relying on 120 fps in hardware.
 4. Detection is weaker than the reference library at long range (> ~3.5 m for 16.5 cm tags), in very low light (until
-   the MCU's auto-exposure runs) and in cluttered backgrounds. The labeller no longer rejects busy frames (256 runs/row, label
-   recycling, the 64 largest candidates kept), but a cluttered frame can need up to 2.5 M TPU clocks (29 ms at 85.7 MHz): in a
-   stream at 120 fps such a frame makes the following frame be dropped (`frames_dropped`); 102 of the 500 evaluation frames
-   (`results/tpu_budget_by_category.md`) would do so if the whole stream looked like them. 7 of the 500 frames also lose 1-5
-   image rows in the labeller (status flag) because their rows are too busy for the 686-clock line.
+   the MCU's auto-exposure runs) and in cluttered, dim backgrounds (the labeller drops rows beyond ~55 runs/row and
+   flags it).
 5. No schematic capture: the board is netlist-first (`pcb/design.py`, `pcb/output/netlist.txt`).

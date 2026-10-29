@@ -34,7 +34,7 @@ def test_structured(vvp):
     check(vvp, m, 'dsp_struct')
 
 def test_real_image_mask(vvp):
-    img = cv2.imread(os.path.join(rtlutil.ROOT, 'test_images', 'sensor', 'rand_05.png'), 0)
+    img = cv2.imread(os.path.join(rtlutil.ROOT, 'test_images', 'sensor', 'clutter_001.png'), 0)
     check(vvp, golden.binarize(img), 'dsp_real')
 
 def test_all_ones_and_zeros(vvp):

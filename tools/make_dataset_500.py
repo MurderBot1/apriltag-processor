@@ -1,4 +1,6 @@
-"""Extend the test-image dataset from 100 to 500 frames (the original 100 are never re-rendered or touched).
+"""LEGACY (the 500-frame set was replaced by the 10 x 10 dataset of tools/make_dataset_100.py, which imports the case-generation helpers
+of this module; running this script directly would need the old 100-frame ground truth and is no longer supported).
+Extend the test-image dataset from 100 to 500 frames (the original 100 are never re-rendered or touched).
 
   py -3.12 tools/make_dataset_500.py            # generate cases -> render missing frames (Blender, GPU) -> sensor model -> ground truth
   py -3.12 tools/make_dataset_500.py --gen      # only (re)write test_images/cases_500.json

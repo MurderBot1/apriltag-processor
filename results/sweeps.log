@@ -1,0 +1,34 @@
+=== py -3.12 tests/sweep_params.py
+diff=24 abs=64 minarea=100 mindim=10: non-dark found 459/583 spurious 0 dark 60/69 max cands 821 max cycles 18552446
+diff=24 abs=64 minarea=40 mindim=6: non-dark found 422/583 spurious 0 dark 57/69 max cands 2506 max cycles 20473690
+diff=16 abs=64 minarea=40 mindim=6: non-dark found 422/583 spurious 0 dark 57/69 max cands 2506 max cycles 20473690
+diff=16 abs=64 minarea=25 mindim=5: non-dark found 410/583 spurious 0 dark 56/69 max cands 3460 max cycles 22285324
+diff=20 abs=64 minarea=40 mindim=6: non-dark found 422/583 spurious 0 dark 57/69 max cands 2506 max cycles 20473690
+diff=12 abs=64 minarea=30 mindim=6: non-dark found 413/583 spurious 0 dark 56/69 max cands 3054 max cycles 20957945
+=== py -3.12 tests/sweep_despeckle.py
+base        found 459/583 dark 60/69 spur 0 | median comps/img 314 max 64713 | max runs/row 309 imgs>64runs 25 | corner err mean 0.635 p95 1.14
+maj5        found 457/583 dark 69/69 spur 0 | median comps/img 38 max 8683 | max runs/row 154 imgs>64runs 17 | corner err mean 0.588 p95 1.01
+maj4        found 464/583 dark 69/69 spur 0 | median comps/img 37 max 6361 | max runs/row 145 imgs>64runs 17 | corner err mean 0.559 p95 0.96
+thr40       found 475/583 dark 60/69 spur 0 | median comps/img 142 max 75908 | max runs/row 309 imgs>64runs 25 | corner err mean 0.859 p95 1.46
+thr40+maj5  found 475/583 dark 69/69 spur 0 | median comps/img 21 max 15355 | max runs/row 150 imgs>64runs 15 | corner err mean 0.842 p95 1.40
+thr37       found 475/583 dark 60/69 spur 0 | median comps/img 134 max 79723 | max runs/row 309 imgs>64runs 25 | corner err mean 0.928 p95 1.52
+=== py -3.12 tests/sweep_noise.py
+baseline       found 423/647 (65.4%)  false 0  overflow frames 22
+diff32         found 423/647 (65.4%)  false 0  overflow frames 22
+diff48         found 403/647 (62.3%)  false 0  overflow frames 22
+diff64         found 389/647 (60.1%)  false 0  overflow frames 22
+smooth2        found 468/647 (72.3%)  false 0  overflow frames 15
+smooth3        found 477/647 (73.7%)  false 0  overflow frames 13
+smooth3_d32    found 474/647 (73.3%)  false 0  overflow frames 13
+smooth2_d32    found 467/647 (72.2%)  false 0  overflow frames 15
+smooth3_d40    found 462/647 (71.4%)  false 0  overflow frames 13
+smooth3_d48    found 450/647 (69.6%)  false 0  overflow frames 13
+=== py -3.12 tests/sweep_candidates.py
+label order                    found 533/647 (82.4%) false 0  frames cand>64: 6  max cycles 1713034
+area desc cap64                found 562/647 (86.9%) false 0  frames cand>64: 6  max cycles 1545798
+area desc cap32                found 554/647 (85.6%) false 0  frames cand>64: 6  max cycles 818884
+area desc cap128               found 562/647 (86.9%) false 0  frames cand>64: 6  max cycles 3091583
+area desc cap256               found 562/647 (86.9%) false 0  frames cand>64: 6  max cycles 5172646
+label cap128                   found 533/647 (82.4%) false 0  frames cand>64: 6  max cycles 3426055
+bbox desc cap64                found 553/647 (85.5%) false 0  frames cand>64: 6  max cycles 1468555
+area desc cap64 minarea150     found 562/647 (86.9%) false 0  frames cand>64: 6  max cycles 1545798

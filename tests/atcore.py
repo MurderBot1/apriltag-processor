@@ -16,6 +16,12 @@ def structs(real):
 class Solver:
     def __init__(self, double=False):
         dll = os.path.join(ROOT, 'firmware', 'tests', 'libatcore_d.dll' if double else 'libatcore.dll')
+        if os.name != 'nt':                 # Linux / CI: build the shared object from the firmware sources (the .dll files are Windows builds)
+            import subprocess
+            dll = os.path.join(ROOT, 'sim', 'libatcore_d.so' if double else 'libatcore.so'); os.makedirs(os.path.dirname(dll), exist_ok=True)
+            src = os.path.join(ROOT, 'firmware', 'core', 'atpose.c')
+            if not os.path.exists(dll) or os.path.getmtime(dll) < os.path.getmtime(src):
+                subprocess.check_call(['gcc', '-O2', '-shared', '-fPIC'] + (['-DAT_REAL=double'] if double else []) + ['-o', dll, src, '-lm'])
         self.lib = C.CDLL(dll)
         real = C.c_double if double else C.c_float
         self.Calib, self.Tag, self.Field, self.Meas, self.Pose = structs(real)

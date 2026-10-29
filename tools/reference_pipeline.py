@@ -13,6 +13,7 @@ def detector():
     if _DET is None:
         from pupil_apriltags import Detector
         _DET = Detector(families='tag36h11', quad_decimate=1.0, refine_edges=True, decode_sharpening=0.25)
+        type(_DET).__del__ = lambda self: None       # pupil-apriltags segfaults in its destructor at interpreter exit on Linux (exit code 139): never destroy it
     return _DET
 
 
@@ -114,14 +115,14 @@ def f(x, p=2):
 
 def main():
     rows = evaluate(); s = summarize(rows)
-    suffix = '' if len(rows) == 100 else f'_{len(rows)}'      # the 100-image baseline files are kept as they are
+    suffix = '' if len(rows) == 100 else f'_{len(rows)}'
     os.makedirs(os.path.join(ROOT, 'results'), exist_ok=True)
     json.dump(dict(per_image=rows, per_category=s), open(os.path.join(ROOT, 'results', f'reference_baseline{suffix}.json'), 'w'), indent=1)
     tot = lambda k: sum(v[k] for v in s.values())
     L = ['# Reference pipeline baseline' + (f' ({len(rows)} images)' if suffix else ''), '',
          'undistort -> pupil-apriltags tag36h11 -> SQPnP + LM over all detected tag corners.', '',
          'A tag is *detectable* when it faces the camera, is fully inside the frame, is >= 10 px wide, is within 75 deg of the camera axis, is <= 50 % occluded and is not washed out / flat in the image (tools/dataset_gt.py). '
-         'Rates are detected / detectable; `vis` = legacy geometric visibility (facing + inside the frame) is kept for comparison with the 100-image baseline.', '',
+         'Rates are detected / detectable; `vis` = legacy geometric visibility (facing + inside the frame) is kept for comparison with the old geometric-visibility numbers.', '',
          f"Overall: {tot('det_detectable')} / {tot('detectable')} detectable tags detected ({tot('det_detectable') / max(1, tot('detectable')):.1%}); legacy vis: {tot('detected')} / {tot('visible')}; false-ID detections {tot('false')}.", '',
          '## Per category', '', '| cat | imgs | detectable | det | rate (detectable) | vis | rate (vis) | false | corner mean/med/max px | pose imgs | t mean/max mm | rot mean/max deg |', '|---|---|---|---|---|---|---|---|---|---|---|---|']
     for c, v in s.items():

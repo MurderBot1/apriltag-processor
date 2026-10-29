@@ -1,0 +1,107 @@
+{
+ "category": "dark",
+ "ok": 10,
+ "total": 10,
+ "images": [
+  {
+   "image": "dark_000",
+   "ok": true,
+   "detectable": 8,
+   "detected": 8,
+   "false_ids": 0,
+   "corner_mean_px": 0.2352668489401759,
+   "t_err_mm": 0.666785626916836,
+   "missed": []
+  },
+  {
+   "image": "dark_001",
+   "ok": true,
+   "detectable": 7,
+   "detected": 7,
+   "false_ids": 0,
+   "corner_mean_px": 0.2858946336753907,
+   "t_err_mm": 0.3711005045361683,
+   "missed": []
+  },
+  {
+   "image": "dark_002",
+   "ok": true,
+   "detectable": 6,
+   "detected": 6,
+   "false_ids": 0,
+   "corner_mean_px": 0.2398358910050056,
+   "t_err_mm": 0.6849836820821366,
+   "missed": []
+  },
+  {
+   "image": "dark_003",
+   "ok": true,
+   "detectable": 8,
+   "detected": 8,
+   "false_ids": 0,
+   "corner_mean_px": 0.2680722249825124,
+   "t_err_mm": 0.33528754773043945,
+   "missed": []
+  },
+  {
+   "image": "dark_004",
+   "ok": true,
+   "detectable": 8,
+   "detected": 8,
+   "false_ids": 0,
+   "corner_mean_px": 0.25425320144257246,
+   "t_err_mm": 0.3988514342989065,
+   "missed": []
+  },
+  {
+   "image": "dark_005",
+   "ok": true,
+   "detectable": 4,
+   "detected": 4,
+   "false_ids": 0,
+   "corner_mean_px": 0.25334640471296244,
+   "t_err_mm": 0.40863677056179,
+   "missed": []
+  },
+  {
+   "image": "dark_006",
+   "ok": true,
+   "detectable": 9,
+   "detected": 9,
+   "false_ids": 0,
+   "corner_mean_px": 0.25647713583386056,
+   "t_err_mm": 0.9991317098984837,
+   "missed": []
+  },
+  {
+   "image": "dark_007",
+   "ok": true,
+   "detectable": 3,
+   "detected": 3,
+   "false_ids": 0,
+   "corner_mean_px": 0.25641414129758894,
+   "t_err_mm": 0.48302179997132766,
+   "missed": []
+  },
+  {
+   "image": "dark_008",
+   "ok": true,
+   "detectable": 8,
+   "detected": 8,
+   "false_ids": 0,
+   "corner_mean_px": 0.20142175057069917,
+   "t_err_mm": 0.7546759788113061,
+   "missed": []
+  },
+  {
+   "image": "dark_009",
+   "ok": true,
+   "detectable": 8,
+   "detected": 8,
+   "false_ids": 0,
+   "corner_mean_px": 0.1936535783942488,
+   "t_err_mm": 1.0926199707629085,
+   "missed": []
+  }
+ ]
+}

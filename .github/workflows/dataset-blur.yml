@@ -1,0 +1,11 @@
+name: dataset-blur
+on:
+  pull_request:
+permissions:
+  contents: read
+  pull-requests: write
+jobs:
+  run:
+    uses: ./.github/workflows/dataset-category.yml
+    with:
+      category: blur

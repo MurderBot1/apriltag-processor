@@ -1,0 +1,113 @@
+{
+ "category": "shadow",
+ "ok": 7,
+ "total": 10,
+ "images": [
+  {
+   "image": "shadow_000",
+   "ok": true,
+   "detectable": 2,
+   "detected": 2,
+   "false_ids": 0,
+   "corner_mean_px": 0.2336842487784724,
+   "t_err_mm": 2.9544988410541966,
+   "missed": []
+  },
+  {
+   "image": "shadow_001",
+   "ok": true,
+   "detectable": 5,
+   "detected": 5,
+   "false_ids": 0,
+   "corner_mean_px": 0.26114258040184435,
+   "t_err_mm": 0.4502294408606268,
+   "missed": []
+  },
+  {
+   "image": "shadow_002",
+   "ok": false,
+   "detectable": 3,
+   "detected": 2,
+   "false_ids": 0,
+   "corner_mean_px": 0.24654187047925835,
+   "t_err_mm": 3.0553148775190255,
+   "missed": [
+    311
+   ]
+  },
+  {
+   "image": "shadow_003",
+   "ok": true,
+   "detectable": 7,
+   "detected": 7,
+   "false_ids": 0,
+   "corner_mean_px": 0.21941120683106036,
+   "t_err_mm": 0.20801754519523072,
+   "missed": []
+  },
+  {
+   "image": "shadow_004",
+   "ok": true,
+   "detectable": 3,
+   "detected": 3,
+   "false_ids": 0,
+   "corner_mean_px": 0.3095836456180814,
+   "t_err_mm": 4.838116436317258,
+   "missed": []
+  },
+  {
+   "image": "shadow_005",
+   "ok": true,
+   "detectable": 10,
+   "detected": 10,
+   "false_ids": 0,
+   "corner_mean_px": 0.26129325086395117,
+   "t_err_mm": 0.40913434521151115,
+   "missed": []
+  },
+  {
+   "image": "shadow_006",
+   "ok": false,
+   "detectable": 6,
+   "detected": 5,
+   "false_ids": 0,
+   "corner_mean_px": 0.24872436776800416,
+   "t_err_mm": 0.6118924571132448,
+   "missed": [
+    58
+   ]
+  },
+  {
+   "image": "shadow_007",
+   "ok": true,
+   "detectable": 8,
+   "detected": 8,
+   "false_ids": 0,
+   "corner_mean_px": 0.2617817930981027,
+   "t_err_mm": 0.8190762800550954,
+   "missed": []
+  },
+  {
+   "image": "shadow_008",
+   "ok": false,
+   "detectable": 2,
+   "detected": 1,
+   "false_ids": 0,
+   "corner_mean_px": 0.233828090454011,
+   "t_err_mm": 5.923848305713313,
+   "missed": [
+    250
+   ]
+  },
+  {
+   "image": "shadow_009",
+   "ok": true,
+   "detectable": 1,
+   "detected": 1,
+   "false_ids": 0,
+   "corner_mean_px": 0.22123253410696928,
+   "t_err_mm": 4.515247720696984,
+   "missed": []
+  }
+ ]
+}

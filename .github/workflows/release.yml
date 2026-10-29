@@ -1,0 +1,76 @@
+name: release
+
+# Every push to the `deploy` branch builds everything (tools/build_all.sh) and publishes a NEW GitHub Release
+# with the products + manifest attached. Releases are never overwritten. `main` does not trigger this.
+# To cut a release:  git push origin main:deploy   (or merge main into deploy).
+on:
+  push:
+    branches: [deploy]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install toolchains
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends yosys nextpnr-ecp5 fpga-trellis iverilog \
+            gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib cmake ninja-build \
+            build-essential default-jdk-headless python3-pip python3-pytest python3-setuptools python3-wheel
+          rustup toolchain install stable --profile minimal
+          git clone --depth 1 --branch 2.1.1 --recurse-submodules --shallow-submodules \
+            https://github.com/raspberrypi/pico-sdk.git "$RUNNER_TEMP/pico-sdk"
+          echo "PICO_SDK_PATH=$RUNNER_TEMP/pico-sdk" >> "$GITHUB_ENV"
+
+      - name: Build all products
+        # --strict: any failed step fails the run. REQUIRE: missing FPGA/firmware toolchains are errors here.
+        env:
+          REQUIRE: "fpga firmware api-python api-cpp api-java api-rust"
+        run: bash tools/build_all.sh --strict
+
+      - name: Upload products as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: products-${{ github.run_number }}
+          path: products/
+          if-no-files-found: error
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -eu
+          SHORT=$(git rev-parse --short=8 HEAD)
+          TAG="deploy-${GITHUB_RUN_NUMBER}-${SHORT}"
+          python3 - <<'PY' > release_notes.md
+          import json
+          m = json.load(open('products/MANIFEST.json'))
+          print(f"Automated build of `{m['git_commit']}` (branch `{m['git_branch']}`), built {m['build_date_utc']}.\n")
+          print("## Build / test results\n\n| step | status | note |\n|---|---|---|")
+          for s in m['steps']: print(f"| {s['step']} | {s['status']} | {s['note']} |")
+          print("\n## Tool versions\n")
+          for k, v in m['tool_versions'].items(): print(f"- {k}: `{v}`")
+          print("\n## Files\n\n| file | bytes | sha256 |\n|---|---|---|")
+          for f in m['files']:
+              if not f['path'].startswith('logs/'): print(f"| {f['path']} | {f['bytes']} | `{f['sha256'][:16]}...` |")
+          print("\nFull hashes: `MANIFEST.json`.")
+          PY
+          # one flat asset per file (release assets cannot have directories); products tree also as a single zip
+          mkdir -p assets
+          (cd products && zip -qr ../assets/products-${TAG}.zip .)
+          cp products/MANIFEST.json products/MANIFEST.txt assets/
+          for f in $(cd products && find fpga firmware host api docs config -type f); do
+            cp "products/$f" "assets/$(echo "$f" | tr '/' '_')"
+          done
+          gh release create "$TAG" assets/* --target "$GITHUB_SHA" --title "Build $TAG" --notes-file release_notes.md
