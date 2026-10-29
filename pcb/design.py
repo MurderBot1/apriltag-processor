@@ -173,10 +173,13 @@ for refn, out, val, x, y in LDOS:
 cap('4u7', '+3V3', -15.0, 12.0, size=C0603)
 cap('4u7', '+1V8', -15.0, 7.0, size=C0603)
 # status LEDs (top side) + power LED
-add('D', 'LED_SMD', 'LED_0603_1608Metric', 'PWR', P['status_leds'][0]['pos'][0], P['status_leds'][0]['pos'][1], 0, 'top', {'1': 'LED_PWR_K', '2': '+3V3'})
-res('1k', 'LED_PWR_K', 'GND', 9.0, 19.2, side='bottom')
-add('D', 'LED_SMD', 'LED_0603_1608Metric', 'STAT', P['status_leds'][1]['pos'][0], P['status_leds'][1]['pos'][1], 0, 'top', {'1': 'LED_STAT_K', '2': '+3V3'})
-res('1k', 'LED_STAT', 'LED_STAT_K', 12.0, 19.2, side='bottom')
+# The LEDs sit on the flat part of the front-cover roof (see pcb_params.json); each 1k resistor is on the top side
+# next to its LED (the bottom is occupied by the USB-C receptacle there); cathode pad (1) faces the resistor.
+(lx0, ly0), (lx1, ly1) = P['status_leds'][0]['pos'], P['status_leds'][1]['pos']
+add('D', 'LED_SMD', 'LED_0603_1608Metric', 'PWR', lx0, ly0, 180, 'top', {'1': 'LED_PWR_K', '2': '+3V3'})
+res('1k', 'LED_PWR_K', 'GND', lx0 + 2.8, ly0, 0, side='top')
+add('D', 'LED_SMD', 'LED_0603_1608Metric', 'STAT', lx1, ly1, 180, 'top', {'1': 'LED_STAT_K', '2': '+3V3'})
+res('1k', 'LED_STAT', 'LED_STAT_K', lx1 + 2.8, ly1, 180, side='top')
 
 # ---------------------------------------------------------------------------------------------- FPGA support
 # decoupling ring around U1 (bottom side)
@@ -261,7 +264,6 @@ def _top_ok(p):
     x, y = p['x'], p['y']
     if abs(x) <= 11.0 and -1.8 <= y <= 19.8: return False                  # lens holder + sensor
     if abs(x + 20.0) < 5.0 and abs(y + 8.0) < 9.0: return False             # USB-C shield tabs
-    if abs(y - 21.5) < 3.0 and 6.0 < x < 15.0: return False                 # status LEDs
     for q in parts:
         if q['ref'].startswith('MH') and math.hypot(q['x'] - x, q['y'] - y) < 5.0: return False
     return True

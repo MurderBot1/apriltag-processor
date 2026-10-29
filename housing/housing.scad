@@ -39,7 +39,7 @@ bore_d   = 15.0;              // lens aperture (14 mm barrel + 0.5 per side)
 hood_wall = 2.0;
 hood_top = holder[2] + barrel_h + 0.3;   // rim 0.3 above lens front
 cone_in_top = roof_in + (cone_r0 - bore_d/2);   // inner cone height at bore
-led_bore = 2.0;               // for 1.75 mm clear filament light pipe
+led_bore = 2.0;               // for 1.75 mm clear filament light pipe; LEDs sit on the FLAT roof (> cone_r0 from the lens axis), bores are perpendicular to it
 
 module rrect(w, r, h) { linear_extrude(h) offset(r) square(w - 2*r, center = true); }
 function sgn() = [[1,1],[-1,1],[1,-1],[-1,-1]];
@@ -98,7 +98,6 @@ module outer_env() {   // outer solid of the front cover (axis at sensor_c)
 }
 
 module front() {
-  led_mid = (led_pos[0][0] + led_pos[1][0]) / 2;
   difference() {
     union() {
       difference() {
@@ -125,7 +124,8 @@ module front() {
       square(2*(hi + tongue_t + groove_extra), center = true);
       square(2*hi - 0.001, center = true);
     }
-    translate([led_mid - 2.5, led_pos[0][1] - 0.8, -1]) cube([5.0, 1.6, 1 + 1.2]);
+    // LED well under the roof (both LEDs, 1.6 x 0.8 bodies + margin)
+    hull() for (p = led_pos) translate([p[0] - 1.2, p[1] - 0.8, -1]) cube([2.4, 1.6, 1 + 1.2]);
     for (p = led_pos) translate([p[0], p[1], 0.5]) cylinder(d = led_bore, h = hood_top);
     for (s = sgn()) translate([s[0]*hole_xy, s[1]*hole_xy, -1]) cylinder(d = pilot_d, h = pilot_depth + 1);
     translate([sensor_c[0], sensor_c[1], -1]) cylinder(d = bore_d, h = hood_top + 2);

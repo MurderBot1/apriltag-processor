@@ -6,7 +6,7 @@ PCB: 48 x 48 mm, 4 layers (F.Cu signal / In1 GND plane / In2 3V3 plane / B.Cu si
 
 | side | parts |
 |---|---|
-| top (lens side) | OV9281 (bare CSP) at (0,+9), M12 lens holder footprint (20x20, two M2.6 holes), PWR + STAT LEDs, 4 M2 mounting holes |
+| top (lens side) | OV9281 (bare CSP) at (0,+9), M12 lens holder footprint (20x20, two M2.6 holes), PWR + STAT LEDs (at (-21.5, -6.5) / (-21.5, -9.5) with their 1k resistors, under the flat part of the housing roof) , 4 M2 mounting holes |
 | bottom | ECP5-85F BG381 at (0,-8), RP2350A, 16 MB QSPI flash, USB-C (left edge), all regulators, decoupling, JTAG header, test points, BOOTSEL button |
 
 ## Block / power tree
