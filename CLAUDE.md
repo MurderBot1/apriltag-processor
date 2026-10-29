@@ -10,6 +10,7 @@ Standing rules from the project owner. Every agent (manager and workers) must fo
 - The manager reviews each PR (CI checks green, diff scoped to the task) and merges it into `main`.
 - After every merge the manager pulls the latest `main` into `D:\apriltag-proccessor`.
 - **Everything GitHub goes through the `gh` CLI**: clone with `gh repo clone MurderBot1/apriltag-processor`, open and merge PRs with `gh pr ...`, check CI with `gh pr checks` / `gh run ...`, publish releases with `gh release ...`. Push with `git -c credential.helper='!gh auth git-credential' push ...`; the default git credential prompt hangs in this environment.
+- After a worker's PR is merged, the manager deletes that worker's folder under `D:/claude/<agent_id>/` (first checking that nothing is unpushed). Folders of running agents are left alone.
 - Side or random tasks given mid-work go to a subagent so the main task keeps going.
 - Never fabricate results, prices, links or measurements. Regenerate numbers by running the tools, and report what could not be run or verified.
 - Commit messages end with `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>`. PR descriptions end with `🤖 Generated with [Claude Code](https://claude.com/claude-code)`.
