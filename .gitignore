@@ -1,6 +1,7 @@
 __pycache__/
 *.pyc
-sim/
+/sim/
+site/sim/work/
 test_images/raw/
 render/work/
 pcb/tools/freerouting.jar
