@@ -23,8 +23,8 @@ PLA or PETG, 0.4 mm nozzle, 0.2 mm layers, 3 perimeters, 20 % gyroid, no support
 ## Hardware
 | Qty | Item |
 |---|---|
-| 4 | M2 x 10 pan/cap head screws (see note), 3.8 mm head max |
-| 4 (optional) | M2 heat-set inserts OD 3.2 x 4 mm into front bosses; set `pilot_d = 3.2` |
+| 4 | M2 x 10 pan/button head screws (see note), head <= 3.8 mm dia x <= 1.4 mm high (DIN 7985 pan is 4.0 x 1.7: too big; ISO 7380 button head 3.4 x 1.3 fits) |
+| 4 (optional) | M2 knurled brass heat-set inserts, 4 mm long, 3.5 mm OD, into a 3.2 mm pilot in the front bosses; set `pilot_d = 3.2` (a 5 mm long insert does not fit the 4.0 mm pilot depth) |
 | 2 | 1.75 mm clear filament, ~4.5 mm long (LED light pipes) |
 Note: M2 x 8 was requested but the stack (head seat to boss) is 6.2 mm + 1.6 mm PCB, so M2 x 8 would engage only 1.8 mm in the front boss. M2 x 10 gives 3.4 mm engagement (pilot depth 4.0). Use M2 x 10.
 
