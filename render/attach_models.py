@@ -3,7 +3,7 @@ Run with KiCad python:  "C:/Program Files/KiCad/10.0/bin/python.exe" render/atta
 Official-library models stay as they are; footprints whose library model does not exist in KiCad 10's 3dmodels (or that never had one)
 get the parametric models from render/models (gen_models.py).  Mounting holes (4x MH, plain NPTH holes) are not parts."""
 import os, pcbnew
-R = 'D:/apriltag-proccessor/render'
+R = os.path.dirname(os.path.abspath(__file__)).replace(chr(92), '/')
 LIB = 'C:/Program Files/KiCad/10.0/share/kicad/3dmodels'
 b = pcbnew.LoadBoard(R + '/work/apriltag_cam.kicad_pcb')
 OWN = {'Lattice_caBGA-381_17x17mm_Layout20x20_P0.8mm': 'Lattice_caBGA-381_17x17mm_Layout20x20_P0.8mm',

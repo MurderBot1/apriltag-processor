@@ -1,6 +1,6 @@
 """Housing STL -> STEP (FreeCAD): front.stl / back.stl become solids in one STEP file. Run: freecadcmd make_step.py"""
 import os, FreeCAD, Mesh, Part
-HERE = os.path.dirname(os.path.abspath(__file__)) if '__file__' in globals() else r'D:\apriltag-proccessor\housing'
+HERE = os.path.dirname(os.path.abspath(__file__)) if '__file__' in globals() else os.getcwd()
 doc = FreeCAD.newDocument('housing')
 objs = []
 for name in ('back', 'front'):

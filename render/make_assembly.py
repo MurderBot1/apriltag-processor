@@ -4,7 +4,7 @@ to a dummy footprint on a COPY of the board (render/work/apriltag_cam_models.kic
 (PCB bottom at z=6.5 above the back-shell bottom, front cover on the split plane z=8.0); kicad-cli merges everything (KiCad puts model z=0 of a top-side footprint on the board top face, z=1.595 in its frame).
 Run:  py -3.12 render/make_assembly.py   (needs render/work/apriltag_cam_models.kicad_pcb; calls KiCad python + kicad-cli)"""
 import re, subprocess, os
-R = 'D:/apriltag-proccessor/render'; H = 'D:/apriltag-proccessor/housing/output'
+R = os.path.dirname(os.path.abspath(__file__)).replace(chr(92), '/'); H = os.path.dirname(R) + '/housing/output'
 for n in ('housing_front', 'housing_back'):
     t = open('%s/%s.step' % (H, n), encoding='utf8', errors='replace').read()
     ids = [int(m.group(1)) for m in re.finditer(r'^#(\d+)\s*=\s*MANIFOLD_SOLID_BREP', t, re.M)]

@@ -245,3 +245,48 @@ def test_pcb_components_do_not_interfere(back, front):
     P = P[keep]
     assert not inside(back, P).any(), "component intersects back shell"
     assert not inside(front, P).any(), "component intersects front cover"
+
+
+# LED function symbols (housing.scad: sym_*): PWR = IEC 5009 power symbol above its bore, STAT = pulse line below its bore
+SYM_SIZE, SYM_DEPTH, SYM_W, SYM_GAP, SYM_DX, LED_BORE = 4.4, 0.6, 0.8, 0.8, 1.2, 2.0
+ROOF_TOP = 2.6 + 2.4   # flat outer roof height (front-local z; roof_in + roof_t)
+
+
+def symbol_centres():
+    (px, py), (sx, sy) = (l["pos"] for l in PARAMS["status_leds"])
+    off = LED_BORE / 2 + SYM_GAP + SYM_SIZE / 2
+    return (px + SYM_DX, py + off), (sx + SYM_DX, sy - off)
+
+
+def test_led_symbols_are_engraved_and_clear_of_bores(front):
+    """Both symbols exist as 0.6 mm engravings in the flat roof: material is missing along the strokes, solid floor below them
+    and untouched roof between the strokes, and they keep clear of the bores, the cone, the outer wall and the screw bosses."""
+    assert [l["name"] for l in PARAMS["status_leds"]] == ["PWR", "STAT"]
+    pwr, stat = symbol_centres()
+    z_in, z_floor = ZPT + ROOF_TOP - SYM_DEPTH / 2, ZPT + ROOF_TOP - SYM_DEPTH - 0.15
+    ro = SYM_SIZE / 2
+    # points on the stroke centre lines (must be empty), at mid engraving depth
+    power_strokes = [(pwr[0], pwr[1] + ro * 0.6), (pwr[0], pwr[1] + ro * 0.2),            # vertical bar
+                     (pwr[0] - ro + SYM_W / 2, pwr[1]), (pwr[0] + ro - SYM_W / 2, pwr[1]),   # ring left / right
+                     (pwr[0], pwr[1] - ro + SYM_W / 2)]                                         # ring bottom
+    pulse_strokes = [(stat[0] - ro + 0.6, stat[1]), (stat[0] + ro - 0.6, stat[1]), (stat[0] - 0.5 + 0.17, stat[1] + 0.4)]
+    strokes = np.array([[x, y, z_in] for x, y in power_strokes + pulse_strokes])
+    assert not inside(front, strokes).any(), "symbol strokes must be engraved (empty at mid depth)"
+    floors = np.array([[x, y, z_floor] for x, y in power_strokes + pulse_strokes])
+    assert inside(front, floors).all(), "engraving floor must be solid (roof not pierced)"
+    # untouched roof: inside the power ring and in the gaps between ring and bar
+    islands = np.array([[pwr[0], pwr[1] - 0.6, z_in], [pwr[0] - 0.9, pwr[1] + 1.3, z_in], [pwr[0] + 0.9, pwr[1] + 1.3, z_in],
+                        [stat[0] - 1.7, stat[1] + 1.0, z_in], [stat[0] + 1.7, stat[1] - 1.0, z_in]])
+    assert inside(front, islands).all(), "roof between the strokes must stay"
+    # clearances (symbol envelope is a SYM_SIZE square, strokes are inside it)
+    for (lx, ly), (cx, cy) in zip((l["pos"] for l in PARAMS["status_leds"]), (pwr, stat)):
+        for l2 in PARAMS["status_leds"]:
+            d = math.hypot(cx - l2["pos"][0], cy - l2["pos"][1]) - SYM_SIZE / 2
+            assert d - LED_BORE / 2 >= 0.6, "symbol too close to a light-pipe bore"
+        assert math.hypot(cx - AX[0], cy - AX[1]) - SYM_SIZE / 2 * math.sqrt(2) > 18.5, "symbol must lie on the flat roof (outside the cone)"
+        assert cx - SYM_SIZE / 2 > -HO + 0.8, "symbol too close to the outer wall"
+        for sx in (-1, 1):
+            for sy in (-1, 1):
+                bx, by = sx * PARAMS["mounting_holes"]["positions"][0][0] * 1, sy * abs(PARAMS["mounting_holes"]["positions"][0][1])
+                assert math.hypot(cx - bx, cy - by) > SYM_SIZE / 2 * math.sqrt(2) + 3.0 + 0.5, "symbol over a screw boss"
+    assert SYM_W >= 0.8 and SYM_DEPTH >= 0.4
