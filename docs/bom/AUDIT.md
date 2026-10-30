@@ -90,3 +90,20 @@ in-stock match, not an exact 1.92 mm / 90 deg lens; if exactly 90 deg rectilinea
 - Commonlands: `products.json` and product page text (price, availability, specs, FOV table for the OV9281).
 - Not fetchable (403/timeout/Cloudflare): DigiKey, Mouser, Zoro, GoPhotonics, Edmund. Their figures only come from search snippets and are marked as such.
 - Per-row price rule: the LCSC tier at the largest quantity break not above the quantity needed, or the minimum order quantity.
+
+## 5. Hardware and filament prices (follow-up, 2026-10-29)
+
+Read in a real browser or via the seller's JSON, price stated on the page. Housing needs per board: 4 screws M2 x 10 (head <= 3.8 x 1.4 mm), 4 optional heat-set inserts (4.0 mm pilot depth, 3.2 mm pilot), 2 holder screws M1.6 x 5, about 18 g filament. Pack accounting: unit_price = pack price / pack size, qty = per-board need, one pack must be bought.
+
+| Item | Old | New | Source |
+|---|---|---|---|
+| M2 x 10 screws (qty 4) | Zoro ZSCRW-213, 0.1175, unverified (snippet, 403) | uxcell M2x10 button head, 304 SS, head 3.4 x 1.3 mm, 100 pk USD 9.99 = 0.0999, **verified**, Amazon B011BNTAAU (4 in stock) | https://www.amazon.com/dp/B011BNTAAU |
+| Heat-set inserts (qty 4, optional) | XHHD SZTB1091 / LCSC C51938904, 0.0143, unverified ("M2*3*4") | uxcell M2 x 4 mm L x 3.5 mm OD, 100 pk USD 7.69 = 0.0769, **verified**, Amazon B0CTCQ6MHK (13 in stock) | https://www.amazon.com/dp/B0CTCQ6MHK |
+| Filament (18 g) | 0.3958 (21.99/kg, snippet), unverified | MatterHackers Polymaker PolyLite PLA Black 1.75 mm 1 kg USD 19.99 (InStock) = 0.3598, **verified**; Polymaker store PA02001 also 19.99 | https://www.matterhackers.com/store/l/polymaker-polylite-pla-black-175mm-1kg/sk/M3RRH23H |
+| M1.6 x 5 holder screws (qty 2) | CLA904-SCR 0.48, verified | unchanged: USD 12.00, in stock; head diameter still not published | https://commonlands.com/products/phillips-m1-6x5-thread-forming-screws-for-plastic-25 |
+
+Fit findings:
+* **Zoro M2 Phillips pan screw does not meet the housing limits.** Zoro page (read in a browser, USD 12.39 per 100, in stock) gives head 4 mm x 1.7 mm; housing/README.md allows <= 3.8 mm and the underside counterbore is 4.4 x 1.4 mm deep, so the head would stand 0.3 mm proud. Replaced by a button head (3.4 x 1.3 mm). Alternative: keep pan head and deepen the counterbore to 1.8 mm (`head_cb_h`).
+* **Inserts.** The LCSC part "M2*3*4" has no stated OD/length. Standard M2 inserts are 3.5 mm OD x 4 mm and are installed in a 3.2 mm hole, which matches `pilot_d = 3.2` and the 4.0 mm pilot depth, so the 3.2 in the README is the hole, not the insert OD. The 5 mm long inserts (e.g. spool3d.ca 3.5 x 5) would not fit the 4.0 mm pilot.
+* **Holder screws.** M1.6 pan head is about 3 mm (not published by Commonlands); the PCB hole is 2.6 mm, so the head bears only about 0.2 mm all round. Check against the CLA020 drawing.
+* McMaster-Carr requires a login to show prices and Bolt Depot/Fastenal/Digi-Key blocked automated access, so they were not used.
