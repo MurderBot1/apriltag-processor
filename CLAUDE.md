@@ -20,6 +20,7 @@ Standing rules from the project owner. Every agent (manager and workers) must fo
 - Whenever you modify the site (`site/`) or anything that changes the parts list (PCB `pcb/`, housing `housing/`, sensor, lens, fasteners, connectors, order or assembly choices), you must also update the BOM in the same PR:
   - edit `docs/bom/bom.json` (value, MPN, quantity, designators, link, unit price, stock, status),
   - regenerate the page with `python docs/bom/build_bom.py`,
+  - **regenerate the website** with `python site/build_site.py` and commit the results (`site/data/bom.js` and the other generated `site/` files). The site's BOM page is built from `bom.json` and does not update on its own,
   - keep it consistent with `pcb/output/bom.csv`.
 - Only mark an item `verified` with an exact MPN, a link and an explicitly stated price. Keep everything else `unverified` with a note. Update `price_checked` when prices are re-checked.
 
