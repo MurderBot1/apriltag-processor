@@ -55,7 +55,7 @@
 <a class="navlink" href="#/config" data-id="config">Field map &amp; calibration</a>
   </div>
   <div id="navempty" class="muted" hidden>no match</div>
-  <div class="navfoot muted">built 2026-10-29 23:27</div>
+  <div class="navfoot muted">built 2026-10-29 23:40</div>
 </nav>
 <main id="main">
 <section class="page" id="page-home" hidden><h1>AprilTag camera: project browser</h1>
@@ -73,7 +73,7 @@ Everything below is generated from the repository by <code>site/build_site.py</c
                         -> RP2350 MCU (USB, stored field map, pose solve) -> host</pre>
 <img class="hero" src="img/r_hero_s.jpg" alt="housing assembly render"></section>
 <section class="page" id="page-about" hidden><h1>About this site</h1>
-<p>Generated 2026-10-29 23:27 by <code>site/build_site.py</code> (run <code>py -3.12 site/build_site.py</code>; reads the repo, writes only under <code>site/</code>). All data is embedded or loaded with <code>&lt;script src&gt;</code>, so it works from file://.</p>
+<p>Generated 2026-10-29 23:40 by <code>site/build_site.py</code> (run <code>py -3.12 site/build_site.py</code>; reads the repo, writes only under <code>site/</code>). All data is embedded or loaded with <code>&lt;script src&gt;</code>, so it works from file://.</p>
 <ul><li>3D: three.js r147 (non-module build + OrbitControls) vendored in <code>site/vendor/</code>, MIT licence.</li>
 <li>PCB 3D: full-assembly GLB from kicad-cli (<code>render/out/apriltag_cam_full.glb</code>) converted by <code>site/glb_convert.py</code>; the STEP was <code>render/out/apriltag_cam_full.step</code>.</li>
 <li>Markdown rendered with markdown-it-py; charts are inline SVG.</li>
@@ -1421,11 +1421,11 @@ openscad -D &quot;part=\&quot;exploded\&quot;&quot; --render --imgsize 1200,1200
 <tbody>
 <tr>
 <td>4</td>
-<td>M2 x 10 pan/cap head screws (see note), 3.8 mm head max</td>
+<td>M2 x 10 pan/button head screws (see note), head &lt;= 3.8 mm dia x &lt;= 1.4 mm high (DIN 7985 pan is 4.0 x 1.7: too big; ISO 7380 button head 3.4 x 1.3 fits)</td>
 </tr>
 <tr>
 <td>4 (optional)</td>
-<td>M2 heat-set inserts OD 3.2 x 4 mm into front bosses; set <code>pilot_d = 3.2</code></td>
+<td>M2 knurled brass heat-set inserts, 4 mm long, 3.5 mm OD, into a 3.2 mm pilot in the front bosses; set <code>pilot_d = 3.2</code> (a 5 mm long insert does not fit the 4.0 mm pilot depth)</td>
 </tr>
 <tr>
 <td>2</td>
