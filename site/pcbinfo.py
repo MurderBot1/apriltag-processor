@@ -1,6 +1,6 @@
 """PCB component metadata for the interactive 3D viewer (used by build_site.py).
 
-Reads (read-only): pcb/output/apriltag_cam_unrouted.kicad_pcb (footprint ref/position/side - the board the STEP was exported from),
+Reads (read-only): pcb/output/apriltag_cam.kicad_pcb (footprint ref/position/side of the routed board),
 pcb/output/placement.csv (value + notes), pcb/output/netlist.txt (ref.pin -> net).
 Matches STEP solids to reference designators by position, so the viewer can look a clicked solid up by ref.
 """
@@ -25,7 +25,7 @@ def kind_of(ref):
 def read_footprints():
     """-> {ref: dict(fp, side, x, y, rot)} with x,y relative to board centre, +y up (same frame as the 3D view)"""
     fps = {}
-    for name in ('apriltag_cam_unrouted.kicad_pcb', 'apriltag_cam.kicad_pcb'):
+    for name in ('apriltag_cam.kicad_pcb',):   # the routed board; the old *_unrouted variant held pre-move LED positions
         p = os.path.join(OUT, name)
         try:
             t = _rd(p)

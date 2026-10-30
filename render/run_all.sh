@@ -3,6 +3,7 @@
 cd "$(dirname "$0")"; HERE=$(pwd -W 2>/dev/null || pwd)
 B="/c/Program Files/Blender Foundation/Blender 5.1/blender.exe"
 K="/c/Program Files/KiCad/10.0/bin"; FC="/c/Program Files/FreeCAD 1.1/bin/freecadcmd.exe"
+export RENDER_DIR="$HERE"   # the scripts find work/, models/ and out/ relative to THIS clone
 export RENDER_DEVICE=${RENDER_DEVICE:-HIP}
 mkdir -p work out models
 # 1. real 3D models on a COPY of the board (pcb/ is never modified): parametric models for parts missing from the KiCad library, then attach to every footprint

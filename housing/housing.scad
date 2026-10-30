@@ -41,6 +41,40 @@ hood_top = holder[2] + barrel_h + 0.3;   // rim 0.3 above lens front
 cone_in_top = roof_in + (cone_r0 - bore_d/2);   // inner cone height at bore
 led_bore = 2.0;               // for 1.75 mm clear filament light pipe; LEDs sit on the FLAT roof (> cone_r0 from the lens axis), bores are perpendicular to it
 
+// LED function symbols, engraved into the flat outer roof beside each light-pipe bore (led_pos[0] = PWR, led_pos[1] = STAT, as in pcb_params.json)
+sym_size  = 4.4;              // symbol envelope (square, mm)
+sym_depth = 0.6;              // engraving depth (3 layers at 0.2); roof stays 1.8 thick under it
+sym_w     = 0.8;              // stroke width (2 perimeters of a 0.4 nozzle)
+sym_gap   = 0.8;              // clear distance bore edge -> symbol envelope
+sym_dx    = 1.2;              // symbol centre shifted +X from the LED (keeps >= 1 mm from the left outer wall)
+
+module stroke(a, b) { hull() { translate(a) circle(d = sym_w, $fn = 16); translate(b) circle(d = sym_w, $fn = 16); } }
+module polyline(pts) { for (i = [0 : len(pts) - 2]) stroke(pts[i], pts[i + 1]); }
+
+// IEC 5009 power symbol: ring open at the top with a vertical bar through the gap
+module sym_power(s = sym_size) {
+  ro = s/2;
+  difference() {
+    difference() { circle(r = ro, $fn = 48); circle(r = ro - sym_w, $fn = 48); }
+    translate([-(sym_w + 1.2)/2, 0]) square([sym_w + 1.2, ro + 1]);     // gap in the top of the ring (0.6 each side of the bar)
+  }
+  hull() { translate([-sym_w/2, 0]) square([sym_w, 0.01]); translate([0, ro - sym_w/2]) circle(d = sym_w, $fn = 16); }
+}
+
+// heartbeat / pulse line: flat, up-spike, down-spike, flat (firmware heartbeat + status)
+module sym_pulse(s = sym_size) {
+  h = s/2 - sym_w/2;
+  polyline([[-s/2 + sym_w/2, 0], [-s/2 + 1.3, 0], [-0.5, 0.8*h], [0.35, -h], [1.0, 0], [s/2 - sym_w/2, 0]]);
+}
+
+// centre of the symbol of LED i: beyond its bore, away from the other LED (PWR up, STAT down)
+function sym_pos(i) = [led_pos[i][0] + sym_dx, led_pos[i][1] + (i == 0 ? 1 : -1) * (led_bore/2 + sym_gap + sym_size/2)];
+
+module led_symbols(z0) {   // cutters from z0 upward
+  translate([sym_pos(0)[0], sym_pos(0)[1], z0]) linear_extrude(sym_depth + 1) sym_power();
+  translate([sym_pos(1)[0], sym_pos(1)[1], z0]) linear_extrude(sym_depth + 1) sym_pulse();
+}
+
 module rrect(w, r, h) { linear_extrude(h) offset(r) square(w - 2*r, center = true); }
 function sgn() = [[1,1],[-1,1],[1,-1],[-1,-1]];
 
@@ -127,6 +161,7 @@ module front() {
     // LED well under the roof (both LEDs, 1.6 x 0.8 bodies + margin)
     hull() for (p = led_pos) translate([p[0] - 1.2, p[1] - 0.8, -1]) cube([2.4, 1.6, 1 + 1.2]);
     for (p = led_pos) translate([p[0], p[1], 0.5]) cylinder(d = led_bore, h = hood_top);
+    led_symbols(roof_in + roof_t - sym_depth);
     for (s = sgn()) translate([s[0]*hole_xy, s[1]*hole_xy, -1]) cylinder(d = pilot_d, h = pilot_depth + 1);
     translate([sensor_c[0], sensor_c[1], -1]) cylinder(d = bore_d, h = hood_top + 2);
   }

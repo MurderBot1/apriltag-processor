@@ -8,8 +8,9 @@ Colours are written as STEP STYLED_ITEMs by post-processing (FreeCAD headless ca
 import os, re, json, math
 import FreeCAD, Part, Import
 from FreeCAD import Vector as V
-HERE = 'D:/apriltag-proccessor/render/models'
-PADS = json.load(open('D:/apriltag-proccessor/render/work/localpads.json'))
+RENDER = (os.environ.get('RENDER_DIR') or os.getcwd()).replace(chr(92), '/')   # render/ of THIS clone (run_all.sh exports RENDER_DIR)
+HERE = RENDER + '/models'
+PADS = json.load(open(RENDER + '/work/localpads.json'))
 
 def box(x0, x1, y0, y1, z0, z1): return Part.makeBox(x1 - x0, y1 - y0, z1 - z0, V(x0, y0, z0))
 def cbox(cx, cy, dx, dy, z0, z1): return box(cx - dx / 2, cx + dx / 2, cy - dy / 2, cy + dy / 2, z0, z1)
