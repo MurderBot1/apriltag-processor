@@ -1,0 +1,22 @@
+; Receiver of the FPGA frame bus (rtl/mask_stream.v): one byte per rising edge of the FPGA's strobe.
+; Pins (IN base = D0): D0..D7 = base+0..7, CLK = base+8.  ISR shifts right, so four bytes make one little-endian word; autopush at 32 bits,
+; DMA drains the RX FIFO.  Per byte the loop needs 3 PIO cycles; the FPGA provides one byte per 4 core clocks (85.714 MHz) = 21.4 Mbyte/s, the
+; PIO runs at the system clock (150 MHz) = 7 cycles per byte.  The FPGA changes D one core clock before CLK rises and holds it for three
+; clocks after, the 2-cycle input synchroniser of the PIO adds 13 ns: the byte is sampled inside the stable window.
+.program frame_rx
+.wrap_target
+    wait 1 pin 8            ; CLK high: data is stable
+    in pins, 8
+    wait 0 pin 8
+.wrap
+
+% c-sdk {
+static inline pio_sm_config frame_rx_program_get_default_config_for(uint offset, uint pin_base)
+{
+    pio_sm_config c = frame_rx_program_get_default_config(offset);
+    sm_config_set_in_pins(&c, pin_base);
+    sm_config_set_in_shift(&c, true, true, 32);           /* shift right, autopush every 32 bits */
+    sm_config_set_fifo_join(&c, PIO_FIFO_JOIN_RX);        /* 8-word RX FIFO */
+    return c;
+}
+%}

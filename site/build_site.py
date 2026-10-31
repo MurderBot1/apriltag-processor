@@ -365,7 +365,7 @@ def build_verification(imgs, rows, ref):
     o.append('<rect x="%d" y="4" width="11" height="11" class="bar c1"/><text x="%d" y="14" class="cl">chip (bar)</text><circle cx="%d" cy="9" r="4" class="dot c2"/><text x="%d" y="14" class="cl">reference (dot)</text></svg>' % (w - 250, w - 234, w - 120, w - 112))
     h.append(''.join(o))
     # (c) FPGA
-    h.append('<h2>FPGA resources and timing (yosys + nextpnr-ecp5, LFE5U-85F-8BG381C)</h2>')
+    h.append('<h2>FPGA resources and timing (yosys + nextpnr-ecp5, LFE5U-45F-8BG381C)</h2>')
     ft = md_tables(ftxt)
     for hd, rs in ft:
         if hd[0] == 'resource':
@@ -376,7 +376,7 @@ def build_verification(imgs, rows, ref):
             h.append(svg_group('Post-P&R fmax per seed (MHz). Core target 85.714 MHz (built), original target 100 MHz; D-PHY sclk target 200 MHz', [s for s, _ in seeds],
                                [('core clock', 'c1', [v for _, v in seeds]), ('D-PHY sclk', 'c2', [v for _, v in sc])], unit=' MHz', fmt='{:.0f}', height=270))
             h.append('<div class="tablewrap"><table><thead><tr>' + ''.join('<th>%s</th>' % esc(x) for x in hd) + '</tr></thead><tbody>' + ''.join('<tr>' + ''.join('<td>%s</td>' % esc(c) for c in r) + '</tr>' for r in rs) + '</tbody></table></div>')
-    h.append('<p>Timing budget: frame = 1041 lines x 8 us = 8.328 ms (120.08 fps). CCL row time &lt;= 651 clocks (budget 686 at 85.714 MHz). TPU 190k clocks median, 523k worst = 6.1 ms at 85.7 MHz. Source: <a href="#/fpga">FPGA results</a>, <a href="#/verification-doc">Verification</a>.</p>')
+    h.append('<p>Timing budget: frame = 1041 lines x 8 us = 8.328 ms (120.08 fps). CCL row time &lt;= 651 clocks (budget 686 at 85.714 MHz). Tag unit on the RP2350 (C, estimate): 1.6 ms median, 9.3 ms worst per frame at 150 MHz (<a href="#/verification-doc">Verification</a>). Source: <a href="#/fpga">FPGA results</a>, <a href="#/verification-doc">Verification</a>.</p>')
     # (d) headline table from verification.md
     for hd, rs in tabs:
         if hd and hd[0] == '' and 'this chip' in hd:
@@ -608,7 +608,7 @@ def main():
     P_.append(('gallery', 'Results', 'Test images', gallery_html(imgs)))
     P_.append(('results', 'Results', 'Verification results', '<h1>Verification results</h1>' + ver_html))
     P_.append(('netlist', 'Hardware', 'Netlist', '<h1>Netlist</h1><p class="muted">from <code>pcb/output/netlist.txt</code> (netlist-first design, no schematic)</p>' + ''.join(nl)))
-    P_.append(('pins', 'Hardware', 'FPGA pin plan', '<h1>FPGA pin plan</h1><p class="muted">from <code>tools/pins.py</code> (single source for the LPF and the PCB netlist). The ECP5-85F BG381 pin data used for the choice is in <code>pcb/ecp5_85f_bg381_io.json</code>.</p>' + pin_html + '<p>The table in <a href="#/hardware-doc">Hardware</a> explains bank / standard choices.</p>'))
+    P_.append(('pins', 'Hardware', 'FPGA pin plan', '<h1>FPGA pin plan</h1><p class="muted">from <code>tools/pins.py</code> (single source for the LPF and the PCB netlist). The ECP5 BG381 pin data used for the choice (85F database; the 45F has the same pads, checked by <code>tools/pin_compat.py</code>) is in <code>pcb/ecp5_85f_bg381_io.json</code>.</p>' + pin_html + '<p>The table in <a href="#/hardware-doc">Hardware</a> explains bank / standard choices.</p>'))
     P_.append(('board', 'Hardware', 'Board & DRC', '<h1>Board stats &amp; DRC</h1>' + table(['item', 'value'], [[esc(a), esc(b)] for a, b in stats]) + '<h2>DRC summary</h2>' + ''.join(drc_html) +
               '<h2>Placement</h2>' + place_html + '<h2>Bill of materials (pcb/output/bom.csv, grouped)</h2>' + bom_html))
     P_.append(('bom', 'Hardware', 'BOM & pricing', bom_page_html()))

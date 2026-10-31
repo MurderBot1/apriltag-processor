@@ -33,10 +33,10 @@ STAGES = [
          caption='despeckle keeps a pixel only if at least 4 of the 9 pixels in its 3x3 neighbourhood are black. Isolated noise dots disappear (and 1-pixel holes fill) so the labeller is not flooded with tiny components. Latency: one row.'),
     dict(short='components', title='Connected components + extremes', file='ccl.png', ov='ccl', rtl=['run_ccl.v'], golden='tools/golden.py components()',
          caption='run_ccl labels the black regions on the fly (4-connected runs, union-find) and keeps per component the area and the eight extreme points (max/min of x, y, x+y, x-y). Components that pass the area / size / border filters become candidates: yellow boxes contain a tag that was decoded, red boxes are candidates that did not decode. The cyan dots are the extremes the TPU uses as a coarse quadrilateral.'),
-    dict(short='TPU quads', title='TPU: refined quad corners + tag IDs', file='raw.jpg', ov='tpu', rtl=['tpu_core.v'], golden='tools/tpu_isa.py (bit-exact ISS)',
-         caption='For each candidate the TPU (a small custom processor running a baked program) refines the four sides to sub-pixel accuracy by line-fitting binary edge samples, builds the tag homography, samples the 6x6 data cells and matches them against the tag36h11 code ROM (587 codes x 4 rotations). Blue quads = decoded tags with their IDs; green = ground-truth corners from the renderer.'),
+    dict(short='TPU quads', title='Tag unit: refined quad corners + tag IDs', file='raw.jpg', ov='tpu', rtl=['ref/tpu/tpu_core.v'], golden='tools/tpu_isa.py (bit-exact ISS); firmware/core/attpu.c (C port, runs on the MCU)',
+         caption='For each candidate the tag unit (C code on the RP2350, a bit-exact port of the former FPGA processor) refines the four sides to sub-pixel accuracy by line-fitting binary edge samples, builds the tag homography, samples the 6x6 data cells and matches them against the tag36h11 code ROM (587 codes x 4 rotations). Blue quads = decoded tags with their IDs; green = ground-truth corners from the renderer.'),
     dict(short='pose', title='Pose from the firmware solver vs ground truth', file='raw.jpg', ov='pose', rtl=['spi_slave.v', 'cam_core.v'], golden='firmware/core/atpose.c',
-         caption='Only tag IDs and corners cross the SPI link (cam_core result bank, spi_slave). The RP2350 firmware (atpose.c) undistorts the corners and solves the camera pose against the stored field map with Levenberg-Marquardt over all corners. Orange dashed quads are the field-map tags re-projected with the solved pose; blue = chip corners; green = ground truth.'),
+         caption='The FPGA streams the binary frame and the candidate list to the RP2350 (mask_stream, 8-bit frame bus); the MCU decodes the tags (attpu.c) and its firmware (atpose.c) undistorts the corners and solves the camera pose against the stored field map with Levenberg-Marquardt over all corners. Orange dashed quads are the field-map tags re-projected with the solved pose; blue = chip corners; green = ground truth.'),
 ]
 
 
@@ -72,6 +72,7 @@ def main():
     os.makedirs(PIPE_DIR, exist_ok=True); os.makedirs(WORK, exist_ok=True)
     gtj = json.load(open(os.path.join(ROOT, 'test_images', 'ground_truth.json')))
     rtl_all = json.load(open(os.path.join(ROOT, 'results', 'rtl_chain_results.json')))
+    m33_rows = json.load(open(os.path.join(ROOT, 'results', 'tpu_c_m33_cycles.json')))['rows']
     ref = json.load(open(os.path.join(ROOT, 'results', 'reference_baseline.json')))
     tmap = geom.load_tag_map()
     sol = atcore.Solver(False); sol.set_field(tmap)
@@ -142,7 +143,7 @@ def main():
         found = [t for t in det if str(t) in g['tags'] and g['tags'][str(t)]['visible']]
         cerr = [float(np.linalg.norm(np.array(det[t]['corners']) - np.array(g['tags'][str(t)]['corners']), axis=1).max()) for t in found]
         st = rtl_all[name]['stats']
-        tpu_clk = int(st.get('tpucyc', 0))
+        tpu_ms = next((r['cycles']['nominal'] / 150e3 for r in m33_rows if r['name'] == name), 0.0)      # estimate, tools/m33_cycles.py
         rd = ref['per_image'].get(name, {})
         # --- RTL equality checks (unmodified testbenches)
         print('   rtl checks', chk)
@@ -154,9 +155,9 @@ def main():
             'Despeckle changed %d pixels. RTL vs golden despeckle() on the same input: %s' % (int((thr != desp).sum()), '<span class="good">identical</span>.' if chk['desp_diff'] == 0 else '<span class="bad">%d differ</span>.' % chk['desp_diff']),
             '%d components in the frame, %d pass the candidate filters (%d contain a decoded tag). RTL run_ccl candidate list (area + bounding box) vs golden components(): %s' % (len(allc), len(keep), sum(c['tag'] for c in cc),
                 '<span class="good">identical</span> (%d candidates).' % chk['ccl_n_rtl'] if chk['ccl_match'] else '<span class="bad">RTL reports %d candidates, golden %d</span>%s (worst row %d clocks).' % (chk['ccl_n_rtl'], chk['ccl_n_gold'], ' - run_ccl status flags: ' + flagtxt if flagtxt else '', chk['ccl_row_cycles'])),
-            'Chip decoded %d of %d ground-truth-visible tags%s. Mean/max corner error vs ground truth: %s px. TPU run: %d clocks = %.2f ms at %.1f MHz (stored full-chain RTL simulation, results/rtl_chain_results.json).' % (
+            'Chip decoded %d of %d ground-truth-visible tags%s. Mean/max corner error vs ground truth: %s px. Tag unit on the MCU: %.2f ms (estimate, Cortex-M33 at 150 MHz, tools/m33_cycles.py); chain data from results/rtl_chain_results.json.' % (
                 len(found), len(vis), '' if len(det) == len(found) else ' (+%d further detections that match no visible ground-truth tag: wrong id or non-visible tag)' % (len(det) - len(found)),
-                '%.2f / %.2f' % (np.mean(cerr), np.max(cerr)) if cerr else '-', tpu_clk, tpu_clk / CLK_MHZ / 1000, CLK_MHZ),
+                '%.2f / %.2f' % (np.mean(cerr), np.max(cerr)) if cerr else '-', tpu_ms),
             ('Solved from %d tags: position error %.1f mm, orientation error %.3f deg, reprojection rms %.2f px (reference pupil-apriltags + solvePnP: %s mm).' % (info['n'], info['terr'], info['rerr'], info['rms'], ('%.1f' % rd['t_err_mm']) if rd.get('t_err_mm') is not None else 'n/a')
              if pose else 'No pose: the chip decoded no tag in this frame, so the solver has nothing to work with.'),
         ]

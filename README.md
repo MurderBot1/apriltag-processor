@@ -5,20 +5,21 @@ in a world frame you define**. You send it the tags you use and where they are (
 stores them in flash and then streams the camera position and orientation over the same USB-C cable that powers it.
 
 ```
-OV9281 (MIPI, 120 fps) -> ECP5 FPGA running custom RTL (threshold, labelling, own CPU with the tag decoder baked into
-                          its ROM) -> RP2350 MCU (USB, stored field map, pose solve) -> host
+OV9281 (MIPI, 120 fps) -> ECP5-45F FPGA running custom RTL (threshold, despeckle, labelling, frame streamer) -> 8-bit frame bus ->
+                          RP2350 MCU (tag decoder in C, pose solve, USB, stored field map) -> host
 ```
 
-Nothing here is a stock vision pipeline: the per-pixel and per-tag work is **hardware designed in Verilog in this repo**,
-including a small custom processor (the TPU) whose program is burned into the chip image. The MCU only sees the tag
-estimates (id + sub-pixel corners), never an image.
+Nothing here is a stock vision pipeline: the per-pixel work is **hardware designed in Verilog in this repo**, the per-tag work (sub-pixel
+corner fitting, tag36h11 decoding) is C code in this repo that runs on the MCU on the binary frame the FPGA streams to it (architecture "A3",
+`docs/costdown.md`; it started life as a custom FPGA processor, the TPU, kept in `ref/tpu` as the bit-exact reference). The host only sees the tag
+estimates and poses, never an image.
 
 ## What is in the box
 
 | directory | contents |
 |---|---|
-| `rtl/` | the chip: D-PHY + CSI-2 receiver, adaptive threshold, despeckle, connected components, **TPU** (custom processor + baked tag36h11 ROM), SPI/I2C, top levels, pin constraints (`apriltag_cam.lpf`), generated TPU program (`tpu_prog.hex`) |
-| `tools/` | golden Python models of every block, TPU assembler + instruction-set simulator + the baked program (`tpu_prog.py`), Blender scene/dataset generator, reference detector, sensor init generator, FPGA flow scripts |
+| `rtl/` | the chip: D-PHY + CSI-2 receiver, adaptive threshold, despeckle, connected components, the MCU frame streamer (`mask_stream`), SPI/I2C, top levels, pin constraints (`apriltag_cam.lpf`) |
+| `tools/` | golden Python models of every block, TPU assembler + instruction-set simulator + the program (`tpu_prog.py`, the golden model of `firmware/core/attpu.c`), Cortex-M33 timing estimators (`m33_cycles.py`, `m33_pose_cycles.py`, `frame_budget.py`), Blender scene/dataset generator, reference detector, sensor init generator, FPGA flow scripts |
 | `tb/`, `tests/` | Verilog testbenches and 226 pytest tests (see `docs/verification.md`) |
 | `test_images/` | **100 rendered 1280x800 test frames in 10 categories of 10** (normal, bright, dark, low-contrast, gradient light, shadow, noise, clutter, blur, perspective; Blender Cycles, lens distortion + sensor noise model) with ground-truth poses (`ground_truth.json`) |
 | `firmware/core`, `firmware/rp2350` | MCU firmware: pose solver, USB protocol, flash storage, auto exposure; RP2350 (Pico SDK) port |
@@ -48,7 +49,8 @@ Protocol: `docs/protocol.md`. Conventions (world, tag, camera frames, corner ord
 ```
 py -3.12 tools/make_tags.py               # tag images + the 587-code ROM table
 py -3.12 tools/make_dataset_100.py        # the 100-image dataset: Blender renders (needs Blender 5.x) -> test_images/ (deterministic, see docs/verification.md)
-py -3.12 tools/tpu_prog.py                # assemble the TPU program ROM (rtl/tpu_prog.hex)
+py -3.12 tools/tpu_prog.py                # assemble the reference TPU program (ref/tpu/tpu_prog.hex)
+py -3.12 tools/m33_cycles.py              # run time of the C tag unit on a Cortex-M33 (Unicorn + cycle model)
 py -3.12 tests/run_all.py                 # the whole verification suite
 bash tools/fpga_flow.sh                   # yosys + nextpnr-ecp5 (+ ecppack bitstream)
 "C:/Program Files/KiCad/10.0/bin/python.exe" pcb/build_pcb.py --route ; py -3.12 pcb/make_outputs.py
@@ -74,16 +76,16 @@ build/test results. Earlier releases are never overwritten. `main` does not trig
 
 ## Headline results (details and caveats in `docs/verification.md`, `docs/fpga.md`, `docs/hardware.md`)
 
-* **120.08 fps** sustained in full-chip simulation at true sensor timing (832,800 clocks per frame at 100 MHz), no dropped
-  frames, two frame banks so capture never stalls.
+* **120.08 fps** sustained in full-chip simulation at true sensor timing (832,800 clocks per frame at 100 MHz), every frame leaves the FPGA
+  as a complete packet; the MCU has two frame buffers so capture never stalls.
 * 100 rendered frames (10 conditions x 10) through the simulated chip + the MCU's solver: **median camera position error about
   1-3 mm and 0.02-0.05 deg** where tags are found; **87 % of the detectable tags overall (562 / 647; the reference AprilTag library: 97 %)**,
-  up from 70 % before the noise-robust labeller - 100 % on normal / dark / grad / noise, 97 % clutter, 90-92 % blur / persp / shadow, but still
+  (identical to the previous all-FPGA design, tag by tag), up from 70 % before the noise-robust labeller - 100 % on normal / dark / grad / noise, 97 % clutter, 90-92 % blur / persp / shadow, but still
   **0 % on the low-contrast category**, see `docs/verification.md`.
 * GitHub Actions: one check per dataset category (`N/10 detected`, reference detector) plus an all-tests workflow, see `docs/verification.md`.
-* RTL is verified bit-exact against Python golden models (threshold, despeckle, labelling, the custom CPU), and the whole
+* RTL is verified bit-exact against Python golden models (threshold, despeckle, labelling), the C tag unit bit-exact against the golden model of the old FPGA processor, and the whole
   chain is exercised with real CSI-2 packets and a bit-level D-PHY model with lane skew and clock offsets.
-* Open-source place-and-route onto the real ECP5-85F pins, with measured resource use and timing (`docs/fpga.md`).
+* Open-source place-and-route onto the real ECP5-45F pins: 12.2 k LUT4 (27 %), 56 of 108 block RAM, core clock closes 85.7 MHz on 4 of 6 seeds, D-PHY 200 MHz on 6 of 6 (`docs/fpga.md`).
 
 ## Honest limits - read before building hardware
 
@@ -96,7 +98,9 @@ build/test results. Earlier releases are never overwritten. `main` does not trig
    targets. Anything reported as failing there must be fixed (more pipelining) before relying on 120 fps in hardware.
 4. Detection is weaker than the reference library at long range (> ~3.5 m for 16.5 cm tags), for low-contrast scenes (0 % on the
    `lowcon` category) and for small / grazing / shadowed tags. The labeller no longer rejects busy frames (256 runs/row, label recycling,
-   the 64 largest candidates kept), but a cluttered or noisy frame can need up to 2.55 M TPU clocks (30 ms at 85.7 MHz): in a stream at
-   120 fps such a frame makes the following frame be dropped (`frames_dropped`); 20 of the 100 evaluation frames would do so if the
-   whole stream looked like them (`results/tpu_budget_by_category.md`).
-5. No schematic capture: the board is netlist-first (`pcb/design.py`, `pcb/output/netlist.txt`).
+   the 64 largest candidates kept), but a cluttered or noisy frame costs the MCU up to about 9 ms (estimate, Cortex-M33 emulation, median 1.6 ms; the old FPGA processor
+   needed up to 30 ms): in a stream at 120 fps a heavy frame can make the MCU miss a packet (`frames_dropped`); the model predicts 1 - 4 % of frames
+   if every 10th frame were the slowest of its category (`results/frame_budget.md`; the old design: 20 %). The MCU timing, the PIO/DMA frame
+   capture and the bus timing margin are **not measured on hardware**.
+5. **The KiCad board / Gerbers are not updated for architecture A3** (netlist, BOM and pin plan are; one of the 10 new frame-bus nets could not be routed, `docs/hardware.md`).
+6. No schematic capture: the board is netlist-first (`pcb/design.py`, `pcb/output/netlist.txt`).

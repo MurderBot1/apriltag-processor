@@ -3,7 +3,8 @@
  * Everything runs on core 0 in one cooperative loop, so the shared at_app_t needs no locking:
  *   tud_task()            USB device stack
  *   CDC rx  -> at_app_rx  protocol commands (replies leave through the HAL tx callback)
- *   at_app_poll           FPGA result -> pose solve -> optional POSE streaming, auto exposure
+ *   at_app_poll           frame packet from the FPGA (PIO + DMA, hal_frame_rx.c) -> tag unit (attpu.c, runs here) -> pose solve ->
+ *                         optional POSE streaming, auto exposure
  *   watchdog_update       2 s watchdog; a hang resets the MCU (config is reloaded from flash, FPGA is reconfigured)
  * Core 1 is unused; flash programming therefore only has to stop core 0's interrupts (flash_safe_execute). */
 #include "pico/stdlib.h"
@@ -14,6 +15,7 @@
 #include "pcb_pins.h"
 #include "hal_spi_fpga.h"
 #include "hal_flash.h"
+#include "hal_frame_rx.h"
 #include "fpga_config.h"
 
 static at_app_t g_app;
@@ -55,6 +57,8 @@ int main(void)
     /* the FPGA must be configured before the first SPI access; do it before USB enumeration */
     fpga_cfg_result_t cfg = fpga_config_load();
 
+    if (cfg == FPGA_CFG_OK) hal_frame_init();   /* frame bus receiver: only once the FPGA drives its pins */
+
     tusb_init();                              /* if cfg != OK we keep running: the host can still talk to the MCU, polling is skipped */
 
     const at_hal_t hal = {
@@ -62,6 +66,7 @@ int main(void)
         .fpga_read = hal_fpga_read, .fpga_write = hal_fpga_write,
         .flash_read = hal_flash_read, .flash_erase = hal_flash_erase, .flash_write = hal_flash_write,
         .tx = hal_tx, .micros = hal_micros,
+        .frame_get = hal_frame_get, .frame_put = hal_frame_put, .detect = NULL,
     };
     at_app_init(&g_app, &hal);
 

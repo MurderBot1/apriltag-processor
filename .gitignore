@@ -10,3 +10,6 @@ api/java/out/
 api/cpp/build/
 *.vvp
 products/
+build/
+pcb/tools/*.jar
+pcb/output/apriltag_cam_a3*

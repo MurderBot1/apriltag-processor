@@ -7,7 +7,7 @@ PCB: 48 x 48 mm, 4 layers (F.Cu signal / In1 GND plane / In2 3V3 plane / B.Cu si
 | side | parts |
 |---|---|
 | top (lens side) | OV9281 (bare CSP) at (0,+9), M12 lens holder footprint (20x20, two M2.6 holes), PWR + STAT LEDs (at (-21.5, -6.5) / (-21.5, -9.5) with their 1k resistors, under the flat part of the housing roof; the front cover has an engraved power symbol above the PWR light pipe and an engraved heartbeat/pulse symbol below the STAT light pipe) , 4 M2 mounting holes |
-| bottom | ECP5-85F BG381 at (0,-8), RP2350A, 16 MB QSPI flash, USB-C (left edge), all regulators, decoupling, JTAG header, test points, BOOTSEL button |
+| bottom | ECP5-45F BG381 (LFE5U-45F-8BG381C, same footprint as the 85F) at (0,-8), RP2350A, 16 MB QSPI flash, USB-C (left edge), all regulators, decoupling, JTAG header, test points, BOOTSEL button |
 
 ## Block / power tree
 
@@ -21,7 +21,7 @@ USB-C VBUS --ferrite--> +5V --+-- TLV62569 buck --> +3V3 (MCU, flash, FPGA banks
 RP2350 internal buck (VREG_LX, 3.3 uH) --> +1V1MCU (DVDD)
 ```
 Power budget (typical): FPGA core ~0.4 A @1.1 V, aux 0.1 A, MCU ~50 mA, sensor ~120 mA -> about 1.1 W from 5 V (USB 2.0
-limit 2.5 W). The USB-C receptacle presents 5.1 kOhm Rd on CC1/CC2 (default-power sink).
+limit 2.5 W). (These figures are from the original design; with architecture A3 the FPGA is smaller and the MCU busier - no new power estimate was made.) The USB-C receptacle presents 5.1 kOhm Rd on CC1/CC2 (default-power sink).
 
 ## FPGA pin plan (`tools/pins.py`, single source for the LPF and the PCB netlist)
 
@@ -34,6 +34,7 @@ limit 2.5 W). The USB-C receptacle presents 5.1 kOhm Rd on CC1/CC2 (default-powe
 | `CLK24M` | D12 | bank 1, 1.8 V | 24 MHz 1.8 V oscillator -> PLL (100 MHz core, 24 MHz sensor XVCLK) |
 | `XVCLK`, `XSHUTDN`, `SCL`, `SDA` | B13, C13, A12, A13 | bank 1, 1.8 V | I2C pull-ups 2.2 k to 1.8 V |
 | `SPI_SCK/CS/MOSI/MISO`, `FPGA_IRQ`, `FPGA_RST` | E16, E17, E18, F16, F18, G16 | bank 2, 3.3 V | to the RP2350 SPI0 |
+| `FB_D0..FB_D7`, `FB_CLK`, `FB_FS` | P1 N1 M1 L1 K1 P2 N2 L2, K2, M3 | bank 6, 3.3 V | frame bus (mask + candidates) to the RP2350 GPIO16..23, 24, 25 (PIO + DMA) |
 | `LED_STAT`, spare LEDs | D18, D19, E19, F19 | bank 2 | |
 | configuration | CFG[2:0] = 001 (slave SPI) | bank 8 | RP2350 loads the bitstream (SPI1) after power-up: PROGRAMN, INITN, DONE, CCLK, MOSI (W2), MISO (V2), CSSPIN (R2) |
 | JTAG | TCK T5, TMS U5, TDI R5, TDO V4 | | 1.27 mm 2x5 header |
@@ -57,3 +58,18 @@ rather than hidden:
    `bom.csv` are generated from it. ERC-style checks (single-pin nets, power pin coverage) are in `tests/test_pcb.py`.
 4. The RP2350 slave-SPI FPGA configuration opcodes (`firmware/rp2350/fpga_config.c`) come from memory of Lattice
    TN1260 and are unverified.
+
+## Architecture A3 board status (2026-10-31): netlist updated, board file NOT re-routed
+
+`pcb/design.py` (netlist source of truth) now has U1 = `LFE5U-45F-8BG381C` (same CABGA-381 footprint, `tools/pin_compat.py`: all 31 used balls have the
+same bank and pad function as on the 85F) and the 10 frame-bus nets `FB_D0..FB_D7`, `FB_CLK`, `FB_FS` (FPGA bank 6 outer ball row facing the MCU <->
+RP2350 GPIO16..25). `pcb/output/netlist.txt`, `bom.csv` and `placement.csv` are regenerated from it. **The KiCad board, Gerbers, STEP and renders were
+not regenerated and still describe the 85F board without the frame bus.** Reason: the bus could not be routed completely with the tools available here:
+`pcb/route_a3.py` (new; keeps all other copper, rips up the 20-25 signal nets crossing the MCU's left/bottom escape area, re-routes them with the
+repository's grid router `pcb/router/router14.exe` together with the new nets) routes 9 of the 10 new nets with DRC counts equal to the baseline
+(baseline 72 violations: 28 via_dangling, 1 track_dangling, 2 lib_footprint, 9 silk_overlap, 32 silk_over_copper; the routed variant had the same
+plus one more `via_dangling` = 73, and 14 unconnected items besides the open net against 12 in the baseline, all plane / pour artefacts), but one net (always the 7th data bit, whichever pad or ball it is given) stays unconnected across 8 seeds, 3
+rip-up regions, 4 pin permutations and a dog-bone fan-out experiment; Freerouting 2.1.0 (fixed existing copper, 10 or 1 net to route) did not finish in
+15-30 minutes. The cause is capacity: seven 0.4 mm-pitch QFN pads on the left column must leave through one corridor that the existing 4-layer routing
+already fills. Options to finish: move the 0402 decoupling and filter parts left of the MCU, or take the bus from a different MCU side, or re-route the
+whole board (the earlier full route needed a multi-hour router sweep).

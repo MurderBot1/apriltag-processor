@@ -33,8 +33,8 @@ def run_rtl(vvp, mask, cand_words, ncand, tag, prog_hex=None, frame_id=1):
 @pytest.fixture(scope='module')
 def vvp():
     prog = tpu_harness.tpu_prog
-    prog.program()[1].hexfile(os.path.join(ROOT, 'rtl', 'tpu_prog.hex'))
-    return rtlutil.build('tb_tpu', ['rtl/tpu_core.v', 'tb/tb_tpu.v'])
+    prog.program()[1].hexfile(os.path.join(ROOT, 'ref', 'tpu', 'tpu_prog.hex'))
+    return rtlutil.build('tb_tpu', ['ref/tpu/tpu_core.v', 'tb/tb_tpu.v'])
 
 
 # ------------------------------------------------------------------ ISA semantics (pure ISS)
@@ -135,13 +135,13 @@ def test_rtl_microprogram_matches_iss(vvp):
     a.HALT()
     prog = a.link()
     # run both
-    old = open(os.path.join(ROOT, 'rtl', 'tpu_prog.hex')).read()
+    old = open(os.path.join(ROOT, 'ref', 'tpu', 'tpu_prog.hex')).read()
     try:
-        a.hexfile(os.path.join(ROOT, 'rtl', 'tpu_prog.hex'))
-        v = rtlutil.build('tb_tpu_micro', ['rtl/tpu_core.v', 'tb/tb_tpu.v'])
+        a.hexfile(os.path.join(ROOT, 'ref', 'tpu', 'tpu_prog.hex'))
+        v = rtlutil.build('tb_tpu_micro', ['ref/tpu/tpu_core.v', 'tb/tb_tpu.v'])
         res, cyc = run_rtl(v, np.zeros((800, 1280), np.uint8), [0], 0, 'micro')
     finally:
-        open(os.path.join(ROOT, 'rtl', 'tpu_prog.hex'), 'w').write(old)
+        open(os.path.join(ROOT, 'ref', 'tpu', 'tpu_prog.hex'), 'w').write(old)
     m = Machine(prog, [], lambda x, y: 0, [0] * 1024, dict(frame_id=1, maxham=2, cand_count=0, minside=8)).run()
     assert res[5] & 0xFFFFFFFF == m.res[5] & 0xFFFFFFFF, (hex(res[5]), hex(m.res[5]))
 

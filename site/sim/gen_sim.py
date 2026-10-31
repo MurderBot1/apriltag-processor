@@ -366,14 +366,14 @@ def scen_tpu(name='dist_15'):
     code = asm.link()
     hexp = W('tpu_prog.hex')
     open(hexp, 'w').write('\n'.join('%08x' % w for w in code) + '\n')
-    repo_hex = open(os.path.join(ROOT, 'rtl', 'tpu_prog.hex')).read().split()
+    repo_hex = open(os.path.join(ROOT, 'ref', 'tpu', 'tpu_prog.hex')).read().split()
     same = repo_hex[:len(code)] == ['%08x' % w for w in code]
-    print('  rtl/tpu_prog.hex == assembled program:', same)
-    taghex = os.path.join(ROOT, 'rtl', 'tag36h11.hex')
-    v = build('tpu', ['rtl/tpu_core.v', tb('tb_tpu_wave.v')], params=['PROG="%s"' % hexp.replace('\\', '/')])
+    print('  ref/tpu/tpu_prog.hex == assembled program:', same)
+    taghex = os.path.join(ROOT, 'ref', 'tpu', 'tag36h11.hex')
+    v = build('tpu', ['ref/tpu/tpu_core.v', tb('tb_tpu_wave.v')], params=['PROG="%s"' % hexp.replace('\\', '/')])
     # TAG_HEX is a tpu_core parameter: patch through a defparam-free route -> run with cwd=ROOT-independent copy
     shutil.copy(taghex, W('tag36h11.hex'))
-    os.makedirs(W('rtl'), exist_ok=True); shutil.copy(taghex, W('rtl/tag36h11.hex'))
+    os.makedirs(W('ref/tpu'), exist_ok=True); shutil.copy(taghex, W('ref/tpu/tag36h11.hex'))
     t = time.time()
     out = run(v, ['cand=cand.hex', 'fb=fb.hex', 'n=1', 'vcd=tpu.vcd', 'frame=1'], timeout=3000)
     print('  tpu sim %.0fs:' % (time.time() - t), out.strip().splitlines()[-1])
@@ -385,13 +385,13 @@ def scen_tpu(name='dist_15'):
     print('  TPU RTL result matches ISS:', ok, rt[0]['id'], rt[0]['rot'], rt[0]['ham'])
     assert ok
     cycles = int(re.search(r'cycles=(\d+)', out).group(1))
-    ops = simlib.localparams('rtl/tpu_core.v')
+    ops = simlib.localparams('ref/tpu/tpu_core.v')
     opnames = {}
-    txt = open(os.path.join(ROOT, 'rtl', 'tpu_core.v')).read()
+    txt = open(os.path.join(ROOT, 'ref', 'tpu', 'tpu_core.v')).read()
     blk = re.search(r'localparam \[5:0\]\s*(.*?);', txt, re.S).group(1)
     for nm, val in re.findall(r'(\w+)=(\d+)', blk):
         opnames[int(val)] = nm
-    states = {v_: k[2:] for k, v_ in simlib.localparams('rtl/tpu_core.v', 'S_').items()}
+    states = {v_: k[2:] for k, v_ in simlib.localparams('ref/tpu/tpu_core.v', 'S_').items()}
     inv = {}
     for k, a in asm.labels.items():
         inv.setdefault(a, k)

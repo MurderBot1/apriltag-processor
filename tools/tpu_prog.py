@@ -337,6 +337,6 @@ def program():
 
 if __name__ == '__main__':
     code, a = program()
-    out = os.path.join(os.path.dirname(__file__), '..', 'rtl', 'tpu_prog.hex')
+    out = os.path.join(os.path.dirname(__file__), '..', 'ref', 'tpu', 'tpu_prog.hex')
     a.hexfile(out)
     print('TPU program:', len(code), 'words ->', out)

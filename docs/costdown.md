@@ -7,6 +7,37 @@ detector 630/647 detectable tags, current chip 562/647)?
 This is research only. `docs/bom/bom.json` and the design are unchanged. Every number below comes from a script in `tools/` and a file in
 `results/` (list at the end) or from a vendor page named next to it. Anything I could not read from a vendor is marked **UNVERIFIED**.
 
+
+## STATUS (2026-10-30): option A3 is implemented on branch `a3-arch`
+
+The TPU and the two binary frame banks moved out of the FPGA into the RP2350 firmware / SRAM; the FPGA is now the LFE5U-45F-8BG381C. What was built and what
+came out (measured = simulation / tool run in this repo; estimated = model, not silicon):
+
+| item | study estimate | result |
+|---|---|---|
+| C port bit-exact with the ISS | "if bit-exact" | **yes, measured**: all 100 frames, whole result image (`tests/test_fw_tpu.py`); chain on all 100 frames gives the old tags and corners exactly (562 / 647, 0 px difference) |
+| tag unit time per frame, Cortex-M33 @ 150 MHz, 1 core | 2.0 - 5.7 ms median, 12 - 34 ms worst (k = 0.7 - 2.0) | **estimated** (emulated machine code + latency table): median 1.59 ms, worst 9.3 ms (1.25/7.4 .. 1.89/11.0 across the three models). Pass criterion (median <= 6, worst <= 12 ms) met |
+| pose solve on the same core | not estimated | **estimated**: 1.8 ms median / 3.6 max (FPU single precision) .. 3.0 / 8.8 (software doubles) |
+| frame drops (2 buffers, category repeated) | "similar to today" (20 %) | **estimated**: 1 % tag unit only, 3 - 4 % with pose on one core, 2 % with two cores; 0 % with 3 buffers in most cases (`results/frame_budget.md`) |
+| FPGA block RAM | 58 | **56 of 108** (measured by nextpnr) |
+| FPGA LUT4 | ~10 k | **12,227 of 43,848** (the labeller and streamer are bigger than the per-module estimate) |
+| core clock at 85.714 MHz | "closes" | 81.7 - 91.0 MHz over 6 seeds, closes on 4 of 6; D-PHY 200 MHz closes on 6 of 6 (201.5 - 217.5 MHz) |
+| data path | PIO + DMA, 15.4 MB/s | designed and simulated (RTL), firmware compiled; **not run on hardware**; bus runs at 21.4 MB/s bursts, 15.4 MB/s average |
+| PCB: frame bus routed | "re-route only what changed" | **not achieved**: 9 of 10 nets route; the board file, Gerbers and renders are still the 85F board (docs/hardware.md) |
+| ball compatibility 85F -> 45F | "checked for 18 balls" | 31 balls (incl. the new bus), identical bank and pad function on 85F / 45F / UM-45F / 25F (`tools/pin_compat.py`) |
+
+Corrections to this study found while implementing:
+
+* **The plain LFE5U-45F-8BG381C does have an LCSC page** (C1551314, $11.2791 at 1+, $10.9093 at 10+) - the sentence in section 4 saying it had none was wrong.
+  But its **stock is 0** on 2026-10-30. The $35.28 part used in the BOM tables below is the SERDES variant LFE5UM-45F-8BG381C (C1550814, 6 pcs). The design
+  needs no SERDES, the pads are identical, but the UM's extra SERDES balls are not in this repo's pin table, so it is **not verified as a drop-in**.
+  `docs/bom/bom.json` now lists the exact part (LFE5U-45F-8BG381C, $11.28, status verified price / hard to source: stock 0). Recurring BOM with that price
+  (arithmetic on the table in section 1): about $68.7 / $67.8 / $67.3 per board at 1 / 10 / 100 (A3 with the Commonlands lens); with the in-stock UM
+  part at $35.28 / $34.12 it is the $92.68 / $91.04 / $90.48 of the table.
+* The 25F (speed 8, CABGA-381) *does* fit in a nextpnr trial (LUT4 50 %, block RAM 56 of 56, core 93.1 MHz, D-PHY 216 MHz, one seed), but with no block RAM margin and
+  no speed-8 25F listing found at LCSC; section 4's "NLAB 1024 -> 512" was not needed for the fit.
+* The 'frame gate' in the old design dropped frames when the TPU was busy; with A3 a frame can still be lost, in the MCU, when both of its two frame buffers are busy.
+
 ## 1. Answer in one page
 
 1. **A CPU alone cannot do the detection at 1280x800@120.** Measured on this PC (Ryzen 9 7900X, one thread, upstream AprilTag C library,
@@ -165,7 +196,7 @@ the candidate table. The **TPU algorithm (`tools/tpu_prog.py`, 574 words, ISS `t
   `tools/pins.py` have the same bank and pad function. So A3 with the 45F is a drop-in for the FPGA footprint; only the new FPGA-to-RP2350 bus
   needs routing. (Ball compatibility from the open database, not from a Lattice drawing.)
 * FPGA price: LFE5UM-45F-8BG381C (the SerDes variant, SerDes unused) $35.28 at 1+, $34.12 at 10+, LCSC C1550814, stock **6**. The plain
-  LFE5U-45F-8BG381C had no LCSC page in my search (a $43.23 Octopart figure from a search snippet is UNVERIFIED).
+  LFE5U-45F-8BG381C: **corrected** - it has LCSC C1551314 ($11.28 at 1+, stock 0); the sentence 'no LCSC page' was wrong (see STATUS).
 * **TPU in C, the key risk.** The TPU takes 427k clocks median / 2.55 M worst at 85.714 MHz = 5.0 ms / 29.8 ms. Its instructions take 2 clocks
   each, divides about 48. A C port on a Cortex-M33 at 150 MHz costs k M33 cycles per TPU clock. I **cannot measure k here**; a plausible
   range is 0.7 to 2.0 (RISC-like ops, 64-bit divide in software, bit-packed pixel fetch). That gives 2.0 to 5.7 ms median per frame on **one** core
@@ -238,6 +269,14 @@ A3 gives -$65 per unit at the LCSC prices read today; with the lens -$94 (-60 %)
 1. Port `tools/tpu_prog.py` to C (use `tools/tpu_isa.py` outputs as golden vectors) and run the 100 frames' candidates on a Pico 2 / RP2350 dev
    board with the binary frames in SRAM. Measure cycles per frame per category. Pass criterion: median <= 6 ms and worst <= 12 ms on one core,
    or the two-core split meets 8.33 ms for the categories that fit the TPU today (`results/tpu_budget_by_category.md`).
+   **Result (A3 branch, phase 1; emulated, not measured on silicon):** `firmware/core/attpu.c` is bit-exact with the ISS on all 100 frames
+   (full result RAM image, `tests/test_fw_tpu.py`, also thresholds 0..8, corrupted masks, garbage records, 20 000 random divides). Executed as
+   Cortex-M33 code (`tools/m33_cycles.py`, Unicorn + table-driven cycle model, 150 MHz, one core, -O3) it costs **median 1.59 ms, p95 6.1 ms,
+   worst 9.3 ms** (optimistic model 1.25 / 7.4, pessimistic model 1.89 / 11.0 ms); 3 of 100 frames exceed one 8.33 ms frame period (5 under the
+   pessimistic model). Gate passed (median <= 6 ms, worst <= 12 ms) under all three models. Per-category table: `results/tpu_c_m33_cycles.md`.
+   This is far below the estimate above (2.0-5.7 ms median, 12-34 ms worst): the C version needs about 160 k instructions for a median frame
+   against 213 k TPU instructions (427 k clocks / 2) of the RTL because the CPU has single-cycle multiply, hardware 32-bit divide and a bucket
+   index replaces the 2 348-entry tag scan (~590 clocks per candidate in hardware).
 2. Synthesise the reduced RTL (no TPU, no fb0/fb1, add a mask-stream output) with `--45k --package CABGA381 --speed 8` and with `--25k`
    to confirm the 58 / 51 block RAM estimate and the 85.7 MHz closure over several seeds.
 3. PIO capture of a 15.4 MB/s 8-bit bus at 120 fps into RP2350 SRAM with DMA, with USB and pose running.

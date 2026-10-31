@@ -36,13 +36,13 @@ unavailable() { case " ${REQUIRE:-} " in *" $1 "*) record "$1" failed "required 
 if [ $FPGA = 0 ]; then skip fpga "--skip-fpga given"
 elif have yosys && have nextpnr-ecp5 && have ecppack; then
   mkdir -p sim
-  step fpga fpga bash tools/fpga_flow.sh "${FPGA_SEED:-1}" "${FPGA_FREQ:-100}"
+  step fpga fpga bash tools/fpga_flow.sh "${FPGA_SEED:-1}" "${FPGA_FREQ:-85.714}"
   if [ -f sim/apriltag_cam.bit ] && grep -q FLOW_DONE sim/nextpnr.out 2>/dev/null; then
     cp sim/apriltag_cam.bit sim/timing.json sim/yosys_top.out sim/nextpnr.log "$OUT/fpga/" 2>/dev/null
     gzip -9 -c sim/top.json > "$OUT/fpga/top.json.gz"; gzip -9 -c sim/top.cfg > "$OUT/fpga/top.cfg.gz"   # netlist + textual config (large)
     cp rtl/apriltag_cam.lpf "$OUT/fpga/"
     { grep -E "Max frequency for clock" sim/nextpnr.log | tail -4; grep -A14 "Device utilisation" sim/nextpnr.log | tail -15; } > "$OUT/fpga/summary.txt"
-    if grep -q "FAIL at" "$OUT/fpga/summary.txt"; then record fpga-timing warning "timing NOT met at ${FPGA_FREQ:-100} MHz target (see fpga/summary.txt); bitstream still produced"; fi
+    if grep -q "FAIL at" "$OUT/fpga/summary.txt"; then record fpga-timing warning "timing NOT met at ${FPGA_FREQ:-85.714} MHz target (see fpga/summary.txt); bitstream still produced"; fi
   else
     record fpga-bitstream failed "no bitstream / FLOW_DONE marker (see logs/)"; cp sim/*.out sim/*.log "$OUT/logs/" 2>/dev/null
   fi
@@ -61,7 +61,7 @@ else unavailable firmware "arm-none-eabi-gcc, cmake or PICO_SDK_PATH (Pico SDK 2
 if have gcc; then
   EXT=so; case "$(uname -s)" in MINGW*|MSYS*|CYGWIN*) EXT=dll;; Darwin) EXT=dylib;; esac
   step firmware-sim firmware_sim gcc -O2 -Wall -Wextra -shared -fPIC -Ifirmware/core firmware/core/atpose.c firmware/core/atproto.c \
-    firmware/core/atapp.c firmware/core/atae.c firmware/tests/atfw_shim.c -o "$OUT/firmware/libatfw.$EXT" -lm
+    firmware/core/atapp.c firmware/core/atae.c firmware/core/atframe.c firmware/core/attpu.c firmware/tests/atfw_shim.c -o "$OUT/firmware/libatfw.$EXT" -lm
 else unavailable firmware-sim "gcc not installed"; fi
 
 # ---- Host software + configs ----------------------------------------------------------------
