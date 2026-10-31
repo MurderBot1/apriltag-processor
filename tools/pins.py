@@ -1,4 +1,4 @@
-"""Pin plan for the ECP5-85F caBGA381: single source of truth for the LPF (FPGA constraints) and the PCB netlist.
+"""Pin plan for the ECP5 caBGA381 (LFE5U-45F in architecture A3; the 85F has the same balls, see tools/pin_compat.py): single source of truth for the LPF (FPGA constraints) and the PCB netlist.
 Balls were chosen from the Project Trellis IO database (pcb/ecp5_85f_bg381_io.json): MIPI on left bank 7 (VCCIO 1.8 V; 4:1 DDR gearing is only
 supported on left/right banks; clock lane on the PCLKT7_0 edge-clock pad), sensor control + oscillator on bank 1 (1.8 V), MCU SPI / LEDs on bank 2 (3.3 V)."""
 import os, json
@@ -20,6 +20,16 @@ PINS = {
     'spi_miso':       ('F16', 'LVCMOS33', 'DRIVE=8'),
     'mcu_irq':        ('F18', 'LVCMOS33', 'DRIVE=4'),
     'mcu_rst_n':      ('G16', 'LVCMOS33', 'PULLMODE=UP'),
+    'mcu_d[0]':       ('H16', 'LVCMOS33', 'DRIVE=8 SLEWRATE=FAST'),   # frame bus to the RP2350 PIO (rtl/mask_stream.v), bank 2 like the SPI pins
+    'mcu_d[1]':       ('H17', 'LVCMOS33', 'DRIVE=8 SLEWRATE=FAST'),
+    'mcu_d[2]':       ('H18', 'LVCMOS33', 'DRIVE=8 SLEWRATE=FAST'),
+    'mcu_d[3]':       ('G18', 'LVCMOS33', 'DRIVE=8 SLEWRATE=FAST'),
+    'mcu_d[4]':       ('G20', 'LVCMOS33', 'DRIVE=8 SLEWRATE=FAST'),
+    'mcu_d[5]':       ('F17', 'LVCMOS33', 'DRIVE=8 SLEWRATE=FAST'),
+    'mcu_d[6]':       ('F20', 'LVCMOS33', 'DRIVE=8 SLEWRATE=FAST'),
+    'mcu_d[7]':       ('E20', 'LVCMOS33', 'DRIVE=8 SLEWRATE=FAST'),
+    'mcu_clk':        ('J16', 'LVCMOS33', 'DRIVE=8 SLEWRATE=FAST'),
+    'mcu_fs':         ('J17', 'LVCMOS33', 'DRIVE=8 SLEWRATE=FAST'),
     'leds[0]':        ('D18', 'LVCMOS33', 'DRIVE=4'),
     'leds[1]':        ('D19', 'LVCMOS33', 'DRIVE=4'),
     'leds[2]':        ('E19', 'LVCMOS33', 'DRIVE=4'),

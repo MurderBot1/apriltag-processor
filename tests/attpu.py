@@ -59,3 +59,35 @@ class Attpu:
         res = np.zeros(512, np.uint32)
         self.lib.attpu_pack_results(out, n, res.ctypes.data)
         return [int(x) for x in res], n, out
+
+
+# ---------------------------------------------------------------------------------------------- FPGA frame packet (rtl/mask_stream.v)
+MAGIC = 0x4D335441
+PKT_WORDS = 4 + 32000 + 4 + 1024
+PKT_BYTES = 4 * PKT_WORDS
+
+
+def parse_packet(words):
+    """33032 little-endian words of one packet -> dict(seq, ts, mask (uint32[32000]), cand (uint32[1024]), cand_count, ccl_flags, status, frame_sum,
+    max_row_cycles, ok).  `status` bits: 0 CSI frame bad, 1 threshold busy error, 2 FIFO overflow, 3 short mask, 4 labeller timeout."""
+    w = np.asarray(words, dtype=np.uint32)
+    assert w.size == PKT_WORDS, w.size
+    t = w[32004:32008]
+    return dict(ok=bool(w[0] == MAGIC and t[3] == (~w[1] & 0xFFFFFFFF)), seq=int(w[1]), ts=int(w[2]) | (int(w[3]) << 32), mask=w[4:32004], cand=w[32008:],
+                cand_count=int((t[0] >> 16) & 0xFF), ccl_flags=int((t[0] >> 8) & 15), status=int(t[0] & 0xFF), frame_sum=int(t[1]), max_row_cycles=int(t[2] & 0xFFFF))
+
+
+def load_packet_hex(path):
+    return np.array([int(x, 16) for x in open(path).read().split()], dtype=np.uint32)
+
+
+_A = None
+
+
+def detect(pkt, frame_id=None, maxham=2):
+    """Run the C tag unit on a parsed packet.  Returns (512-word result image like the old result RAM, number of tags)."""
+    global _A
+    if _A is None:
+        _A = Attpu()
+    res, n, _ = _A.run(pkt['mask'], pkt['cand'][:16 * 64], min(pkt['cand_count'], 64), pkt['seq'] if frame_id is None else frame_id, maxham)
+    return res, n

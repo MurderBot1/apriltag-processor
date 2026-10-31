@@ -9,7 +9,11 @@
 #include "tag36h11_codes.h"
 
 #ifndef ATTPU_FAST
-#define ATTPU_FAST                      /* the RP2350 build puts the hot functions into SRAM (see firmware/rp2350/CMakeLists.txt) */
+#ifdef PICO_BUILD                        /* RP2350 firmware: run the tag unit from SRAM (copied at boot), no XIP cache misses */
+#define ATTPU_FAST __attribute__((section(".time_critical.attpu")))
+#else
+#define ATTPU_FAST
+#endif
 #endif
 
 typedef int32_t s32;
@@ -23,13 +27,13 @@ static inline s32 sub32(s32 a, s32 b) { return (s32)((u32)a - (u32)b); }
 static inline s32 abs32(s32 a) { return a < 0 ? (s32)(0u - (u32)a) : a; }
 static inline s32 shl32(s32 a, unsigned n) { return (s32)((u32)a << n); }
 
-int32_t attpu_muls(int32_t a, int32_t b, unsigned sh) { return (s32)(u32)(u64)(((int64_t)a * (int64_t)b) >> sh); }
+ATTPU_FAST int32_t attpu_muls(int32_t a, int32_t b, unsigned sh) { return (s32)(u32)(u64)(((int64_t)a * (int64_t)b) >> sh); }
 static inline s32 muls16(s32 a, s32 b) { return (s32)(u32)(u64)(((int64_t)a * (int64_t)b) >> 16); }
 static inline s32 muls12(s32 a, s32 b) { return (s32)(u32)(u64)(((int64_t)a * (int64_t)b) >> 12); }
 static inline s32 muls24(s32 a, s32 b) { return (s32)(u32)(u64)(((int64_t)a * (int64_t)b) >> 24); }
 
 /* (u1:u0) / v for u1 < v, v != 0 (Hacker's Delight divlu: two 32/16-bit steps on the hardware divider) */
-static u32 divlu(u32 u1, u32 u0, u32 v)
+ATTPU_FAST static u32 divlu(u32 u1, u32 u0, u32 v)
 {
     const u32 b = 65536u;
     int s = __builtin_clz(v);
@@ -47,7 +51,7 @@ static u32 divlu(u32 u1, u32 u0, u32 v)
 }
 
 /* floor((ua << 16) / ub), ub != 0, result up to 47 bits */
-static u64 udiv_q16(u32 ua, u32 ub)
+ATTPU_FAST static u64 udiv_q16(u32 ua, u32 ub)
 {
     if (ua < 65536u) return (ua << 16) / ub;                         /* the common small case: one hardware divide */
     u32 hi = ua >> 16, lo = ua << 16;
@@ -56,7 +60,7 @@ static u64 udiv_q16(u32 ua, u32 ub)
     return ((u64)qhi << 32) | divlu(hi, lo, ub);
 }
 
-int32_t attpu_divq(int32_t a, int32_t b)
+ATTPU_FAST int32_t attpu_divq(int32_t a, int32_t b)
 {
     if (b == 0) return a >= 0 ? 0x7FFFFFFF : -0x7FFFFFFF;
     u32 ua = a < 0 ? 0u - (u32)a : (u32)a, ub = b < 0 ? 0u - (u32)b : (u32)b;
@@ -78,7 +82,7 @@ static uint16_t g_head[3][4097];                      /* bucket offsets per 12-b
 static uint16_t g_ids[3][ATTPU_NCODES * 4];           /* entry = i * 4 + k */
 static int g_ready;
 
-static u64 rot6(u64 code)                             /* rotate the 6x6 grid by 90 degrees clockwise (tools/tpu_isa.py rot6) */
+ATTPU_FAST static u64 rot6(u64 code)                             /* rotate the 6x6 grid by 90 degrees clockwise (tools/tpu_isa.py rot6) */
 {
     u64 v = 0;
     for (int r = 0; r < 6; r++)
@@ -94,7 +98,7 @@ static inline unsigned popcnt64(u64 v)
     return ((a + b) * 0x01010101u) >> 24;                              /* sum of both byte-wise counts <= 36 fits a byte */
 }
 
-void attpu_init(void)
+ATTPU_FAST void attpu_init(void)
 {
     for (int i = 0; i < ATTPU_NCODES; i++) {
         u64 c = tag36h11_codes[i];
@@ -154,7 +158,7 @@ typedef struct {
     s32 cinfo[8];     /* 0 area, 1 label, 2 width, 3 height, 4 quad area */
 } tpu_t;
 
-static void load_cand(tpu_t *t, const u32 *c)
+ATTPU_FAST static void load_cand(tpu_t *t, const u32 *c)
 {
     t->cinfo[0] = (s32)c[0];
     t->cinfo[1] = (s32)c[9];
@@ -179,7 +183,7 @@ static void load_cand(tpu_t *t, const u32 *c)
 }
 
 /* clockwise order E,SE,S,SW,W,NW,N,NE = dirs 0,4,2,7,1,5,3,6; set A = E,S,W,N; set B = SE,SW,NW,NE.  Returns 1 if the quad is plausible. */
-static s32 shoelace(const s32 *p, const int *ks)
+ATTPU_FAST static s32 shoelace(const s32 *p, const int *ks)
 {
     s32 res = 0;
     for (int i = 0; i < 4; i++) {
@@ -190,7 +194,7 @@ static s32 shoelace(const s32 *p, const int *ks)
     return res;
 }
 
-static int coarse(tpu_t *t)
+ATTPU_FAST static int coarse(tpu_t *t)
 {
     static const int setA[4] = {0, 2, 1, 3}, setB[4] = {4, 7, 5, 6};
     s32 a2 = shoelace(t->pts, setA), b2 = shoelace(t->pts, setB);
@@ -352,7 +356,7 @@ ATTPU_FAST int attpu_run(const uint32_t *fb, const uint32_t *cand, unsigned cand
     return tags;
 }
 
-void attpu_pack_results(const attpu_tag_t *tags, int n, uint32_t *w)
+ATTPU_FAST void attpu_pack_results(const attpu_tag_t *tags, int n, uint32_t *w)
 {
     w[0] = (uint32_t)n;
     for (int i = 0; i < n; i++) {

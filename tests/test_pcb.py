@@ -145,3 +145,15 @@ def test_sensor_ball_map_has_unique_balls_and_all_supplies():
     for n in ('AVDD_S', 'DVDD_S', 'DOVDD_S', 'EVDD_S', 'PVDD_S', 'VH', 'VN1', 'VN2', 'VN3'):
         assert n in b.values(), n
     assert sum(1 for v in b.values() if v == 'GND') == 3
+
+
+def test_used_balls_have_the_same_bank_and_function_on_the_85f_45f_and_25f():
+    """A3 swaps the LFE5U-85F for a LFE5U-45F in the same CABGA-381 footprint: every used ball must be the same pad (Project Trellis database)."""
+    import pytest
+    sys.path.insert(0, os.path.join(ROOT, 'tools'))
+    import pin_compat
+    try:
+        pin_compat.trellis_dir()
+    except SystemExit:
+        pytest.skip('Project Trellis database not installed')
+    assert pin_compat.main([]) == 0

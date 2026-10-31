@@ -1,10 +1,12 @@
+// REFERENCE ONLY - since architecture A3 the TPU is no longer part of the FPGA: its algorithm runs as C on the RP2350 (firmware/core/attpu.c, bit-exact).
+// This RTL stays as the hardware reference that tools/tpu_isa.py (the golden model) and the C port are verified against (tests/test_tpu.py, tests/test_fw_tpu.py).
 // TPU: Tag Processing Unit - a small custom processor whose instruction ROM is the baked edge-refinement /
-// decode program (tools/tpu_prog.py -> rtl/tpu_prog.hex) with a baked tag36h11 code ROM.
+// decode program (tools/tpu_prog.py -> ref/tpu/tpu_prog.hex) with a baked tag36h11 code ROM.
 // Bit-exact with the Python ISS in tools/tpu_isa.py.  Two clock cycles per simple instruction.
 `timescale 1ns/1ps
 module tpu_core #(
-    parameter PROG_HEX = "rtl/tpu_prog.hex",
-    parameter TAG_HEX  = "rtl/tag36h11.hex"
+    parameter PROG_HEX = "ref/tpu/tpu_prog.hex",
+    parameter TAG_HEX  = "ref/tpu/tag36h11.hex"
 ) (
     input  wire        clk,
     input  wire        rst,

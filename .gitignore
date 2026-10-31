@@ -10,3 +10,4 @@ api/java/out/
 api/cpp/build/
 *.vvp
 products/
+build/

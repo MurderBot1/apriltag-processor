@@ -1,4 +1,4 @@
-// Chip-level top for the ECP5 (LFE5U-85F-8BG381C): 24 MHz oscillator -> PLL (85.714 MHz core, 24 MHz sensor clock, 200 MHz spare),
+// Chip-level top for the ECP5 (LFE5U-45F-8BG381C, architecture A3): 24 MHz oscillator -> PLL (85.714 MHz core, 24 MHz sensor clock, 200 MHz spare),
 // OV9281 MIPI CSI-2 (2 lanes, LVDS + resistor network) -> dphy_rx -> cam_core, SPI slave to the MCU, I2C to the sensor.
 // Pin locations: tools/pins.py (single source of truth for this file's LPF and the PCB netlist).
 `timescale 1ns/1ps
@@ -15,6 +15,9 @@ module apriltag_cam_top (
     input  wire        spi_mosi,
     output wire        spi_miso,
     output wire        mcu_irq,
+    output wire [7:0]  mcu_d,             // frame bus to the MCU (PIO capture): mask + candidate list, see rtl/mask_stream.v
+    output wire        mcu_clk,
+    output wire        mcu_fs,
     input  wire        mcu_rst_n,
     output wire [3:0]  leds
 );
@@ -44,7 +47,7 @@ module apriltag_cam_top (
     wire scl_oe, sda_oe, miso, miso_oe, irq; wire [3:0] core_leds;
     cam_core #(.US_NUM(7), .US_DEN(600)) core(.clk(clk100), .rst(rst), .hs_valid(hs_valid), .lane0(lane0), .lane1(lane1), .sck(spi_sck),
         .cs_n(spi_cs_n), .mosi(spi_mosi), .miso(miso), .miso_oe(miso_oe), .scl_oe(scl_oe), .sda_oe(sda_oe),
-        .sda_i(i2c_sda), .csi_pkt_end(pkt_end), .irq(irq), .leds(core_leds));
+        .sda_i(i2c_sda), .mcu_d(mcu_d), .mcu_clk(mcu_clk), .mcu_fs(mcu_fs), .csi_pkt_end(pkt_end), .irq(irq), .leds(core_leds));
     assign i2c_scl = scl_oe ? 1'b0 : 1'bz;
     assign i2c_sda = sda_oe ? 1'b0 : 1'bz;
     assign spi_miso = miso_oe ? miso : 1'bz;

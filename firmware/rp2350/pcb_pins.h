@@ -14,6 +14,9 @@
  *  FPGA_DONE            8    SIO           in, pull-up      ECP5 DONE      (high = configured)
  *  FPGA_IRQ             9    SIO           in               FPGA result-ready / frame-done (optional, polled today)
  *  LED_STAT            10    SIO           out              status LED
+ *  FB_D0..FB_D7        16-23 PIO0          in               FPGA frame bus data (rtl/mask_stream.v mcu_d[0..7]); D0 must be the PIO IN base
+ *  FB_CLK              24    PIO0          in               FPGA frame bus strobe (mcu_clk) = IN base + 8
+ *  FB_FS               25    SIO           in (IRQ)         FPGA frame bus packet-valid level (mcu_fs)
  *  FPGA_CFG_SCK        14    SPI1 SCK      out              ECP5 CCLK   (slave SPI configuration port)
  *  FPGA_CFG_MOSI       15    SPI1 TX       out              ECP5 MOSI   (SI)
  *  FPGA_CFG_MISO       12    SPI1 RX       in               ECP5 MISO   (SO)
@@ -34,6 +37,9 @@
 #define PIN_FPGA_DONE       8
 #define PIN_FPGA_IRQ        9
 #define PIN_LED_STAT        10
+#define PIN_FB_D0           16     /* ... PIN_FB_D0 + 7 = 23 */
+#define PIN_FB_CLK          24     /* must equal PIN_FB_D0 + 8: frame_rx.pio waits on 'pin 8' */
+#define PIN_FB_FS           25
 #define PIN_FPGA_CFG_SCK    14
 #define PIN_FPGA_CFG_MOSI   15
 #define PIN_FPGA_CFG_MISO   12

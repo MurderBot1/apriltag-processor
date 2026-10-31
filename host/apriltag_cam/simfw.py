@@ -1,5 +1,6 @@
 """Native firmware (firmware/core compiled for the PC) driven through a fake HAL: fake FPGA register/result memory, fake flash,
 collected tx bytes.  Used by the host SimTransport and by the firmware tests."""
+import collections
 import ctypes as C
 import os
 import random
@@ -9,13 +10,15 @@ import subprocess
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 CORE = os.path.join(ROOT, 'firmware', 'core')
 DLL = os.path.join(ROOT, 'firmware', 'tests', 'libatfw.dll' if os.name == 'nt' else 'libatfw.so')
-SOURCES = [os.path.join(CORE, f) for f in ('atpose.c', 'atproto.c', 'atapp.c', 'atae.c')] + \
+SOURCES = [os.path.join(CORE, f) for f in ('atpose.c', 'atproto.c', 'atapp.c', 'atae.c', 'atframe.c', 'attpu.c')] + \
           [os.path.join(ROOT, 'firmware', 'tests', 'atfw_shim.c')]
 
 FPGA_ID = 0x41544731
 REG_ID, REG_STATUS, REG_FRAME, REG_I2C, REG_I2C_DATA, REG_THRESH, REG_FRAME_SUM = 0x00, 0x18, 0x1C, 0x40, 0x44, 0x0C, 0x60
-REG_TIME_LO, REG_TIME_HI, REG_FT0 = 0x64, 0x68, 0x6C
-BANK0, BANK1 = 0x1000, 0x2000
+REG_TIME_LO, REG_TIME_HI = 0x64, 0x68
+PKT_MAGIC = 0x4D335441
+PKT_WORDS = 4 + 32000 + 4 + 1024
+PKT_BYTES = 4 * PKT_WORDS
 SLOT_BYTES = 4096
 FRAME_PIXELS = 1024000
 
@@ -150,42 +153,63 @@ def q16(v):
     return int(round(v * 65536.0)) & 0xFFFFFFFF
 
 
+def _s32(v):
+    return v - (1 << 32) if v & 0x80000000 else v
+
+
+def make_packet(seq, ts=0, frame_sum=0, status=0, mask=None, cand=None, count=0, ccl_flags=0, max_row=0):
+    """One FPGA frame packet (rtl/mask_stream.v layout).  mask: uint32[32000] or None (all white), cand: uint32 array of 16 * count words."""
+    import numpy as np
+    w = np.zeros(PKT_WORDS, np.uint32)
+    w[0] = PKT_MAGIC; w[1] = seq & 0xFFFFFFFF; w[2] = ts & 0xFFFFFFFF; w[3] = (ts >> 32) & 0xFFFFFFFF
+    if mask is not None:
+        w[4:32004] = mask
+    w[32004] = (status & 0xFF) | ((ccl_flags & 15) << 8) | ((count & 0xFF) << 16)
+    w[32005] = frame_sum & 0xFFFFFFFF; w[32006] = max_row & 0xFFFF; w[32007] = ~np.uint32(seq & 0xFFFFFFFF)
+    if cand is not None:
+        w[32008:32008 + len(cand)] = cand
+    return w.tobytes()
+
+
 class FakeFpga:
-    """Register file + two result banks with the exact layout of rtl/cam_core.v.
-    STATUS = {seq[31:16], tag_count[15:8], init_done[3], tpu_busy[2], res_bank[1], res_valid[0]}."""
+    """Register file of rtl/cam_core.v plus the MCU frame bus: a queue of frame packets that the firmware fetches through the HAL.
+    publish(tags) queues a packet whose detections are injected (the real tag unit is replaced by the test hook for it); publish_packet() queues
+    a real packet (mask + candidates) that the firmware's C tag unit processes.
+    STATUS = {frames_sent[31:16], candidates[15:8], init_done[3], stream_busy[2], 0[1], any_frame[0]}."""
     def __init__(self):
         self.regs = {}
-        self.banks = [[0] * (16 + 16 * 31) for _ in range(2)]
+        self.queue = collections.deque()      # (packet bytes, injected tags or None)
         self.seq = 0
-        self.res_bank = 0
-        self.res_valid = 0
         self.count = 0
         self.frame_id = 0
         self.init_done = 1
-        self.tpu_busy = 0
+        self.tpu_busy = 0                     # (stream_busy) kept for tests that poke it
         self.i2c_log = []              # (reg, value)
         self.sensor_regs = {}
         self.i2c_busy_polls = 0
         self.frame_sum = 0
         self.time_us = 0               # device clock; tests set it or let time_fn drive it (callable(fpga) -> us)
         self.time_fn = None
-        self.ft = [0, 0]               # frame start timestamp per capture bank
         self._time_hi = 0
         self.frame_sum_fn = None       # callable(fpga) -> int, overrides frame_sum
         self.on_sensor_write = None    # callable(fpga, reg) after each I2C write
         self.counters = {0x28: 0x00190008, 0x30: 0, 0x34: 0, 0x38: 0}
-        self.torn_hook = None          # callable(fpga) invoked once after the next result-bank read
-        self.torn_always = None        # callable(fpga) invoked after every result-bank read
-        self.fail_reads = 0            # next N reads fail (return nonzero)
+        self.fail_reads = 0            # next N register reads fail (return nonzero)
         self.read_log = []
         self._i2c_data = 0
+        self.lost = 0                  # packets the receiver dropped (reported through the HAL like the DMA layer does)
+        self.max_queue = 2             # frame buffers: a third packet is lost
+        self.inject = {}               # seq -> list of tag records
+        self.last_ts = 0
 
     def status(self):
-        return ((self.seq & 0xFFFF) << 16) | ((self.count & 0xFF) << 8) | (self.init_done << 3) | (self.tpu_busy << 2) | \
-               (self.res_bank << 1) | self.res_valid
+        return ((self.seq & 0xFFFF) << 16) | ((self.count & 0xFF) << 8) | (self.init_done << 3) | (self.tpu_busy << 2) | (1 if self.seq else 0)
 
-    def publish(self, tags, frame_id=None):
-        """tags: iterable of (id, corners[4][2], ham=0, rot=0) or dicts {id, corners, ham}.  Writes the inactive bank, then flips."""
+    def _now(self):
+        return self.time_fn(self) if self.time_fn else self.time_us
+
+    def publish(self, tags, frame_id=None, status=0):
+        """tags: iterable of (id, corners[4][2], ham=0, rot=0) or dicts {id, corners, ham}.  Queues one frame packet whose detections are `tags`."""
         recs = []
         for t in tags:
             if isinstance(t, dict):
@@ -193,52 +217,32 @@ class FakeFpga:
             else:
                 t = tuple(t)
                 recs.append((t[0], t[1], t[2] if len(t) > 2 else 0, t[3] if len(t) > 3 else 0))
-        bank = (self.res_bank ^ 1) if self.res_valid else 0
         fid = (frame_id if frame_id is not None else self.frame_id + 1) & 0xFFFFFFFF
-        w = [0] * (16 + 16 * 31)
-        recs = recs[:31]
-        w[0] = len(recs)
-        for i, (tid, cs, ham, rot) in enumerate(recs):
-            base = 16 + 16 * i
-            w[base] = 0x80000000 | (ham & 63) << 12 | (rot & 3) << 10 | (tid & 0x3FF)
-            for c in range(4):
-                w[base + 1 + 2 * c] = q16(cs[c][0])
-                w[base + 2 + 2 * c] = q16(cs[c][1])
-            w[base + 9] = i + 1
-            w[base + 10] = 1000
-            w[base + 11] = fid
-        self.banks[bank] = w
         self.frame_id = fid
         self.seq = (self.seq + 1) & 0xFFFF
-        self.res_bank = bank
-        self.ft[bank] = self.time_fn(self) if self.time_fn else self.time_us
-        self.res_valid = 1
         self.count = len(recs)
+        ts = self._now()
+        self._enqueue(make_packet(fid, ts, self.frame_sum_fn(self) if self.frame_sum_fn else self.frame_sum, status, count=len(recs)), recs[:31], fid)
+
+    def publish_packet(self, packet):
+        """Queue a complete packet (bytes) built by make_packet() or taken from the RTL simulation; the real C tag unit decodes it."""
+        self.seq = (self.seq + 1) & 0xFFFF
+        self._enqueue(bytes(packet), None, None)
+
+    def _enqueue(self, pkt, recs, fid):
+        if len(self.queue) >= self.max_queue:
+            self.lost += 1
+            return
+        if recs is not None:
+            self.inject[fid] = recs
+        self.queue.append(pkt)
 
     def read(self, addr, n):
         if self.fail_reads:
             self.fail_reads -= 1
             return None
         self.read_log.append((addr, n))
-        out = []
-        in_bank = False
-        for i in range(n):
-            a = addr + 4 * i
-            if BANK0 <= a < BANK0 + 0x1000:
-                out.append(self.banks[0][(a - BANK0) // 4] if (a - BANK0) // 4 < len(self.banks[0]) else 0)
-                in_bank = True
-            elif BANK1 <= a < BANK1 + 0x1000:
-                out.append(self.banks[1][(a - BANK1) // 4] if (a - BANK1) // 4 < len(self.banks[1]) else 0)
-                in_bank = True
-            else:
-                out.append(self._reg(a))
-        if in_bank:
-            if self.torn_hook:
-                h, self.torn_hook = self.torn_hook, None
-                h(self)
-            if self.torn_always:
-                self.torn_always(self)
-        return out
+        return [self._reg(addr + 4 * i) for i in range(n)]
 
     def _reg(self, a):
         if a == REG_ID:
@@ -248,14 +252,11 @@ class FakeFpga:
         if a == REG_FRAME:
             return self.frame_id
         if a == REG_TIME_LO:
-            t = (self.time_fn(self) if self.time_fn else self.time_us) & 0xFFFFFFFFFFFFFFFF
+            t = self._now() & 0xFFFFFFFFFFFFFFFF
             self._time_hi = t >> 32
             return t & 0xFFFFFFFF
         if a == REG_TIME_HI:
             return self._time_hi
-        if REG_FT0 <= a < REG_FT0 + 16:
-            i = (a - REG_FT0) // 8
-            return (self.ft[i] >> (32 * (((a - REG_FT0) // 4) & 1))) & 0xFFFFFFFF
         if a == REG_FRAME_SUM:
             return (self.frame_sum_fn(self) if self.frame_sum_fn else self.frame_sum) & 0xFFFFFFFF
         if a == REG_I2C_DATA:
@@ -296,7 +297,21 @@ class FakeFpga:
 # ---------------------------------------------------------------------------------------------- native firmware instance
 class HalStruct(C.Structure):
     _fields_ = [('ctx', C.c_void_p)] + [(n, C.c_void_p) for n in
-                ('fpga_read', 'fpga_write', 'flash_read', 'flash_erase', 'flash_write', 'tx', 'micros')]
+                ('fpga_read', 'fpga_write', 'flash_read', 'flash_erase', 'flash_write', 'tx', 'micros', 'frame_get', 'frame_put', 'detect')]
+
+
+class FrameBuf(C.Structure):          # at_frame_buf_t
+    _fields_ = [('data', C.c_void_p), ('bytes', C.c_size_t), ('lost', C.c_uint32)]
+
+
+class FrameInfo(C.Structure):         # at_frame_t
+    _fields_ = [('seq', C.c_uint32), ('ts', C.c_uint64), ('mask', C.c_void_p), ('cand', C.c_void_p), ('cand_count', C.c_uint32),
+                ('ccl_flags', C.c_uint32), ('status', C.c_uint32), ('frame_sum', C.c_uint32), ('max_row_cycles', C.c_uint32)]
+
+
+class TpuTag(C.Structure):            # attpu_tag_t
+    _fields_ = [('id', C.c_uint16), ('ham', C.c_uint8), ('rot', C.c_uint8), ('c', C.c_int32 * 8), ('label', C.c_uint32),
+                ('area', C.c_uint32), ('frame', C.c_uint32), ('quad_area', C.c_uint32)]
 
 
 _FPGA_READ = C.CFUNCTYPE(C.c_int, C.c_void_p, C.c_uint32, C.POINTER(C.c_uint32), C.c_size_t)
@@ -306,6 +321,9 @@ _FLASH_ERASE = C.CFUNCTYPE(C.c_int, C.c_void_p, C.c_int)
 _FLASH_WRITE = C.CFUNCTYPE(C.c_int, C.c_void_p, C.c_int, C.c_uint32, C.c_void_p, C.c_size_t)
 _TX = C.CFUNCTYPE(None, C.c_void_p, C.POINTER(C.c_uint8), C.c_size_t)
 _MICROS = C.CFUNCTYPE(C.c_uint32, C.c_void_p)
+_FRAME_GET = C.CFUNCTYPE(C.c_int, C.c_void_p, C.POINTER(FrameBuf))
+_FRAME_PUT = C.CFUNCTYPE(None, C.c_void_p)
+_DETECT = C.CFUNCTYPE(C.c_int, C.c_void_p, C.POINTER(FrameInfo), C.POINTER(TpuTag), C.c_uint)
 
 STAT_NAMES = ('solved', 'solve_fail', 'torn_reads', 'tx_msgs', 'frame_id', 'store_seq', 'ae_updates', 'nobs', 'pose_valid',
               'ae_exposure', 'ae_gain', 'ae_enabled', 'streaming', 'ntags', 'divider', 'rx_bad_frames')
@@ -366,9 +384,35 @@ class NativeFirmware:
             self._clock = (self._clock + self.micros_step) & 0xFFFFFFFF
             return self._clock
 
+        def frame_get(ctx, b):
+            b[0].lost = self.fpga.lost
+            if not self.fpga.queue:
+                return 0
+            pkt = self.fpga.queue[0]
+            self._pktbuf = C.create_string_buffer(pkt, len(pkt))       # keeps the memory alive until frame_put
+            b[0].data = C.addressof(self._pktbuf); b[0].bytes = len(pkt)
+            return 1
+
+        def frame_put(ctx):
+            if self.fpga.queue:
+                self.fpga.queue.popleft()
+
+        def detect(ctx, f, out, mx):
+            recs = self.fpga.inject.pop(f[0].seq, None)
+            if recs is None:
+                return -1
+            for i, (tid, cs, ham, rot) in enumerate(recs[:mx]):
+                o = out[i]
+                o.id = tid; o.ham = ham; o.rot = rot
+                for c in range(4):
+                    o.c[2 * c] = _s32(q16(cs[c][0])); o.c[2 * c + 1] = _s32(q16(cs[c][1]))
+                o.label = i + 1; o.area = 1000; o.frame = f[0].seq; o.quad_area = 2000
+            return min(len(recs), mx)
+
         self._cb = [_FPGA_READ(guard(fpga_read, -1)), _FPGA_WRITE(guard(fpga_write, -1)), _FLASH_READ(guard(flash_read, -1)),
                     _FLASH_ERASE(guard(flash_erase, -1)), _FLASH_WRITE(guard(flash_write, -1)), _TX(guard(tx, None)),
-                    _MICROS(guard(micros, 0))]
+                    _MICROS(guard(micros, 0)), _FRAME_GET(guard(frame_get, 0)), _FRAME_PUT(guard(frame_put, None)),
+                    _DETECT(guard(detect, -1))]
         self.hal = HalStruct(None, *[C.cast(c, C.c_void_p).value for c in self._cb])
 
     def boot(self):
