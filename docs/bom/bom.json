@@ -1,25 +1,25 @@
 {
  "project": "AprilTag camera PCB (48x48 mm, 4-layer)",
  "sources": "pcb/output/bom.csv, pcb/design.py, pcb/output/apriltag_cam.kicad_pcb, housing/README.md, docs/bom/AUDIT.md",
- "price_checked": "2026-10-29",
+ "price_checked": "2026-10-30",
  "notes": "Prices re-checked 2026-10-29. LCSC rows come from LCSC's product API (price tier used is noted per row; tier = the largest quantity break not above the quantity needed, or the minimum order quantity). Commonlands rows come from commonlands.com products.json / product pages. DigiKey, Mouser, Zoro, GoPhotonics and Edmund pages block automated fetches, so anything sourced only from them stays 'unverified'. 'verified' = exact MPN, a link, and an explicitly stated unit price read from the vendor on the check date. fixed = one-time per order (not multiplied by board count). See AUDIT.md for every discrepancy.",
  "items": [
   {
    "category": "ICs",
    "designators": "U1",
    "qty": 1,
-   "value": "ECP5 FPGA, 85k LUT, caBGA-381 0.8mm, speed 8, commercial",
-   "mpn": "LFE5U-85F-8BG381C",
+   "value": "ECP5 FPGA, 45k LUT, caBGA-381 0.8mm, speed 8, commercial (no SERDES)",
+   "mpn": "LFE5U-45F-8BG381C",
    "mfr": "Lattice",
-   "link": "https://www.lcsc.com/product-detail/C1551826.html",
-   "unit_price": 100.1279,
-   "checked": "2026-10-29",
+   "link": "https://www.lcsc.com/product-detail/C1551314.html",
+   "unit_price": 11.2791,
+   "checked": "2026-10-30",
    "status": "verified",
    "fixed": false,
-   "hard": "BGA-381. LCSC price is now $100.13 (1+) / $96.85 (10+) with only 8 pcs in stock on 2026-10-29 (the 2026-10-28 snapshot said 36.31 and 1 pc). Other channels could not be fetched (Mouser timed out, DigiKey 403); aggregator snapshots only: Mouser ~33.41 with 0 stock, DigiKey 220-2077-ND 38 pcs at RM357.36 (about USD 80, 40-week lead time), Future 69.07 @90+ with 0 stock. Speed -6/-7 grades (C1551697 / C1552002) are 0 stock at LCSC. Needs BGA-capable assembly.",
-   "notes": "LCSC C1551826: stock 8, JLC stock 8, JLC Extended; price is the 1+ tier at $100.1279.",
+   "hard": "LCSC C1551314 lists 11.2791 (1+) / 10.9093 (10+) but STOCK IS 0 on 2026-10-30, so the price is a list price that cannot be bought there today. The only in-stock 45F in CABGA-381 at LCSC is the SERDES variant LFE5UM-45F-8BG381C (C1550814, 6 pcs, 35.28 / 34.12 @10+): same package and same I/O pads (tools/pin_compat.py), but its extra SERDES balls are not in this repo's pin table, so it is NOT verified as a drop-in; using it would add 24.00 per board. Speed -6/-7 45F in CABGA-381 (C1551300, C1551441) are also 0 stock. Mouser / DigiKey could not be read. Needs BGA-capable assembly.",
+   "notes": "Architecture A3: the TPU and both frame banks moved into the RP2350 firmware, so the 85k part (LFE5U-85F-8BG381C, LCSC C1551826, 100.13 on 2026-10-29) is replaced by the 45k part; same footprint and balls. Synthesis: 12,227 LUT4 (27 %), 56 of 108 block RAM, core clock 84.1-91.4 MHz over 6 seeds (docs/fpga.md).",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 1+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-30; 1+ tier; stock 0"
   },
   {
    "category": "ICs",

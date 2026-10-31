@@ -61,7 +61,7 @@ else unavailable firmware "arm-none-eabi-gcc, cmake or PICO_SDK_PATH (Pico SDK 2
 if have gcc; then
   EXT=so; case "$(uname -s)" in MINGW*|MSYS*|CYGWIN*) EXT=dll;; Darwin) EXT=dylib;; esac
   step firmware-sim firmware_sim gcc -O2 -Wall -Wextra -shared -fPIC -Ifirmware/core firmware/core/atpose.c firmware/core/atproto.c \
-    firmware/core/atapp.c firmware/core/atae.c firmware/tests/atfw_shim.c -o "$OUT/firmware/libatfw.$EXT" -lm
+    firmware/core/atapp.c firmware/core/atae.c firmware/core/atframe.c firmware/core/attpu.c firmware/tests/atfw_shim.c -o "$OUT/firmware/libatfw.$EXT" -lm
 else unavailable firmware-sim "gcc not installed"; fi
 
 # ---- Host software + configs ----------------------------------------------------------------

@@ -1,4 +1,4 @@
-"""Run every dataset image through the full RTL chain (CSI-2 @120fps -> cam_core -> SPI results) in parallel.
+"""Run every dataset image through the full RTL chain (CSI-2 @120fps -> cam_core -> frame packets on the MCU bus -> C tag unit) in parallel.
 Writes results/rtl_chain_results.json: per image the tag estimates the MCU would receive over SPI.
 
 Full 100-frame set (the long job):   py -3.12 tests/run_chain_dataset.py          (WORKERS=12 by default; env WORKERS=n to change)
@@ -23,6 +23,9 @@ def work(name):
     log, res, el = chain.run_frames(vvp, [img], 'ds_' + name)
     tags = []
     if res['results']:
+        pk = res['results'][0]['packet']                       # kept for tools/m33_cycles.py --packets (timing of the C tag unit on the real FPGA output)
+        os.makedirs(os.path.join(rtlutil.SIM, 'chain_packets'), exist_ok=True)
+        np.savez_compressed(os.path.join(rtlutil.SIM, 'chain_packets', name + '.npz'), mask=pk['mask'], cand=pk['cand'], cand_count=pk['cand_count'], seq=pk['seq'], status=pk['status'])
         for t in chain.decode_tags(res['results'][0]['words']):
             tags.append(dict(id=t['id'], ham=t['ham'], corners=t['corners'].tolist()))
     st = res['stats'] or {}

@@ -28,9 +28,9 @@ STOP = 0x10F00000
 
 # cycles per instruction class
 MODELS = {
-    'optimistic':  dict(alu=1, mul=1, load=1, store=1, div=3,  branch=2, ldm_extra=0),
-    'nominal':     dict(alu=1, mul=1, load=2, store=2, div=7,  branch=3, ldm_extra=0),
-    'pessimistic': dict(alu=1, mul=1, load=3, store=2, div=12, branch=4, ldm_extra=1),
+    'optimistic':  dict(alu=1, mul=1, load=1, store=1, div=3,  branch=2, ldm_extra=0, fdiv=14),
+    'nominal':     dict(alu=1, mul=1, load=2, store=2, div=7,  branch=3, ldm_extra=0, fdiv=14),
+    'pessimistic': dict(alu=1, mul=1, load=3, store=2, div=12, branch=4, ldm_extra=1, fdiv=14),
 }
 NOT_BRANCH = ('bic', 'bfc', 'bfi', 'bkpt')
 
@@ -39,6 +39,9 @@ def classify(insn):
     """-> (class, extra registers/words, writes pc)"""
     b = insn.mnemonic.split('.')[0]
     nreg = max(1, len(insn.operands)) if b.startswith(('push', 'pop', 'ldm', 'stm')) else 0
+    if b.startswith(('vdiv', 'vsqrt')): return 'fdiv', 0, False
+    if b.startswith(('vldr', 'vldm', 'vpop')): return 'load', max(1, len(insn.operands) - 1) if b.startswith(('vldm', 'vpop')) else 1, False
+    if b.startswith(('vstr', 'vstm', 'vpush')): return 'store', max(1, len(insn.operands) - 1) if b.startswith(('vstm', 'vpush')) else 1, False
     if b.startswith(('sdiv', 'udiv')): return 'div', 0, False
     if b.startswith(('mul', 'mla', 'mls', 'smul', 'umul', 'smla', 'umla', 'smmul')): return 'mul', 0, False
     if b.startswith(('push', 'stm')): return 'ldm', nreg, False
@@ -56,11 +59,11 @@ def classify(insn):
 
 
 class M33:
-    def __init__(self, opt):
+    def __init__(self, opt, build='build.sh', outdir='m33', init='bench_init', fpu=False):
         self.opt = opt
-        subprocess.check_call(['sh', os.path.join(ROOT, 'tools', 'm33_bench', 'build.sh'), opt, 'sim/m33'], cwd=ROOT, stdout=subprocess.DEVNULL)
-        self.elf = os.path.join(ROOT, 'sim', 'm33', 'bench.elf')
-        self.image = open(os.path.join(ROOT, 'sim', 'm33', 'bench.bin'), 'rb').read()
+        subprocess.check_call(['sh', os.path.join(ROOT, 'tools', 'm33_bench', build), opt, 'sim/' + outdir], cwd=ROOT, stdout=subprocess.DEVNULL)
+        self.elf = os.path.join(ROOT, 'sim', outdir, 'bench.elf')
+        self.image = open(os.path.join(ROOT, 'sim', outdir, 'bench.bin'), 'rb').read()
         nm_exe = shutil.which('arm-none-eabi-nm') or 'C:/msys64/ucrt64/bin/arm-none-eabi-nm.exe'
         nm = subprocess.run([nm_exe, self.elf], capture_output=True, text=True).stdout
         self.sym = {l.split()[2]: int(l.split()[0], 16) for l in nm.splitlines() if len(l.split()) == 3}
@@ -72,7 +75,14 @@ class M33:
         self.uc.mem_map(RAM, RAM_SIZE)
         self.blocks, self.trans, self.prev = collections.Counter(), collections.Counter(), None
         self.uc.hook_add(UC_HOOK_BLOCK, self._blk)
-        self.call('bench_init')
+        if fpu:
+            from unicorn.arm_const import UC_ARM_REG_C1_C0_2, UC_ARM_REG_FPEXC
+            self.uc.reg_write(UC_ARM_REG_C1_C0_2, 0xF00000); self.uc.reg_write(UC_ARM_REG_FPEXC, 0x40000000)
+        self.sym.setdefault('_sdata', 0)
+        if '_data_lma' in self.sym and self.sym['_edata'] > self.sym['_sdata']:        # initialised data lives after .text in the image: copy it to RAM
+            n = self.sym['_edata'] - self.sym['_sdata']; o = self.sym['_data_lma'] - FLASH
+            self.uc.mem_write(self.sym['_sdata'], self.image[o:o + n])
+        if init: self.call(init)
 
     def _blk(self, uc, addr, size, ud):
         self.blocks[(addr, size)] += 1
@@ -103,7 +113,7 @@ class M33:
             for m, t in MODELS.items():
                 c = 0
                 for cls, k, _ in ins:
-                    if cls in ('alu', 'mul', 'div'): c += t[cls]
+                    if cls in ('alu', 'mul', 'div', 'fdiv'): c += t[cls]
                     elif cls == 'load': c += t['load'] + (k - 1)
                     elif cls == 'store': c += t['store'] + (k - 1)
                     elif cls == 'ldm': c += 1 + k + t['ldm_extra']
@@ -117,7 +127,8 @@ class M33:
 
     def run_frame(self, mask, cands, frame_id=1, maxham=2):
         from test_tpu import pack_fb
-        self.uc.mem_write(FB, pack_fb(mask).tobytes())
+        packed = mask.astype(np.uint32) if (mask.dtype == np.uint32 and mask.size == 32000) else pack_fb(mask)          # packed words (FPGA packet) or a bool mask
+        self.uc.mem_write(FB, packed.tobytes())
         cw = np.zeros(1024, np.uint32); cw[:len(cands)] = np.asarray(cands, dtype=np.uint64) & 0xFFFFFFFF
         self.uc.mem_write(CAND, cw.tobytes())
         self.uc.mem_write(PARAM, np.array([len(cands) // 16, frame_id, maxham, 0], np.uint32).tobytes())
@@ -126,7 +137,11 @@ class M33:
         return ntags, bytes(self.uc.mem_read(OUT, 52 * ntags))
 
 
-def frame_inputs(name, stream=True):
+def frame_inputs(name, stream=True, packets=None):
+    if packets:                                         # the real FPGA output of the RTL chain (tests/run_chain_dataset.py saves sim/chain_packets/*.npz)
+        z = np.load(os.path.join(packets, name + '.npz'))
+        n = int(z['cand_count'])
+        return z['mask'], list(z['cand'][:16 * n]), n
     img = cv2.imread(os.path.join(ROOT, 'test_images', 'sensor', name + '.png'), 0)
     mask = golden.binarize_clean(img)
     keep, lab, allc = golden.components(mask)
@@ -142,7 +157,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--opt', default='-O2'); ap.add_argument('--mhz', type=float, default=150.0)
     ap.add_argument('--frames', type=int, default=0, help='only the first N frames'); ap.add_argument('--golden', action='store_true')
-    ap.add_argument('--json'); ap.add_argument('--check', action='store_true', help='4 representative frames, fail if the pessimistic worst exceeds 12 ms')
+    ap.add_argument('--packets', help='directory of RTL-chain packets (npz) instead of the Python golden model'); ap.add_argument('--json'); ap.add_argument('--check', action='store_true', help='4 representative frames, fail if the pessimistic worst exceeds 12 ms')
     a = ap.parse_args()
     gt = json.load(open(os.path.join(ROOT, 'test_images', 'ground_truth.json')))['images']
     names = ['normal_001', 'persp_004', 'clutter_002', 'noise_006'] if a.check else sorted(gt)[:a.frames or None]
@@ -154,10 +169,10 @@ def main():
     print(f'attpu_init: {ni} instr, ' + ', '.join(f'{k} {v / a.mhz / 1000:.3f} ms' for k, v in cy.items()))
     rows = []
     for n in names:
-        mask, words, nc = frame_inputs(n, not a.golden)
+        mask, words, nc = frame_inputs(n, not a.golden, a.packets)
         ntags, out = m.run_frame(mask, words, zlib.crc32(n.encode()) & 0xFFFF)
         ni, cy = m.cost()
-        _, n_pc, tags_pc = pc.run(pack_fb(mask), words, nc, zlib.crc32(n.encode()) & 0xFFFF)     # same C file built for the PC
+        _, n_pc, tags_pc = pc.run(mask if mask.dtype == np.uint32 else pack_fb(mask), words, nc, zlib.crc32(n.encode()) & 0xFFFF)     # same C file built for the PC
         assert n_pc == ntags and bytes(tags_pc)[:52 * ntags] == out, f'{n}: emulated M33 result differs from the PC build'
         rows.append(dict(name=n, cat=gt[n]['category'], ncand=nc, tags=ntags, instr=ni, cycles=cy, out=out.hex()))
     ms = lambda r, k: r['cycles'][k] / (a.mhz * 1000.0)

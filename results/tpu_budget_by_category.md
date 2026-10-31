@@ -1,3 +1,5 @@
+Historical (old design, TPU inside the FPGA, 713,840 clocks per frame): produced by tests/analyze_tpu_budget.py as of commit 90940f6, since removed with the FPGA TPU. The A3 numbers are in results/frame_budget.md.
+
 | category | frames | TPU clk median | worst | would drop @ real core (713840) | would drop @ sim core (832800) | CCL flags set | rows dropped (bit 0) |
 |---|---|---|---|---|---|---|---|
 | blur | 10 | 313612 | 467900 | 0 | 0 | 0 | 0 |

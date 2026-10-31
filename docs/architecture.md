@@ -3,22 +3,22 @@
 ```
                   24 MHz osc                                    USB-C (power + data, FS device)
                       |                                                   |
-  +-----------+   +---v---------------------------------------+      +-----v-------------+
-  |  OV9281   |   |  ECP5 LFE5U-85F-8BG381C  (custom RTL)     |      |  RP2350A (MCU)    |
-  | 1280x800  |   |                                           | SPI  |  - USB CDC link   |
-  | global    |MIPI  dphy_rx -> csi2_rx -> thresh_binarize -> |<---->|  - field map +    |
-  | shutter   |2-lane|  (LVDS gearing,  (packet     (adaptive    |12 MHz  calibration     |
-  | 120 fps   +----->|   sync, deskew)   layer)      threshold)  |      |    flash storage |
-  |           |      |        -> despeckle -> run_ccl -> TPU     |      |  - pose solve     |
-  +-----^-----+      |           (3x3 maj.)   (components)  (own |      |    (LM over all   |
-        |I2C         |                         CPU, baked ROM)   |      |     tag corners)  |
-        +------------+  i2c_master + sensor_init ROM  spi_slave  |      |  - auto exposure  |
-                     +-------------------------------------------+      +-------------------+
-                       frame banks 2x1 Mbit | candidate RAM | result RAM
+  +-----------+   +---v---------------------------------+  8-bit frame bus  +-----v----------------------+
+  |  OV9281   |   |  ECP5 LFE5U-45F-8BG381C (custom RTL) |  21 MB/s strobe   |  RP2350A (MCU, 2 x M33)   |
+  | 1280x800  |MIPI  dphy_rx -> csi2_rx -> thresh_binarize ->  mask_stream ----->  PIO + DMA -> 2 x 132 KB  |
+  | global    |2-lane|  (LVDS gearing,  (packet     (adaptive   |  (mask +   |   frame buffers (SRAM)    |
+  | shutter   +----->|   sync, deskew)   layer)      threshold)  |  cand. list)|  - tag unit in C (attpu.c) |
+  | 120 fps   |      |        -> despeckle -> run_ccl -----------+            |  - pose solve (LM)         |
+  +-----^-----+      |           (3x3 maj.)   (components)  SPI <------------>|  - USB CDC link            |
+        |I2C         |  i2c_master + sensor_init ROM  spi_slave  |   12 MHz   |  - field map + calibration |
+        +------------+-------------------------------------------+            |    flash storage, auto exp.|
+                       no frame store, no CPU in the FPGA                     +----------------------------+
 ```
 
-Everything per-pixel and per-tag is hardware. The MCU never sees an image: it receives, for each decoded tag, an
-ID and four sub-pixel corners (Q16.16), solves the camera pose from the stored field map, and streams it to the host.
+The FPGA does everything that is per pixel and streaming: it never stores a frame. The binary (thresholded, despeckled) frame leaves it at the pixel rate
+together with the candidate list of the labeller; the MCU receives it into SRAM, decodes the tags (sub-pixel corners, tag36h11 match, `firmware/core/attpu.c`),
+solves the camera pose from the stored field map, and streams it to the host. (Architecture "A3" of `docs/costdown.md`: this is what lets the FPGA
+be the 45k-LUT part instead of the 85k one. The old design ran the tag decoder in a custom FPGA processor, the TPU, and held two frame banks in block RAM.)
 
 ## Pixel path (what the chip does to every frame)
 
@@ -29,17 +29,18 @@ ID and four sub-pixel corners (Q16.16), solves the camera pose from the stored f
 | threshold | `thresh_binarize` | 2x2 binning, 8x8-pixel tile min/max, 3x3 tile neighbourhood, per-tile contrast test, black mask; 17-row delay line | 17 rows |
 | despeckle | `despeckle` | 3x3 majority filter (suppresses isolated speckle so the labeller is not flooded) | 1 row |
 | components | `run_ccl` | streaming run-based 4-connected labelling, union-find with **label recycling**, per-component area and 8 directional extremes; filters; the **64 largest** candidates by area are kept as records; capacity limits degrade a frame (flags) and never reject it | 2-3 rows + termination (median `done` 185 clocks after the last row) |
-| tag unit | `tpu_core` | **custom processor**, baked program: coarse quad -> sub-pixel edge refinement by line fitting on binary samples -> homography -> 6x6 sampling -> tag36h11 match (587 codes x 4 rotations in ROM) | ~0.2 ms / 6 tags |
-| bridge | `cam_core`, `spi_slave` | ping-pong frame/candidate/result banks, registers, SPI (mode 0, <= 16 MHz), I2C bring-up of the sensor | - |
+| stream | `mask_stream` | packs the despeckled pixels into 32-bit words (bit x%32 = pixel x), sends header + 32,000 mask words + trailer + the 64 candidate records over an 8-bit strobed bus (132,128 bytes per frame, `docs/fpga.md`) | pixel rate (1 byte per 4 clocks), candidates ~0.2 ms after the mask |
+| bridge | `cam_core`, `spi_slave` | registers (SPI mode 0, <= 16 MHz), device clock, brightness sum, I2C bring-up of the sensor | - |
+| tag unit (**MCU**) | `firmware/core/attpu.c` | C port of the old TPU program, bit-exact: coarse quad -> sub-pixel edge refinement by line fitting on binary samples -> homography -> 6x6 sampling -> tag36h11 match (587 codes x 4 rotations, bucket index) | median 1.6 ms, worst 9.3 ms per frame (estimate, Cortex-M33 @ 150 MHz) |
 
-### Why the TPU (and not a CPU running code)
-The tag decoder is a small *fixed program* with a lot of fixed-point multiply/divide and pixel look-ups. The TPU
-(`tools/tpu_isa.py`, `rtl/tpu_core.v`) is a 32-bit processor with exactly the operations that program needs: Q16.16
-multiply/shift, 64-bit-numerator divide, a binary-frame pixel fetch, candidate read, result write and a hardware
-`TAGMATCH` instruction that scans the baked code ROM. Its program (`tools/tpu_prog.py`, 574 words) is assembled
-into the instruction ROM at build time, so the chip contains the algorithm; there is no firmware to load. A Python
-instruction-set simulator is the golden model and the RTL is checked **bit-exact** against it (every arithmetic corner
-case, plus full scenes).
+### Where the tag decoder runs, and why it is bit-exact with the old FPGA processor
+The decoder is a small *fixed program* with a lot of fixed-point multiply/divide and pixel look-ups. It was first built as a custom FPGA processor
+(the TPU, `ref/tpu/tpu_core.v`, program `tools/tpu_prog.py`, golden Python model `tools/tpu_isa.py`), which needed 10 k LUT4, 8 block RAMs and, with the
+two 1 Mbit frame banks it read, most of the 85k-LUT part. `firmware/core/attpu.c` is a line-by-line port of that program to C (Q16.16 integer arithmetic, 64-bit
+multiply/shift, 48/32-bit divide on the Cortex-M33's 32-bit divider, a bucket index instead of scanning all 2,348 tag codes). `tests/test_fw_tpu.py` checks the
+whole result image against the ISS word for word on all 100 dataset frames (and thresholds, corrupted masks, random candidate records); the RTL chain
+(`tests/run_chain_dataset.py`) gives the same tags and corners as the old all-FPGA chain on every one of the 100 frames (0 px difference).
+The ISS is itself checked against the old RTL (`tests/test_tpu.py`), so the C code is transitively equal to the hardware it replaced.
 
 ## Timing budget at 120 fps
 
@@ -54,24 +55,21 @@ OV9281 settings (`tools/ov9281_init.py`, register values from the mainline Linux
   real 85.714 MHz core. Unions of several components, new labels and finished components cost more (10-20 clocks each); a
   row that still cannot be labelled in time is dropped with a flag (`max_row_cycles` is exported in the status registers) -
   never a hang. 7 of 500 frames of an earlier (historical) evaluation set lose 1-5 rows that way, none of the current 100, see `docs/verification.md`
-* two frame banks: frame N is processed by the TPU (median ~0.2-0.35 ms, worst case measured 2.1 ms) while frame N+1
-  streams into the other bank, so capture never stalls; a frame is only dropped (and counted) if the TPU is still busy
-  with the bank the next frame would overwrite
-* end-to-end latency (last pixel -> tag list in the result RAM) = 17-row threshold delay + 1 row despeckle +
-  ~2-3 rows CCL + TPU run ~ 0.15 ms + TPU time
+* two frame buffers in the MCU's SRAM (2 x 132 KB): frame N is processed by the tag unit (median 1.6 ms, worst 9.3 ms, estimated) while frame N+1
+  streams into the other buffer, so capture never stalls; a packet is lost (and counted) only if both buffers are busy when it starts, which needs the
+  processing of a frame to take more than ~10 ms (`results/frame_budget.md`)
+* end-to-end latency (last pixel -> tag list on the MCU) = 17-row threshold delay + 1 row despeckle + ~2-3 rows CCL + the candidate list
+  (~0.2 ms) + tag unit time
 
-## Memory map (SPI, 24-bit byte addresses)
+## Memory map (SPI, 24-bit byte addresses; registers only, frames travel on the frame bus)
 
 | address | content |
 |---|---|
 | `0x000000..0x0000FF` | registers (ID `0x41544731`, CTRL, thresholds, STATUS, counters, I2C bridge, FRAME_SUM) |
-| `0x001000`, `0x002000` | result banks 0/1: word0 = tag count, record i at word 16+16i |
-| `0x100000`, `0x200000` | debug read-back of the binary frame banks (only while the TPU is idle) |
-| `0x300000`, `0x301000` | candidate RAM banks (debug) |
 
-Result record (16 words): `w0 = 0x80000000 | ham<<12 | rot<<10 | id`, `w1..w8` = corners TL,TR,BR,BL as (x,y) Q16.16 pixels
-(pixel centre of the top-left pixel = (0,0)), `w9` label, `w10` area, `w11` frame id, `w12` quad area.
-The same tables are in `rtl/cam_core.v` and `firmware/core/atapp.h`.
+Tag record (produced by `attpu_run`, same layout the FPGA result RAM used to hold; `attpu_pack_results`): 16 words, `w0 = 0x80000000 | ham<<12 | rot<<10 | id`,
+`w1..w8` = corners TL,TR,BR,BL as (x,y) Q16.16 pixels (pixel centre of the top-left pixel = (0,0)), `w9` label, `w10` area, `w11` frame id, `w12` quad area.
+Frame packet (FPGA -> MCU): `docs/fpga.md`, `firmware/core/atframe.h`.
 
 ## Pose solve (MCU)
 

@@ -66,26 +66,39 @@ def _advance(pending, busy_until, state, now):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--json', default=os.path.join(ROOT, 'sim', 'm33_chain_O3.json'))
-    ap.add_argument('--cores', type=int, default=1); ap.add_argument('--bufs', type=int, default=2)
-    ap.add_argument('--pose-ms', type=float, default=0.0, help='extra per-frame time on the same core (pose solve, USB, AE)')
+    ap.add_argument('--tpu', default=os.path.join(ROOT, 'results', 'tpu_c_m33_cycles.json'), help='output of tools/m33_cycles.py --json')
+    ap.add_argument('--pose', default=os.path.join(ROOT, 'results', 'pose_m33_cycles.json'), help='output of tools/m33_pose_cycles.py --json')
+    ap.add_argument('--bufs', type=int, default=2)
     a = ap.parse_args()
-    d = json.load(open(a.json))
-    mhz = d['mhz']
-    cats = sorted({r['cat'] for r in d['rows']})
-    print(f'one frame period {T:.3f} ms, {a.bufs} buffers, {a.cores} core(s), extra {a.pose_ms} ms per frame; per category the 10 frames are repeated')
-    print('| category | frames | lost optimistic | lost nominal | lost pessimistic | lost (old design, TPU in the FPGA) |')
-    print('|---|---|---|---|---|---|')
-    tot = {m: [0, 0] for m in ('optimistic', 'nominal', 'pessimistic')}
-    for c in cats + ['all']:
-        rs = [r for r in d['rows'] if c == 'all' or r['cat'] == c]
-        cells = []
-        for m in tot:
-            t = [r['cycles'][m] / (mhz * 1000.0) + a.pose_ms for r in rs]
-            n, lost = simulate(t, a.bufs, a.cores)
-            cells.append(f'{lost}/{n} ({100 * lost / n:.1f} %)')
-            if c == 'all': tot[m] = [n, lost]
-        print(f'| {c} | {len(rs)} | ' + ' | '.join(cells) + ' | |')
+    d = json.load(open(a.tpu)); mhz = d['mhz']
+    pose = json.load(open(a.pose)) if os.path.exists(a.pose) else {}
+    pose_ms = {lab: {r['name']: r['ms'] for r in rows} for lab, rows in pose.items()}
+    cats = sorted({r['cat'] for r in d['rows']}) + ['all']
+    print(f'frame period {T:.3f} ms, {a.bufs} frame buffers; per category the 10 frames repeat; "lost" = frames with no free buffer when their packet starts')
+    print('TPU run times: tools/m33_cycles.py (C tag unit, 150 MHz, -O3); pose: tools/m33_pose_cycles.py (float = FPU single precision, double = software doubles)')
+    print()
+    scen = [('TPU only, 1 core', None, 1)]
+    for lab in pose:
+        scen += [(f'TPU + pose ({lab}), 1 core', lab, 1), (f'TPU + pose ({lab}), 2 cores (alternate frames)', lab, 2)]
+    for model in ('nominal', 'pessimistic'):
+        print(f'### cycle model: {model}')
+        print('| category | frames | ' + ' | '.join(n for n, _, _ in scen) + ' |')
+        print('|---|---|' + '---|' * len(scen))
+        for c in cats:
+            rs = [r for r in d['rows'] if c == 'all' or r['cat'] == c]
+            cells = []
+            for _, lab, cores in scen:
+                t = [r['cycles'][model] / (mhz * 1000.0) + (pose_ms[lab][r['name']][model] if lab and r['tags'] else 0.0) for r in rs]
+                n, lost = simulate(t, a.bufs, cores)
+                cells.append(f'{lost}/{n} ({100 * lost / n:.1f} %)')
+            print(f'| {c} | {len(rs)} | ' + ' | '.join(cells) + ' |')
+        print()
+        tt = [r['cycles'][model] / (mhz * 1000.0) for r in d['rows']]
+        print(f'TPU per frame {model}: median {np.median(tt):.2f} ms, max {max(tt):.2f} ms')
+        for lab in pose:
+            pp = [pose_ms[lab][r['name']][model] for r in d['rows'] if r['tags']]
+            print(f'pose ({lab}) {model}: median {np.median(pp):.2f} ms, max {max(pp):.2f} ms')
+        print()
 
 
 if __name__ == '__main__':
