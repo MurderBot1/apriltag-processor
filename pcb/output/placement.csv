@@ -1,6 +1,6 @@
 Ref,Value,Footprint,X_mm,Y_mm,Rot,Side,Note
-U1,LFE5U-85F-8BG381C,Lattice_caBGA-381_17x17mm_Layout20x20_P0.8mm,0.0,-8.0,0,bottom,"Lattice ECP5 FPGA (custom RTL: CSI-2/D-PHY RX, threshold, CCL, TPU)"
-U2,RP2350A,QFN-60-1EP_7x7mm_P0.4mm_EP3.4x3.4mm,18.0,9.5,0,bottom,"Raspberry Pi RP2350A: USB, field map/calibration storage, pose solve"
+U1,LFE5U-45F-8BG381C,Lattice_caBGA-381_17x17mm_Layout20x20_P0.8mm,0.0,-8.0,0,bottom,"Lattice ECP5-45F (custom RTL: CSI-2/D-PHY RX, threshold, despeckle, CCL, frame bus to the MCU)"
+U2,RP2350A,QFN-60-1EP_7x7mm_P0.4mm_EP3.4x3.4mm,18.0,9.5,0,bottom,"Raspberry Pi RP2350A: USB, frame bus receiver (PIO+DMA), tag unit (C), pose solve, field map/calibration storage"
 C1,100n,C_0402_1005Metric,13.6,12.7,0,bottom,
 C2,100n,C_0402_1005Metric,13.6,6.3,0,bottom,
 C3,100n,C_0402_1005Metric,22.4,12.7,0,bottom,

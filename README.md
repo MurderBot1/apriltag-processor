@@ -85,7 +85,7 @@ build/test results. Earlier releases are never overwritten. `main` does not trig
 * GitHub Actions: one check per dataset category (`N/10 detected`, reference detector) plus an all-tests workflow, see `docs/verification.md`.
 * RTL is verified bit-exact against Python golden models (threshold, despeckle, labelling), the C tag unit bit-exact against the golden model of the old FPGA processor, and the whole
   chain is exercised with real CSI-2 packets and a bit-level D-PHY model with lane skew and clock offsets.
-* Open-source place-and-route onto the real ECP5-45F pins: 12.2 k LUT4 (27 %), 56 of 108 block RAM, core clock closes 85.7 MHz on 5 of 6 seeds (`docs/fpga.md`).
+* Open-source place-and-route onto the real ECP5-45F pins: 12.2 k LUT4 (27 %), 56 of 108 block RAM, core clock closes 85.7 MHz on 4 of 6 seeds, D-PHY 200 MHz on 6 of 6 (`docs/fpga.md`).
 
 ## Honest limits - read before building hardware
 
@@ -102,4 +102,5 @@ build/test results. Earlier releases are never overwritten. `main` does not trig
    needed up to 30 ms): in a stream at 120 fps a heavy frame can make the MCU miss a packet (`frames_dropped`); the model predicts 1 - 4 % of frames
    if every 10th frame were the slowest of its category (`results/frame_budget.md`; the old design: 20 %). The MCU timing, the PIO/DMA frame
    capture and the bus timing margin are **not measured on hardware**.
-5. No schematic capture: the board is netlist-first (`pcb/design.py`, `pcb/output/netlist.txt`).
+5. **The KiCad board / Gerbers are not updated for architecture A3** (netlist, BOM and pin plan are; one of the 10 new frame-bus nets could not be routed, `docs/hardware.md`).
+6. No schematic capture: the board is netlist-first (`pcb/design.py`, `pcb/output/netlist.txt`).

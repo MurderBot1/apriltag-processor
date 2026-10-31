@@ -122,4 +122,4 @@ category counts therefore describe the dataset and the reference detector, not t
 Per frame (100-frame set, 100 MHz chain run): the CCL status flags are diagnostics only (6 frames set one, none dropped a row); the tag unit time is an MCU estimate, see above. Historical 500-frame
 set at the real 686-clock line: slowest CCL row <= 686 clocks in 485 of 500 frames, `done` 185 clocks (median) to 2738 (worst) after the last row.
 
-FPGA (yosys + nextpnr-ecp5, LFE5U-45F-8BG381C): 12,227 LUT4 (27 %), 56 of 108 block RAM, core clock 84.1 - 91.4 MHz and D-PHY clock 193 - 210 MHz over six seeds; see `docs/fpga.md`.
+FPGA (yosys + nextpnr-ecp5, LFE5U-45F-8BG381C): 12,227 LUT4 (27 %), 56 of 108 block RAM, core clock 81.7 - 91.0 MHz (4 of 6 seeds close 85.714) and D-PHY clock 201.5 - 217.5 MHz (6 of 6 close 200) over six seeds; see `docs/fpga.md`.

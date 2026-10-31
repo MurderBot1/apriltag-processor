@@ -21,8 +21,9 @@ came out (measured = simulation / tool run in this repo; estimated = model, not 
 | frame drops (2 buffers, category repeated) | "similar to today" (20 %) | **estimated**: 1 % tag unit only, 3 - 4 % with pose on one core, 2 % with two cores; 0 % with 3 buffers in most cases (`results/frame_budget.md`) |
 | FPGA block RAM | 58 | **56 of 108** (measured by nextpnr) |
 | FPGA LUT4 | ~10 k | **12,227 of 43,848** (the labeller and streamer are bigger than the per-module estimate) |
-| core clock at 85.714 MHz | "closes" | 84.1 - 91.4 MHz over 6 seeds, closes on 5 of 6; D-PHY 200 MHz closes on 3 of 6 (193 - 210 MHz) |
+| core clock at 85.714 MHz | "closes" | 81.7 - 91.0 MHz over 6 seeds, closes on 4 of 6; D-PHY 200 MHz closes on 6 of 6 (201.5 - 217.5 MHz) |
 | data path | PIO + DMA, 15.4 MB/s | designed and simulated (RTL), firmware compiled; **not run on hardware**; bus runs at 21.4 MB/s bursts, 15.4 MB/s average |
+| PCB: frame bus routed | "re-route only what changed" | **not achieved**: 9 of 10 nets route; the board file, Gerbers and renders are still the 85F board (docs/hardware.md) |
 | ball compatibility 85F -> 45F | "checked for 18 balls" | 31 balls (incl. the new bus), identical bank and pad function on 85F / 45F / UM-45F / 25F (`tools/pin_compat.py`) |
 
 Corrections to this study found while implementing:
@@ -33,7 +34,7 @@ Corrections to this study found while implementing:
   `docs/bom/bom.json` now lists the exact part (LFE5U-45F-8BG381C, $11.28, status verified price / hard to source: stock 0). Recurring BOM with that price
   (arithmetic on the table in section 1): about $68.7 / $67.8 / $67.3 per board at 1 / 10 / 100 (A3 with the Commonlands lens); with the in-stock UM
   part at $35.28 / $34.12 it is the $92.68 / $91.04 / $90.48 of the table.
-* The 25F (speed 8, CABGA-381) *does* fit in a nextpnr trial (LUT4 50 %, block RAM 56 of 56, core 87.7 MHz, D-PHY 208 MHz, one seed), but with no block RAM margin and
+* The 25F (speed 8, CABGA-381) *does* fit in a nextpnr trial (LUT4 50 %, block RAM 56 of 56, core 93.1 MHz, D-PHY 216 MHz, one seed), but with no block RAM margin and
   no speed-8 25F listing found at LCSC; section 4's "NLAB 1024 -> 512" was not needed for the fit.
 * The 'frame gate' in the old design dropped frames when the TPU was busy; with A3 a frame can still be lost, in the MCU, when both of its two frame buffers are busy.
 

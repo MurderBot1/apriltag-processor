@@ -22,21 +22,20 @@ Nothing has been loaded onto a physical device. All numbers below are from nextp
 Block RAM now: threshold 17-row ring 27, labeller ~26 (label tables, run RAM), candidate RAM 2 (1024 x 32, the streamer reads it back), sensor init 1.
 The streamer itself (`rtl/mask_stream.v`) is a 16-word FIFO in LUT RAM plus the byte transmitter: a few hundred LUTs. Logic and block RAM have large
 headroom (the 45F has about 2x the block RAM needed). An ECP5-25F has 56 block RAMs: the design needs all 56 (100 %), so no margin; see
-`results/fpga_45f_seeds.md` for the one-seed nextpnr trial of the 25F.
+`results/fpga_45f_seeds.md` for the one-seed nextpnr trial of the 25F (it fits: core 93.1 MHz, D-PHY 216.3 MHz).
 
 ## Timing (post place-and-route, target 85.714 MHz core clock, 200 MHz D-PHY `sclk`)
 
 | seed | core clock fmax | D-PHY `sclk` fmax | both pass |
 |---|---|---|---|
-| 1 | 89.57 MHz | 209.86 MHz | yes |
-| 2 | 86.24 MHz | 206.14 MHz | yes |
-| 3 | 91.40 MHz | 195.69 MHz (misses by 4.3) | no |
-| 4 | 89.09 MHz | 193.61 MHz (misses by 6.4) | no |
-| 5 | 86.78 MHz | 206.44 MHz | yes |
-| 6 | 84.07 MHz (misses by 1.6) | 193.27 MHz (misses by 6.7) | no |
+| 1 | 90.99 MHz | 206.02 MHz | yes |
+| 2 | 85.48 MHz (misses by 0.2) | 216.64 MHz | no |
+| 3 | 87.50 MHz | 217.49 MHz | yes |
+| 4 | 87.47 MHz | 211.86 MHz | yes |
+| 5 | 81.73 MHz (misses by 4.0) | 204.88 MHz | no |
+| 6 | 87.91 MHz | 201.53 MHz | yes |
 
-Core clock: 5 of 6 seeds close 85.714 MHz (old 85F design: 1 of 5). D-PHY clock: 3 of 6 close 200 MHz (old design: 5 of 5); the misses are
-placement-dependent paths in the lane deskew FIFO (`dphy.f0`). Build the bitstream with seed 1, 2 or 5 and re-check after any RTL change.
+Core clock: 4 of 6 seeds close 85.714 MHz (old 85F design: 1 of 5). D-PHY clock: 6 of 6 close 200 MHz. Seeds 1, 3, 4 and 6 close both; the default is seed 1 (90.99 / 206.02 MHz). Re-check after any RTL or pin change (the numbers moved between the first pin plan in bank 2 and the final one in bank 6).
 Reproduce: `FPGA_OUT=sim/fpga_s<N> bash tools/fpga_flow.sh <N> 85.714`; summary in `results/fpga_45f_seeds.md`.
 
 **Decision unchanged: the core runs at 85.714 MHz** (`rtl/sys_pll.v`, `LINE_CYC_DEFAULT=686` clocks per 8 us sensor line). The 120 fps requirement is a property of
@@ -46,8 +45,8 @@ reason the core clock now closes on most seeds; that causal link was not isolate
 ## MCU frame bus (FPGA -> RP2350)
 
 The mask is streamed at the pixel rate instead of being stored: one byte per 4 core clocks = 21.4 MB/s while a row is flowing, 15.4 MB/s average.
-Pins (bank 2, 3.3 V, LVCMOS33 DRIVE=8 SLEWRATE=FAST, balls checked identical on the 85F / 45F / 25F by `tools/pin_compat.py`):
-`mcu_d[7:0]` = H16 H17 H18 G18 G20 F17 F20 E20 -> RP2350 GPIO16..23, `mcu_clk` = J16 -> GPIO24, `mcu_fs` = J17 -> GPIO25.
+Pins (bank 6, 3.3 V, the outer ball row on the MCU side, LVCMOS33 DRIVE=8 SLEWRATE=FAST, balls checked identical on the 85F / 45F / 25F by `tools/pin_compat.py`):
+`mcu_d[7:0]` = P1 N1 M1 L1 K1 P2 N2 L2 -> RP2350 GPIO16..23, `mcu_clk` = K2 -> GPIO24, `mcu_fs` = M3 -> GPIO25.
 
 | signal | meaning |
 |---|---|
@@ -73,7 +72,7 @@ with the Pico SDK's `pioasm`). Testbenches: `tb/tb_mstream.v` (byte timing, stab
 
 ## Caveats
 
-* Timing is nextpnr's estimate, not signoff; real-device margins are unknown. Seed variation (84 - 91 MHz core, 193 - 210 MHz D-PHY over six seeds)
+* Timing is nextpnr's estimate, not signoff; real-device margins are unknown. Seed variation (81.7 - 91.0 MHz core, 201.5 - 217.5 MHz D-PHY over six seeds)
   means the bitstream must be rebuilt with a passing seed after any RTL change.
 * Frame drops now happen in the MCU (no free frame buffer), see `docs/verification.md` and `results/frame_budget.md`.
 * The RP2350 firmware could not be linked through the SDK's own CMake flow with the msys2 `ld` 2.47 used on the development PC; the Linux release workflow (apt `gcc-arm-none-eabi`, older binutils) was not run here

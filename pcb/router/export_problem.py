@@ -23,7 +23,7 @@ def main(src, dst):
     except Exception: pass
     lines.append(f"B {mm(bb.GetLeft()):.4f} {mm(bb.GetTop()):.4f} {mm(bb.GetRight()):.4f} {mm(bb.GetBottom()):.4f} {corner}")
     def lmask(item):
-        return (1 if item.IsOnLayer(pcbnew.F_Cu) else 0) | (2 if item.IsOnLayer(pcbnew.B_Cu) else 0)
+        return (1 if item.IsOnLayer(pcbnew.F_Cu) else 0) | (2 if item.IsOnLayer(pcbnew.B_Cu) else 0) | (4 if item.IsOnLayer(pcbnew.In2_Cu) and item.GetClass() != 'PAD' else 0)   # In2 copper of an already routed board is an obstacle too
     # fan-out geometry already on the board
     touch = []                                    # (x, y) of via centres / track ends, for 'already connected' tests
     cls_of = {}

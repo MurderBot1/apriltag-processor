@@ -70,7 +70,7 @@ def test_pin_plan_uses_legal_balls_and_banks():
     for sig, (ball, std, extra) in pins.PINS.items():
         assert ball in io, (sig, ball)
         bank = io[ball][1]
-        want = {'LVCMOS18': (0, 1), 'LVDS': (7,)}.get(std, (2, 3))
+        want = {'LVCMOS18': (0, 1), 'LVDS': (7,)}.get(std, (2, 3, 6, 8))   # 3.3 V banks (VCCIO2/3/6/8 are on +3V3, pcb/design.py)
         assert bank in want, (sig, ball, bank, std)
     # differential pairs: P and N balls share a tile (same row/col) and are PIO A/B
     for sig, nball in pins.DIFF_N.items():
