@@ -23,7 +23,7 @@ came out (measured = simulation / tool run in this repo; estimated = model, not 
 | FPGA LUT4 | ~10 k | **12,227 of 43,848** (the labeller and streamer are bigger than the per-module estimate) |
 | core clock at 85.714 MHz | "closes" | 81.7 - 91.0 MHz over 6 seeds, closes on 4 of 6; D-PHY 200 MHz closes on 6 of 6 (201.5 - 217.5 MHz) |
 | data path | PIO + DMA, 15.4 MB/s | designed and simulated (RTL), firmware compiled; **not run on hardware**; bus runs at 21.4 MB/s bursts, 15.4 MB/s average |
-| PCB: frame bus routed | "re-route only what changed" | **not achieved**: 9 of 10 nets route; the board file, Gerbers and renders are still the 85F board (docs/hardware.md) |
+| PCB: frame bus routed | "re-route only what changed" | board re-routed completely (not only the changed nets): KiCad DRC 69 violations + 10 unconnected (baseline 72 + 12), all 10 FB nets connected (docs/hardware.md) |
 | ball compatibility 85F -> 45F | "checked for 18 balls" | 31 balls (incl. the new bus), identical bank and pad function on 85F / 45F / UM-45F / 25F (`tools/pin_compat.py`) |
 
 Corrections to this study found while implementing:

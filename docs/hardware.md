@@ -59,17 +59,19 @@ rather than hidden:
 4. The RP2350 slave-SPI FPGA configuration opcodes (`firmware/rp2350/fpga_config.c`) come from memory of Lattice
    TN1260 and are unverified.
 
-## Architecture A3 board status (2026-10-31): netlist updated, board file NOT re-routed
+## Architecture A3 board status (2026-10-31)
 
-`pcb/design.py` (netlist source of truth) now has U1 = `LFE5U-45F-8BG381C` (same CABGA-381 footprint, `tools/pin_compat.py`: all 31 used balls have the
-same bank and pad function as on the 85F) and the 10 frame-bus nets `FB_D0..FB_D7`, `FB_CLK`, `FB_FS` (FPGA bank 6 outer ball row facing the MCU <->
-RP2350 GPIO16..25). `pcb/output/netlist.txt`, `bom.csv` and `placement.csv` are regenerated from it. **The KiCad board, Gerbers, STEP and renders were
-not regenerated and still describe the 85F board without the frame bus.** Reason: the bus could not be routed completely with the tools available here:
-`pcb/route_a3.py` (new; keeps all other copper, rips up the 20-25 signal nets crossing the MCU's left/bottom escape area, re-routes them with the
-repository's grid router `pcb/router/router14.exe` together with the new nets) routes 9 of the 10 new nets with DRC counts equal to the baseline
-(baseline 72 violations: 28 via_dangling, 1 track_dangling, 2 lib_footprint, 9 silk_overlap, 32 silk_over_copper; the routed variant had the same
-plus one more `via_dangling` = 73, and 14 unconnected items besides the open net against 12 in the baseline, all plane / pour artefacts), but one net (always the 7th data bit, whichever pad or ball it is given) stays unconnected across 8 seeds, 3
-rip-up regions, 4 pin permutations and a dog-bone fan-out experiment; Freerouting 2.1.0 (fixed existing copper, 10 or 1 net to route) did not finish in
-15-30 minutes. The cause is capacity: seven 0.4 mm-pitch QFN pads on the left column must leave through one corridor that the existing 4-layer routing
-already fills. Options to finish: move the 0402 decoupling and filter parts left of the MCU, or take the bus from a different MCU side, or re-route the
-whole board (the earlier full route needed a multi-hour router sweep).
+`pcb/design.py` (netlist source of truth) has U1 = `LFE5U-45F-8BG381C` (same CABGA-381 footprint; `tools/pin_compat.py`: all 31 used balls have the same bank and
+pad function as on the 85F) and the 10 frame-bus nets `FB_D0..FB_D7`, `FB_CLK`, `FB_FS` (FPGA bank 6 outer ball row facing the MCU <-> RP2350 GPIO16..25). The board
+was **re-routed completely** with the repository's grid router (`pcb/route_sweep.py`, seed 128): KiCad DRC **69 violations + 10 unconnected items** (baseline of the 85F
+board: 72 + 12); all 10 new nets are connected; no clearance / short / hole violations. Gerbers, drill, pick-and-place, STEP, renders, netlist, `bom.csv` are regenerated
+(`pcb/make_outputs.py`, `render/run_all.sh`). The remaining DRC items are the same kinds as before: dangling plane-stitch vias (26), silk overlaps (9 + 32), 2 library
+footprint warnings, and 10 plane fan-out artefacts (pad-to-plane stubs on +3V3 / GND) that KiCad reports as unconnected, as it did for the previous board; they
+were not investigated for electrical effect (`Pad 20 / Pad 11 [+3V3]` of the MCU is one of them).
+
+How it got there: an incremental route (`pcb/route_a3.py`, `pcb/ripup_region.py`: keep all other copper, rip up the 20-25 signal nets crossing the MCU's left/bottom
+escape area, re-route with `pcb/router/router14.exe`) routed only 9 of the 10 nets whichever MCU pad, FPGA ball or seed was used (the 7th data bit stayed open;
+Freerouting 2.1.0 with fixed copper timed out). The full re-route found complete solutions on a minority of seeds; seeds 11, 36 and 128 had no router violations and
+128 had the best KiCad DRC (11: 73 + 15, 36: 75 + 23). One router flaw is patched after the fact: the +1V1MCU stub on the 0.2 mm DVDD pad is narrowed from 0.3 to
+0.2 mm (clearance to the neighbouring QFN pads); `pcb/router/export_problem.py` now also treats In2 copper as an obstacle (needed for incremental routing).
+The 3D renders and the site PCB pages were regenerated from the new board.

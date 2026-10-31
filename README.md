@@ -102,5 +102,4 @@ build/test results. Earlier releases are never overwritten. `main` does not trig
    needed up to 30 ms): in a stream at 120 fps a heavy frame can make the MCU miss a packet (`frames_dropped`); the model predicts 1 - 4 % of frames
    if every 10th frame were the slowest of its category (`results/frame_budget.md`; the old design: 20 %). The MCU timing, the PIO/DMA frame
    capture and the bus timing margin are **not measured on hardware**.
-5. **The KiCad board / Gerbers are not updated for architecture A3** (netlist, BOM and pin plan are; one of the 10 new frame-bus nets could not be routed, `docs/hardware.md`).
-6. No schematic capture: the board is netlist-first (`pcb/design.py`, `pcb/output/netlist.txt`).
+5. No schematic capture: the board is netlist-first (`pcb/design.py`, `pcb/output/netlist.txt`).
