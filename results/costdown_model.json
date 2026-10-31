@@ -1,0 +1,42 @@
+{
+ "fixed_per_order": 124.15,
+ "rest_all": 52.682500000000005,
+ "rest_nolens": 13.682499999999997,
+ "arch": {
+  "A0 baseline (ECP5-85F-8, Commonlands lens)": [
+   157.5316,
+   153.75990000000002,
+   153.2007
+  ],
+  "A1 = A0 + Arducam 2.1 mm lens": [
+   128.6216,
+   124.8499,
+   124.2907
+  ],
+  "A2 ECP5 UM-45F-8 + off-chip frame RAM (RAM not priced)": [
+   92.6837,
+   91.0383,
+   90.4791
+  ],
+  "A3 ECP5 UM-45F-8 front end + CCL, TPU in RP2350 firmware": [
+   92.6837,
+   91.0383,
+   90.4791
+  ],
+  "A3b = A3 with LFE5U-25F-6BG256C (needs <=~650 Mb/s MIPI lanes)": [
+   72.7727,
+   70.4637,
+   67.8679
+  ],
+  "A3c = A3 with LFE5U-25F-7BG256C (stock 0 at 1+)": [
+   69.45060000000001,
+   68.9608,
+   68.4016
+  ],
+  "A3+A1 (A3 with UM-45F-8 and Arducam lens)": [
+   63.7737,
+   62.128299999999996,
+   61.5691
+  ]
+ }
+}

@@ -1,0 +1,26 @@
+
+7-Zip 25.01 (x64) : Copyright (c) 1999-2025 Igor Pavlov : 2025-08-03
+
+ mt1
+Compiler:  MSC 1400.140040310
+Windows 10.0 26200 : Microsoft Hv : Hv#1 : 10.0.26100.9.0.9711
+x64 19.6102 threads:24 128TB f:100007FB10E2774C
+AMD Ryzen 9 7900X 12-Core Processor
+(A60F12 : AMD64 Family 25 Model 97 Stepping 2) (->) 4691 MHz
+
+1T CPU Freq (MHz):  4591  4570  4560  4684  5249  5402  5358
+
+RAM size:   64469 MB,  # CPU hardware threads:  24
+RAM usage:    437 MB,  # Benchmark threads:      1
+
+                       Compressing  |                  Decompressing
+Dict     Speed Usage    R/U Rating  |      Speed Usage    R/U Rating
+         KiB/s     %   MIPS   MIPS  |      KiB/s     %   MIPS   MIPS
+
+22:       9921    99   9712   9651  |     132022    99  11366  11272
+23:       8279   100   8412   8436  |     130480    99  11434  11294
+24:       6942    99   7546   7465  |     129106    97  11685  11334
+25:       5934    99   6835   6776  |     127768   100  11404  11372
+----------------------------------  | ------------------------------
+Avr:      7769    99   8126   8082  |     129844    99  11472  11318
+Tot:              99   9799   9700
