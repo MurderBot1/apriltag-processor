@@ -118,14 +118,14 @@ lines then gain up to 0xFF, at most 4x change per step, one frame skipped after 
 
 | offset | type | field |
 |--------|------|-------|
-| 0  | u32 | FPGA STATUS register: `seq[31:16] tag_count[15:8] init_done[3] tpu_busy[2] res_bank[1] res_valid[0]` |
+| 0  | u32 | FPGA STATUS register: `frames_sent[31:16] candidates[15:8] init_done[3] stream_busy[2] 0[1] any_frame[0]` (architecture A3: `frames_sent` counts frame packets streamed to the MCU, `candidates` is the count of the last packet; the bits keep their positions from the old design, where bit 2 was `tpu_busy`) |
 | 4  | u32 | FPGA CCL register (0x28): `max_row_clocks[31:16] flags[11:8] candidates[7:0]`. The flags are **diagnostics of a degraded frame, never a rejection**: bit 8 a row was dropped (labeller too slow for a very busy row), bit 9 a row had more than 256 runs (extra runs ignored), bit 10 the 1024-entry label table was full (the affected runs stayed background), bit 11 more than 64 candidates were found (only the 64 largest by area are kept). The frame is processed and its tags reported in every case; `candidates` is the number handed to the tag unit (0 is valid). |
-| 8  | u32 | frames dropped (0x30) |
-| 12 | u32 | frames total (0x34) |
-| 16 | u32 | frames processed (0x38) |
+| 8  | u32 | frames dropped: FPGA register 0x30 (sensor frames not accepted) + packets the MCU could not receive (no free frame buffer, resync) |
+| 12 | u32 | frames total (FPGA register 0x34: sensor frames seen) |
+| 16 | u32 | frames processed (packets run through the tag unit on the MCU) |
 | 20 | u32 | pose solutions computed |
 | 24 | u32 | solver failures (no known tag / degenerate / no convergence) |
-| 28 | u32 | torn reads (FPGA result bank changed during a read; retried) |
+| 28 | u32 | rejected frame packets (malformed, or flagged by the FPGA as damaged: sensor CRC / line-count error, FIFO overflow, short mask, labeller timeout). Legacy name `torn_reads`; there is no result bank to tear any more |
 | 32 | u32 | frame id of the last processed result |
 | 36 | u16 | tags in the map |
 | 38 | u8  | last pose valid |
@@ -138,7 +138,8 @@ lines then gain up to 0xFF, at most 4x change per step, one frame skipped after 
 
 ### 0x0A SET_TRACK
 `diff u8 | abs_black u8 | mindim u8 | maxham u8 (low 6 bits)`, written to the FPGA THRESH register (0x0C):
-local contrast threshold, absolute black level, minimum tag dimension in pixels, maximum accepted Hamming distance.
+local contrast threshold, absolute black level, minimum tag dimension in pixels, maximum accepted Hamming distance. The first three are used by
+the FPGA; `maxham` is kept by the MCU (the tag unit runs there) and stored in the FPGA register for read-back only.
 Reset values 24, 64, 10, 2.
 
 ### 0x0B GET_POSE -> POSE
@@ -148,8 +149,8 @@ POSE (52 bytes), also the unsolicited streaming message:
 
 | offset | type | field |
 |--------|------|-------|
-| 0  | u32 | frame id (FPGA frame counter of the source frame) |
-| 4  | u32 | processing time of the solver, microseconds |
+| 0  | u32 | frame id (FPGA packet sequence number of the source frame) |
+| 4  | u32 | processing time on the MCU, microseconds: tag unit + pose solver |
 | 8  | u8  | tags used by the solution |
 | 9  | u8  | flags: 1 ambiguous (planar ambiguity unresolved), 2 outlier tag dropped, 4 single tag |
 | 10 | u16 | tag observations in the frame (before filtering) |
@@ -192,11 +193,12 @@ SPI mode 0, <= 12 MHz. Read: `0x03 a2 a1 a0 dummy d0 d1 ...`; write: `0x02 a2 a1
 | 0x00001C | FRAME_ID |
 | 0x000040 / 0x000044 | I2C bridge command / data |
 | 0x000064 / 0x000068 | TIME_LO / TIME_HI (reading LO latches HI, so the pair is coherent) |
-| 0x00006C / 0x000070 | FT0_LO / FT0_HI timestamp of the frame in bank 0 |
-| 0x000074 / 0x000078 | FT1_LO / FT1_HI timestamp of the frame in bank 1 |
 | 0x000060 | FRAME_SUM (sum of all pixels of the last frame) |
-| 0x001000 / 0x002000 | result banks: word 0 = tag count; record i at word 16 + 16 i: w0 = 0x80000000 \| ham << 12 \| rot << 10 \| id; w1..w8 corners TL,TR,BR,BL as signed Q16.16 (x, y) |
+| 0x00002C | streamer status: `fifo_overflows[31:16] aborted_packets[15:0]` |
 
+The frames themselves (binary mask + candidate list) do not travel over SPI: the FPGA streams them on an 8-bit strobed bus into the RP2350 (PIO + DMA),
+see `docs/fpga.md`. The tag decoder runs on the MCU (`firmware/core/attpu.c`) and produces the same records the old FPGA result RAM held: id, hamming
+distance, rotation, four corners as signed Q16.16 (x, y) TL,TR,BR,BL. The sensor frame timestamp comes in the packet header (no FT0/FT1 registers any more).
 ## 6. Flash storage
 
 Two 4 KB slots at the end of flash, written alternately (slot = seq & 1); each commit erases and programs only the slot that does not

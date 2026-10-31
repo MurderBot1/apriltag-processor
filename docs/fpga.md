@@ -1,57 +1,80 @@
-# FPGA implementation results (Yosys + nextpnr-ecp5, LFE5U-85F-8BG381C, speed grade 8)
+# FPGA implementation results (Yosys + nextpnr-ecp5, LFE5U-45F-8BG381C, speed grade 8)
 
-Flow: `bash tools/fpga_flow.sh <seed> <freq>` (synth_ecp5 -> nextpnr-ecp5 with `rtl/apriltag_cam.lpf` -> ecppack).
-A real bitstream is produced (`sim/apriltag_cam.bit`). Nothing has been loaded onto a physical device.
+Architecture A3 (`docs/costdown.md`): the FPGA keeps CSI-2/D-PHY receive, threshold, despeckle, the connected-component labeller
+and a streamer; the tag processing unit (TPU) and the two binary frame banks moved into the RP2350 (firmware C code + SRAM). That is
+what allows the smaller LFE5U-45F in the same CABGA-381 footprint (the old design needed the 85F: 196 of 208 block RAMs).
 
-## Resource use (full chip, seed 4, after the noise-robust `run_ccl`)
+Flow: `bash tools/fpga_flow.sh <seed> <freq>` (synth_ecp5 -> nextpnr-ecp5 `--45k --package CABGA381 --speed 8` with `rtl/apriltag_cam.lpf` -> ecppack;
+env `FPGA_OUT=dir`, `FPGA_DEVICE=45k|85k|25k` for parallel runs / other devices). A real bitstream is produced (`sim/apriltag_cam.bit`).
+Nothing has been loaded onto a physical device. All numbers below are from nextpnr (estimates, not signoff), yosys 0.66, nextpnr 0.7.
 
-| resource | used | of | % |
+## Resource use (full chip, seed 1; the other seeds differ by a few LUTs only)
+
+| resource | used | of (45F) | % | old design on the 85F |
+|---|---|---|---|---|
+| LUT4 (total, incl. carry/RAM) | 12,227 | 43,848 | 27 | 23,346 |
+| flip-flops | 5,435 | 43,848 | 12 | 7,299 |
+| block RAM (DP16KD) | 56 | 108 | **52** | 196 of 208 (94 %) |
+| MULT18X18D | 3 | 72 | 4 | 8 |
+| PLL | 1 | 4 | 25 | 1 |
+| IO | 28 | 245 | 11 | 18 |
+
+Block RAM now: threshold 17-row ring 27, labeller ~26 (label tables, run RAM), candidate RAM 2 (1024 x 32, the streamer reads it back), sensor init 1.
+The streamer itself (`rtl/mask_stream.v`) is a 16-word FIFO in LUT RAM plus the byte transmitter: a few hundred LUTs. Logic and block RAM have large
+headroom (the 45F has about 2x the block RAM needed). An ECP5-25F has 56 block RAMs: the design needs all 56 (100 %), so no margin; see
+`results/fpga_45f_seeds.md` for the one-seed nextpnr trial of the 25F (it fits: core 93.1 MHz, D-PHY 216.3 MHz).
+
+## Timing (post place-and-route, target 85.714 MHz core clock, 200 MHz D-PHY `sclk`)
+
+| seed | core clock fmax | D-PHY `sclk` fmax | both pass |
 |---|---|---|---|
-| LUT4 (total, incl. carry/RAM) | 23,346 | 83,640 | 28 |
-| flip-flops | 7,299 | 83,640 | 9 |
-| block RAM (DP16KD) | 196 | 208 | **94** |
-| MULT18X18D | 8 | 156 | 5 |
-| PLL | 1 | 4 | 25 |
-| IO | 18 | 365 | 4 |
+| 1 | 90.99 MHz | 206.02 MHz | yes |
+| 2 | 85.48 MHz (misses by 0.2) | 216.64 MHz | no |
+| 3 | 87.50 MHz | 217.49 MHz | yes |
+| 4 | 87.47 MHz | 211.86 MHz | yes |
+| 5 | 81.73 MHz (misses by 4.0) | 204.88 MHz | no |
+| 6 | 87.91 MHz | 201.53 MHz | yes |
 
-Before the rework: 18,225 LUT4 / 6,151 FF / 190 block RAM (91 %). The new labeller (`rtl/run_ccl.v`) adds about 5,100 LUT4 and
-1,150 FF (wider run rows, prefetch FIFOs, termination pipeline, free list) and about 6 block RAMs; the 64-entry candidate table is
-LUT RAM, and run RAM is a single packed 22-bit memory (a first version with two write ports per memory mapped to 12 block RAMs per
-copy and did not fit: 223 of 208). Block RAM is the scarce resource (two 1280x800 binary frame banks, candidate/result banks,
-17-row threshold ring, tag ROM, TPU program, and now the label tables: stats 1024 x 214, info 1024 x 33, parent copies, run RAM).
-Logic still has lots of headroom.
+Core clock: 4 of 6 seeds close 85.714 MHz (old 85F design: 1 of 5). D-PHY clock: 6 of 6 close 200 MHz. Seeds 1, 3, 4 and 6 close both; the default is seed 1 (90.99 / 206.02 MHz). Re-check after any RTL or pin change (the numbers moved between the first pin plan in bank 2 and the final one in bank 6).
+Reproduce: `FPGA_OUT=sim/fpga_s<N> bash tools/fpga_flow.sh <N> 85.714`; summary in `results/fpga_45f_seeds.md`.
 
-## Timing (post place-and-route, nextpnr 0.7, `tools/fpga_flow.sh`-equivalent run, yosys 0.66)
+**Decision unchanged: the core runs at 85.714 MHz** (`rtl/sys_pll.v`, `LINE_CYC_DEFAULT=686` clocks per 8 us sensor line). The 120 fps requirement is a property of
+the sensor rate (frame 1041 lines = 8.328 ms). Removing the TPU (whose multiplier/divider operand routing was a critical path of some seeds) is the likely
+reason the core clock now closes on most seeds; that causal link was not isolated.
 
-| seed | core clock fmax (target 85.714 MHz) | D-PHY `sclk` fmax (target 200 MHz) |
-|---|---|---|
-| 2 | 85.46 MHz (misses by 0.3) | 211.3 MHz (pass) |
-| 3 | 76.79 MHz | 206.8 MHz (pass) |
-| **4** | **86.78 MHz (pass)** | 201.3 MHz (pass) |
-| 5 | 78.69 MHz | 219.6 MHz (pass) |
-| 6 | 79.32 MHz | 211.6 MHz (pass) |
+## MCU frame bus (FPGA -> RP2350)
 
-Standalone `run_ccl` (`tools/module_timing.sh`, seed 1, 100 MHz target): **97.1 MHz**. In the full-chip runs the critical path of
-every seed is outside the labeller (`csi2_rx` header ECC to `frames_bad` clock enable on seeds 2/3/6, the TPU multiplier/divider
-operand routing on seed 5); the labeller's own worst paths were the BRAM-output-to-FSM paths that were pipelined (registered
-orphan-check flags, separate decision/finish states, registered find loop). A real bitstream was produced for seed 4.
+The mask is streamed at the pixel rate instead of being stored: one byte per 4 core clocks = 21.4 MB/s while a row is flowing, 15.4 MB/s average.
+Pins (bank 6, 3.3 V, the outer ball row on the MCU side, LVCMOS33 DRIVE=8 SLEWRATE=FAST, balls checked identical on the 85F / 45F / 25F by `tools/pin_compat.py`):
+`mcu_d[7:0]` = P1 N1 M1 L1 K1 P2 N2 L2 -> RP2350 GPIO16..23, `mcu_clk` = K2 -> GPIO24, `mcu_fs` = M3 -> GPIO25.
 
-**Decision: the core runs at 85.714 MHz, not 100 MHz.** The PLL (`rtl/sys_pll.v`, generated by `ecppll`) produces
-85.7143 MHz; the CSI-2/line-time constants are set for it (`LINE_CYC_DEFAULT=686` clocks per 8 us sensor line). Seed 4
-closes that clock with ~1 MHz margin; the other seeds land 0.3-9 MHz short, so closure is seed-dependent and thin
-(as before the rework: 80.9 - 87.7 MHz over four seeds). The 120 fps requirement is a property of the sensor rate (line period
-8.0 us, frame 1041 lines = 8.328 ms), not of the core clock, as long as the core keeps up: 686 clocks per line is the budget for
-the CCL (the slowest row of 493 of 500 frames of the earlier 500-frame evaluation set is below it, see `docs/verification.md`), and the TPU run time is discussed in
-`docs/verification.md` (heavy-clutter frames can exceed one frame period and are then dropped in a stream).
+| signal | meaning |
+|---|---|
+| `mcu_d[7:0]` | byte, changes 1 core clock before `mcu_clk` rises, stable for 3 clocks after |
+| `mcu_clk` | strobe, high 2 of the 4 clocks of a byte slot; stops (while `mcu_fs` stays high) if the next word is late |
+| `mcu_fs` | high from before the first byte of a packet to after the last |
 
-**100 MHz is not closed** (best 87.7 MHz before, 86.8 MHz now). Going to 100 MHz needs more pipelining in the TPU (`tpu_core`) and
-the CSI-2 header path as well as the labeller.
-The earlier simulations were run at 100 MHz clock counts (832,800 clocks/frame); at 85.7 MHz the same 8.328 ms frame
-corresponds to 713,840 clocks, and the per-line budget was re-checked at 686 clocks (`tests/sweep_ccl_rtl.py 686`).
+One packet per accepted frame, 132,128 bytes, little-endian words: 4-word header (`0x4D335441` "AT3M", sequence number, 64-bit device time of the frame
+start), 32,000 mask words (800 rows x 40 words, bit x%32 of word y*40+x/32 = pixel (x,y), 1 = black, after threshold and despeckle), a 4-word trailer
+(candidate count, labeller flags, status bits, frame sum for auto exposure, max row clocks, check word `~seq`) and the 64 x 16-word candidate records of
+`run_ccl`. A frame with a sensor CRC/line-count error still leaves as a complete packet with the `CSI bad` status bit (the FPGA has no store to
+retract it; a frame with missing lines is zero padded); the MCU discards flagged packets. Format: `rtl/mask_stream.v`, `firmware/core/atframe.h`.
+
+RP2350 side (`firmware/rp2350/frame_rx.pio`, `hal_frame_rx.c`): a PIO state machine samples D on the rising edge of the strobe (3 PIO cycles per byte,
+7 available at 150 MHz), autopush every 4 bytes, a DMA channel moves each packet (33,032 words) into one of two 132 KB frame buffers in SRAM; the channel
+is re-armed from its completion interrupt (to a dummy word when both buffers are busy, so the stream never loses alignment); a packet that ends early is
+detected 100 us after `mcu_fs` falls and repaired by restarting the state machine. Firmware RAM use (bss, linked locally): 348 KB of 520 KB.
+
+**Not verified on hardware:** the input timing margin (the PIO input synchroniser adds about 13 ns; the data window around the strobe edge is 11.7 ns
+before / 35 ns after), DMA/CPU SRAM arbitration at 21 MB/s while the tag unit runs, the PIO program itself (no PIO simulator was available; it compiles
+with the Pico SDK's `pioasm`). Testbenches: `tb/tb_mstream.v` (byte timing, stability around the strobe, FIFO, late labeller, short frame, abort),
+`tb/tb_cam.v` (whole chip).
 
 ## Caveats
 
-* Timing is nextpnr's estimate, not signoff; real-device margins are unknown.
-* Seed variation (76.8 - 86.8 MHz over five seeds) means the bitstream should be built with seed 4 and re-checked after any RTL change.
-* Block RAM at 94 % leaves very little room for added features; `NLAB` 1024 -> 512 should free about 7 more (estimate) (the peak live-label count on the
-  the earlier 500-frame set is 167).
+* Timing is nextpnr's estimate, not signoff; real-device margins are unknown. Seed variation (81.7 - 91.0 MHz core, 201.5 - 217.5 MHz D-PHY over six seeds)
+  means the bitstream must be rebuilt with a passing seed after any RTL change.
+* Frame drops now happen in the MCU (no free frame buffer), see `docs/verification.md` and `results/frame_budget.md`.
+* The RP2350 firmware could not be linked through the SDK's own CMake flow with the msys2 `ld` 2.47 used on the development PC; the Linux release workflow (apt `gcc-arm-none-eabi`, older binutils) was not run here
+  ("pico_flash_region.ld appears multiple times", a toolchain/SDK incompatibility unrelated to this code); locally the image was linked with the linker
+  script's include inlined (compile of all sources with SDK 2.1.1 and 2.2.0: no warnings).

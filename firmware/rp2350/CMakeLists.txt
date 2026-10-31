@@ -24,11 +24,19 @@ add_executable(apriltag_cam
     hal_spi_fpga.c
     hal_flash.c
     fpga_config.c
+    hal_frame_rx.c
     ${CORE}/atpose.c
     ${CORE}/atproto.c
     ${CORE}/atapp.c
     ${CORE}/atae.c
+    ${CORE}/atframe.c
+    ${CORE}/attpu.c
 )
+
+pico_generate_pio_header(apriltag_cam ${CMAKE_CURRENT_LIST_DIR}/frame_rx.pio)
+
+# the tag unit is the only compute-heavy code: -O3 and run from SRAM (see docs/fpga.md, tools/m33_cycles.py measured the -O3 build)
+set_source_files_properties(${CORE}/attpu.c PROPERTIES COMPILE_OPTIONS "-O3")
 
 target_include_directories(apriltag_cam PRIVATE ${CMAKE_CURRENT_LIST_DIR} ${CORE})
 
@@ -45,6 +53,9 @@ target_link_libraries(apriltag_cam PRIVATE
     hardware_gpio
     hardware_watchdog
     hardware_sync
+    hardware_pio
+    hardware_dma
+    hardware_irq
     tinyusb_device
     tinyusb_board
     m

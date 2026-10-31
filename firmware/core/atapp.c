@@ -190,14 +190,16 @@ static void on_frame(at_app_t *a, uint8_t type, const uint8_t *p, size_t n)
         a->ae_enabled = p[0] != 0; ack(a, type); break;
     case AT_CMD_SET_TRACK:
         if (n != 4) { nak(a, type, AT_ERR_BAD_LEN); break; }
+        a->maxham = p[3] & 63;                              /* the tag unit runs here; the FPGA keeps the field in its register for read-back */
         a->hal.fpga_write(a->hal.ctx, FPGA_REG_THRESH, (uint32_t)p[0] | ((uint32_t)p[1] << 8) | ((uint32_t)p[2] << 16) | ((uint32_t)(p[3] & 63) << 24));
         ack(a, type); break;
     case AT_CMD_GET_STATUS: {
         uint32_t st[16] = {0}; uint8_t b[64] = {0};
         a->hal.fpga_read(a->hal.ctx, FPGA_REG_STATUS, st, 1);
         a->hal.fpga_read(a->hal.ctx, FPGA_REG_CCL, st + 1, 1);
-        a->hal.fpga_read(a->hal.ctx, FPGA_REG_DROPPED, st + 2, 3);
-        at_put_u32(b, st[0]); at_put_u32(b + 4, st[1]); at_put_u32(b + 8, st[2]); at_put_u32(b + 12, st[3]); at_put_u32(b + 16, st[4]);
+        a->hal.fpga_read(a->hal.ctx, FPGA_REG_DROPPED, st + 2, 2);
+        at_put_u32(b, st[0]); at_put_u32(b + 4, st[1]); at_put_u32(b + 8, st[2] + a->rx_lost); at_put_u32(b + 12, st[3]);
+        at_put_u32(b + 16, a->frames_done);
         at_put_u32(b + 20, a->solved); at_put_u32(b + 24, a->solve_fail); at_put_u32(b + 28, a->torn_reads);
         at_put_u32(b + 32, a->frame_id); at_put_u16(b + 36, a->field.ntags); b[38] = (uint8_t)a->pose_valid; b[39] = a->streaming;
         at_put_u16(b + 40, a->ae.exposure); b[42] = a->ae.gain; b[43] = a->ae_enabled;
@@ -231,71 +233,62 @@ void at_app_rx(at_app_t *a, const uint8_t *data, size_t n)
 void at_app_init(at_app_t *a, const at_hal_t *hal)
 {
     memset(a, 0, sizeof *a);
-    a->hal = *hal; at_rx_init(&a->rx); a->divider = 1;
+    a->hal = *hal; at_rx_init(&a->rx); a->divider = 1; a->maxham = 2;
+    attpu_init();
     at_ae_init(&a->ae, AT_AE_INIT_EXPOSURE, AT_AE_INIT_GAIN); a->ae_enabled = 1;
     a->field.cal = (at_calib_t){640, 640, 639.5f, 399.5f, 0, 0, 0, 0, 0};
     at_store_load(a);
 }
 
 /* ----------------------------------------------------------------------------------- auto exposure */
-static void run_ae(at_app_t *a)
+static void run_ae(at_app_t *a, uint32_t sum)
 {
     if (!a->ae_enabled) return;
     if (!a->ae_synced) {                                      /* first frame: put the sensor into the state the controller assumes */
         if (sensor_write(a, a->ae.exposure, a->ae.gain) == 0) a->ae_synced = 1;
         return;
     }
-    uint32_t sum;
-    if (a->hal.fpga_read(a->hal.ctx, FPGA_REG_FRAME_SUM, &sum, 1)) return;
     a->ae_mean = (float)((double)sum / (double)AT_FRAME_PIXELS);
     if (at_ae_step(&a->ae, a->ae_mean)) {
         if (sensor_write(a, a->ae.exposure, a->ae.gain) == 0) a->ae_updates++;
     }
 }
 
-/* ----------------------------------------------------------------------------------- FPGA results */
+/* ----------------------------------------------------------------------------------- frames from the FPGA */
 int at_app_poll(at_app_t *a)
 {
-    uint32_t st;
-    if (a->hal.fpga_read(a->hal.ctx, FPGA_REG_STATUS, &st, 1)) return 0;
-    if (!(st & 1)) return 0;                                  /* no result yet */
-    uint32_t seq = st >> 16;
-    if (a->have_seq && seq == a->last_seq) return 0;
-    for (int attempt = 0; attempt < 3; attempt++) {
-        uint32_t bank = (st >> 1) & 1, count = (st >> 8) & 0xFF, fid = 0;
-        if (count > 31) count = 31;
-        uint32_t words[16 + 16 * 31];
-        uint32_t base = bank ? FPGA_RES_BANK1 : FPGA_RES_BANK0;
-        if (a->hal.fpga_read(a->hal.ctx, base, words, 16 + 16 * count)) return 0;
-        a->hal.fpga_read(a->hal.ctx, FPGA_REG_FRAME, &fid, 1);
-        uint32_t st2; a->hal.fpga_read(a->hal.ctx, FPGA_REG_STATUS, &st2, 1);
-        if ((st2 >> 16) != seq) { a->torn_reads++; st = st2; seq = st >> 16; continue; }     /* a newer result landed mid-read */
-        uint32_t t0 = a->hal.micros(a->hal.ctx);
-        a->nobs = 0;
-        at_meas_t meas[AT_MAX_MEAS];
-        for (uint32_t i = 0; i < words[0] && i < count && a->nobs < AT_MAX_MEAS; i++) {
-            const uint32_t *r = words + 16 + 16 * i;
-            if (!(r[0] & 0x80000000u)) continue;
-            at_tag_obs_t *o = &a->obs[a->nobs];
-            o->id = (uint16_t)(r[0] & 0x3FF); o->ham = (uint8_t)((r[0] >> 12) & 63);
-            for (int c = 0; c < 4; c++) {
-                o->c[c][0] = (real_t)((int32_t)r[1 + 2 * c]) / 65536; o->c[c][1] = (real_t)((int32_t)r[2 + 2 * c]) / 65536;
-                meas[a->nobs].c[c][0] = o->c[c][0]; meas[a->nobs].c[c][1] = o->c[c][1];
-            }
-            meas[a->nobs].id = o->id; a->nobs++;
-        }
-        uint32_t ft[4] = {0};
-        a->hal.fpga_read(a->hal.ctx, FPGA_REG_FT0, ft, 4);
-        a->frame_ts = bank ? ((uint64_t)ft[2] | ((uint64_t)ft[3] << 32)) : ((uint64_t)ft[0] | ((uint64_t)ft[1] << 32));
-        a->have_seq = 1; a->last_seq = seq; a->frame_id = fid;
-        at_pose_t p;
-        if (a->nobs && at_solve(&a->field, meas, a->nobs, &p) == 0) {
-            a->pose = p; a->pose_valid = 1; a->pose_frame = fid; a->pose_ts = a->frame_ts; a->solved++;
-            a->pose_us = a->hal.micros(a->hal.ctx) - t0;
-            if (a->streaming && ++a->div_cnt >= a->divider) { a->div_cnt = 0; send_pose(a); }
-        } else if (a->nobs) a->solve_fail++;
-        run_ae(a);
-        return 1;
+    at_frame_buf_t b = {0, 0, 0};
+    if (!a->hal.frame_get || !a->hal.frame_get(a->hal.ctx, &b)) { a->rx_lost = b.lost; return 0; }
+    a->rx_lost = b.lost;
+    at_frame_t f;
+    if (at_frame_parse(b.data, b.bytes, &f) || (f.status & AT_PKT_ST_DAMAGED)) {   /* malformed or flagged by the FPGA: no result */
+        a->torn_reads++;
+        a->hal.frame_put(a->hal.ctx);
+        return 0;
     }
-    return 0;
+    uint32_t t0 = a->hal.micros(a->hal.ctx);
+    attpu_tag_t tags[ATTPU_MAX_TAGS];
+    int nt = a->hal.detect ? a->hal.detect(a->hal.ctx, &f, tags, ATTPU_MAX_TAGS) : -1;        /* test hook; < 0 = run the real tag unit */
+    if (nt < 0) nt = attpu_run(f.mask, f.cand, f.cand_count, f.seq, a->maxham, tags);
+    a->nobs = 0;
+    at_meas_t meas[AT_MAX_MEAS];
+    for (int i = 0; i < nt && a->nobs < AT_MAX_MEAS; i++) {
+        at_tag_obs_t *o = &a->obs[a->nobs];
+        o->id = tags[i].id; o->ham = tags[i].ham;
+        for (int c = 0; c < 4; c++) {
+            o->c[c][0] = (real_t)tags[i].c[2 * c] / 65536; o->c[c][1] = (real_t)tags[i].c[2 * c + 1] / 65536;
+            meas[a->nobs].c[c][0] = o->c[c][0]; meas[a->nobs].c[c][1] = o->c[c][1];
+        }
+        meas[a->nobs].id = o->id; a->nobs++;
+    }
+    a->frame_ts = f.ts; a->frame_id = f.seq; a->frames_done++;
+    at_pose_t p;
+    if (a->nobs && at_solve(&a->field, meas, a->nobs, &p) == 0) {
+        a->pose = p; a->pose_valid = 1; a->pose_frame = f.seq; a->pose_ts = f.ts; a->solved++;
+        a->pose_us = a->hal.micros(a->hal.ctx) - t0;
+        if (a->streaming && ++a->div_cnt >= a->divider) { a->div_cnt = 0; send_pose(a); }
+    } else if (a->nobs) a->solve_fail++;
+    run_ae(a, f.frame_sum);
+    a->hal.frame_put(a->hal.ctx);
+    return 1;
 }

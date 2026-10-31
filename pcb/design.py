@@ -62,7 +62,7 @@ board_sig = {
     'clk_24m': 'CLK24M', 'mipi_clk_p': 'MIPI_CLK_P', 'mipi_d_p[0]': 'MIPI_D0_P', 'mipi_d_p[1]': 'MIPI_D1_P',
     'sensor_xvclk': 'XVCLK', 'sensor_xshutdn': 'XSHUTDN', 'i2c_scl': 'SCL', 'i2c_sda': 'SDA',
     'spi_sck': 'SPI_SCK', 'spi_cs_n': 'SPI_CS', 'spi_mosi': 'SPI_MOSI', 'spi_miso': 'SPI_MISO', 'mcu_irq': 'FPGA_IRQ',
-    'mcu_rst_n': 'FPGA_RST', 'leds[0]': 'LED_STAT', 'leds[1]': 'LED_1', 'leds[2]': 'LED_2', 'leds[3]': 'LED_3'}
+    'mcu_rst_n': 'FPGA_RST', **{f'mcu_d[{i}]': f'FB_D{i}' for i in range(8)}, 'mcu_clk': 'FB_CLK', 'mcu_fs': 'FB_FS', 'leds[0]': 'LED_STAT', 'leds[1]': 'LED_1', 'leds[2]': 'LED_2', 'leds[3]': 'LED_3'}
 for sig, ball in SIG.items():
     ball_net[ball] = board_sig[sig]
 for sig, ball in fpga_pins.DIFF_N.items():
@@ -79,14 +79,15 @@ for ball, name, typ in fpga_pin_tab:
         elif fn == 'D1/MISO/IO1': ball_net[ball] = 'FPGA_CFG_MISO'
         elif fn.startswith('HOLDN/DI/BUSY/CSSPIN'): ball_net[ball] = 'FPGA_CFG_CS'
 fpga_nets = {b: n for b, n in ball_net.items()}
-add('U', 'Package_BGA', 'Lattice_caBGA-381_17x17mm_Layout20x20_P0.8mm', 'LFE5U-85F-8BG381C', FPGA_POS[0], FPGA_POS[1], 0, 'bottom',
-    fpga_nets, ref_='U1', note='Lattice ECP5 FPGA (custom RTL: CSI-2/D-PHY RX, threshold, CCL, TPU)')
+add('U', 'Package_BGA', 'Lattice_caBGA-381_17x17mm_Layout20x20_P0.8mm', 'LFE5U-45F-8BG381C', FPGA_POS[0], FPGA_POS[1], 0, 'bottom',
+    fpga_nets, ref_='U1', note='Lattice ECP5-45F (custom RTL: CSI-2/D-PHY RX, threshold, despeckle, CCL, frame bus to the MCU)')
 
 # ---------------------------------------------------------------------------------------------- MCU U2 (RP2350A)
 mcu_pin_tab = json.load(open(os.path.join(HERE, 'rp2350a_pins.json')))              # [number, name, type]
 MCU_GPIO = {'GPIO2': 'SPI_SCK', 'GPIO3': 'SPI_MOSI', 'GPIO4': 'SPI_MISO', 'GPIO5': 'SPI_CS', 'GPIO6': 'FPGA_PROGRAMN',
             'GPIO7': 'FPGA_INITN', 'GPIO8': 'FPGA_DONE', 'GPIO9': 'FPGA_IRQ', 'GPIO10': 'MCU_AUX', 'GPIO11': 'FPGA_RST',
-            'GPIO12': 'FPGA_CFG_MISO', 'GPIO13': 'FPGA_CFG_CS', 'GPIO14': 'FPGA_CCLK', 'GPIO15': 'FPGA_CFG_MOSI'}
+            'GPIO12': 'FPGA_CFG_MISO', 'GPIO13': 'FPGA_CFG_CS', 'GPIO14': 'FPGA_CCLK', 'GPIO15': 'FPGA_CFG_MOSI',
+            **{f'GPIO{16 + i}': f'FB_D{i}' for i in range(8)}, 'GPIO24': 'FB_CLK', 'GPIO25': 'FB_FS'}
 MCU_OTHER = {'IOVDD': '+3V3', 'DVDD': '+1V1MCU', 'XIN': 'XIN', 'XOUT': 'XOUT_R', 'SWCLK': 'SWCLK', 'SWDIO': 'SWDIO', 'RUN': 'MCU_RUN',
              'ADC_AVDD': 'ADC_AVDD', 'VREG_AVDD': 'VREG_AVDD', 'VREG_PGND': 'GND', 'VREG_LX': 'VREG_LX', 'VREG_VIN': '+3V3',
              'VREG_FB': '+1V1MCU', 'USB_DM': 'USB_DM_MCU', 'USB_DP': 'USB_DP_MCU', 'USB_OTP_VDD': '+3V3', 'QSPI_IOVDD': '+3V3',
@@ -98,7 +99,7 @@ for num, name, typ in mcu_pin_tab:
     elif name in MCU_OTHER: mcu_nets[num] = MCU_OTHER[name]
 MCU_POS = (18.0, 9.5)
 add('U', 'Package_DFN_QFN', 'QFN-60-1EP_7x7mm_P0.4mm_EP3.4x3.4mm', 'RP2350A', MCU_POS[0], MCU_POS[1], 0, 'bottom', mcu_nets, ref_='U2',
-    note='Raspberry Pi RP2350A: USB, field map/calibration storage, pose solve')
+    note='Raspberry Pi RP2350A: USB, frame bus receiver (PIO+DMA), tag unit (C), pose solve, field map/calibration storage')
 mx, my = MCU_POS
 # MCU decoupling + VREG
 for i, (dx, dy) in enumerate([(-4.4, 3.2), (-4.4, -3.2), (4.4, 3.2), (4.4, -3.2), (-1.6, 4.6), (1.6, -4.6)]):

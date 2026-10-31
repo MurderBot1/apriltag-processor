@@ -2,7 +2,7 @@
 // (+cand=, +fb=, +n=); windows dumped: start-up, first TAGMATCH, and the result write-back.
 `timescale 1ns/1ps
 module tb;
-    parameter PROG = "rtl/tpu_prog.hex";
+    parameter PROG = "ref/tpu/tpu_prog.hex";
     reg clk = 0, rst = 1, start = 0;
     always #5 clk = ~clk;
     wire busy, done, res_we; wire [8:0] res_waddr; wire [31:0] res_wdata, cycle_count;

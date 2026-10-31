@@ -12,12 +12,14 @@ About 230 tests in 18 files (run_all counts below). What each layer proves:
 | threshold (RTL) | (bit-exact script in `run_all`/`tests/rtlutil`) | - | 0 mismatching pixels vs `tools/golden.py` on 1280x800 frames |
 | despeckle (RTL) | `test_rtl_despeckle.py` | 4 | bit-exact vs golden on 35 % random noise, edge/corner structures, a real mask, all-ones/zeros |
 | connected components (RTL) | `test_rtl_ccl.py` | 14 | areas, bounding boxes and all 8 extremes identical to scipy labelling on random shapes, merging combs, parity edge cases, whole-frame black, **overflow flags + clean recovery on the next frame**, row-time budget |
-| TPU | `test_tpu.py` | 14 | ISA semantics, **RTL == ISS bit-exact** (micro-program over all arithmetic corner cases, full scenes), algorithm accuracy (72/72 synthetic tags, 0.29 px mean corner error), rejection of non-tags, cycle budget |
+| TPU reference (old FPGA processor, `ref/tpu`) | `test_tpu.py` | 14 | ISA semantics, **RTL == ISS bit-exact** (micro-program over all arithmetic corner cases, full scenes), algorithm accuracy (72/72 synthetic tags, 0.29 px mean corner error), rejection of non-tags, cycle budget |
+| **tag unit in C** (architecture A3) | `test_fw_tpu.py`, `test_m33_cycles.py` | 17 + 1 | `firmware/core/attpu.c` **== ISS word for word** (whole result image) on all 100 dataset frames with golden and RTL-policy candidates, thresholds 0..8, corrupted masks, random candidate records, 40,000 random divides / products, 5 x 4,500 tag-match cases; the Cortex-M33 build run in Unicorn gives the PC build's result and stays inside the time budget (skipped without arm-none-eabi-gcc / unicorn) |
+| MCU frame bus (RTL) | `test_rtl_mstream.py` | 4 | `rtl/mask_stream.v` packet format, byte timing and data stability around the strobe, FIFO, late labeller, short frame (zero padded), packet abort |
 | sensor bring-up | `test_i2c.py` | 1 | all 103 OV9281 init writes land in order over I2C, read-back, ID 0x9281, NACK detection |
-| system (RTL) | `test_chain.py` | 6 | whole chip at true 120 fps timing: 3 frames back-to-back, **FS-to-FS = 832,800 clocks exactly (120.08 fps), zero dropped frames**, ping-pong banks, bad-CRC / missing-line frames rejected and the next frame delivered, overload frame does not hang, SPI register path |
+| system (RTL) | `test_chain.py` | 6 | whole chip at true 120 fps timing: 3 frames back-to-back, **FS-to-FS = 832,800 clocks exactly (120.08 fps), zero dropped frames**, every frame leaves as a complete 132,128-byte packet, bad-CRC / missing-line frames are flagged in their packet and the next frame is delivered, overload frame does not hang, SPI register path |
 | pose solver (C) | `test_pose_solver.py` | 11 | float and double builds agree; 0.004 mm / 0.02 deg on noise-free corners over 96 images; noise tolerance; outlier rejection; planar ambiguity |
-| MCU firmware | `test_fw_proto.py`, `test_fw_storage.py`, `test_fw_app.py` | 101 | COBS/CRC framing incl. fuzz, flash storage with **power loss simulated at every byte of a commit**, command handling, torn FPGA reads, auto-exposure convergence |
-| host + end to end | `test_host_e2e.py`, `test_host_fuzz.py` | 32 | host library against the real firmware code with the FPGA result words from the RTL runs; garbage/split/dropped bytes |
+| MCU firmware | `test_fw_proto.py`, `test_fw_storage.py`, `test_fw_app.py` | 101 | COBS/CRC framing incl. fuzz, flash storage with **power loss simulated at every byte of a commit**, command handling, damaged / lost frame packets, a real packet through the C tag unit, auto-exposure convergence |
+| host + end to end | `test_host_e2e.py`, `test_host_fuzz.py` | 32 | host library against the real firmware code with the tags from the RTL runs (injected through the test hook of the fake FPGA); garbage/split/dropped bytes |
 | board data | `test_pcb.py` | 13 | every net has >= 2 pins, every FPGA power ball on the right rail, pin plan legality (banks, LVDS pairs, edge-clock pad, left/right IDDR rule), regulator divider voltages, mechanical contract |
 | housing | `test_housing.py` | 9 | watertight STLs, USB-C opening, screw posts vs PCB holes, 90 deg FOV cone clearance |
 
@@ -78,9 +80,22 @@ The remaining clear weakness is **low-contrast frames (0 %)**, probably the fixe
 The chip now misses only a few tags in `blur`, `persp` and `shadow` (small / grazing / shadowed tags).
 CCL status flag set on 6 of the 100 frames (candidate table full, i.e. more than 64 candidates, only the 64 largest kept), no dropped rows.
 
-TPU time (`tests/analyze_tpu_budget.py`, `results/tpu_budget_by_category.md`): median 427k clocks, worst 2.55 M (noise). One frame period is
-713,840 clocks at 85.714 MHz, so 20 of the 100 frames (clutter 7, noise 6, dark 3, grad 2, shadow 2) would make the *next* frame be dropped
-if the whole stream looked like them. Clean frames keep 120.08 fps with no drops (`test_chain.py`).
+**Architecture A3 (tag unit on the MCU), same 100 frames, full RTL chain (`tests/run_chain_dataset.py`, 470 s with 10 workers) then the C tag unit on the
+packets that leave the FPGA bus: 562 / 647 detectable tags, per category identical to the table above; tag ids and corners are bit-identical to the old
+all-FPGA run for every one of the 100 frames (max corner difference 0 px, 0 frames with a different tag set).** This is measured (simulation), not estimated.
+
+Tag-unit time on the MCU (**estimates**: `tools/m33_cycles.py`, Unicorn runs the Cortex-M33 machine code of the -O3 build and a static latency table costs it;
+150 MHz, one core; not measured on silicon; `results/tpu_c_m33_cycles.md`): median 1.59 ms, p95 6.3 ms, worst 9.3 ms (optimistic model 1.25 / 7.4, pessimistic
+1.89 / 11.0). The old FPGA processor needed a median 427k clocks = 5.0 ms and a worst 2.55 M clocks = 29.8 ms at 85.714 MHz. Pose solver
+(`tools/m33_pose_cycles.py`, estimate, bracketed because the emulator has no RP2350 double-precision coprocessor): median 1.8 ms / worst 3.6 ms with single-precision
+maths on the FPU, median 3.0 / worst 8.8 ms with software doubles; the real firmware (doubles through the SDK, DCP) lies in between.
+
+Frame drops (`tools/frame_budget.py`, `results/frame_budget.md`; model of 2 frame buffers, the 10 frames of a category repeated; ESTIMATE): the old design lost
+20 of 100 frames (clutter 7, noise 6, dark 3, grad 2, shadow 2) if the stream looked like them. New, tag unit only, nominal model: 1.0 % overall (noise 9.9 %,
+every other category 0), pessimistic model 2.0 %; with the pose solve on the same core (float): 3.0 % (dark and noise 10 % / 20 %), software doubles 4.0 %;
+two cores alternating frames: 2.0 % (float pose). A third 132 KB frame buffer brings the nominal model to 0 % except software-double pose on one core (1 %) (pessimistic: 0 % for the tag unit alone and for two cores, 1 % / 2 % for one core with float / software-double pose) -
+it would fit the 520 KB SRAM on paper (3 x 132 KB + 57 KB tables + 12 KB), not built. The dropped frames are the single slowest frame of a category recurring every
+10th frame. Clean frames keep 120.08 fps with no drops (`test_chain.py`).
 
 CCL-only checks (`tests/sweep_ccl_rtl.py`): the RTL candidate table equals the streaming model `golden.stream_components()` (same order); on a
 historical 500-frame set (no longer in the repository) at the real 686-clock line 493 of 500 frames were identical, 7 lost 1-5 rows, peak
@@ -104,8 +119,7 @@ category counts therefore describe the dataset and the reference detector, not t
 ## Timing and resources (measured)
 
 120 fps: FS-to-FS period 832,800 clocks @ 100 MHz = **8.328 ms = 120.08 fps**, no dropped frames in multi-frame runs.
-Per frame (100-frame set, 100 MHz chain run): the CCL status flags are diagnostics only (6 frames set one, none dropped a row); TPU
-427k clocks median, 2.55 M worst (see the table above for how many frames exceed one 713,840-clock frame period). Historical 500-frame
+Per frame (100-frame set, 100 MHz chain run): the CCL status flags are diagnostics only (6 frames set one, none dropped a row); the tag unit time is an MCU estimate, see above. Historical 500-frame
 set at the real 686-clock line: slowest CCL row <= 686 clocks in 485 of 500 frames, `done` 185 clocks (median) to 2738 (worst) after the last row.
 
-FPGA (yosys + nextpnr-ecp5, LFE5U-85F-8BG381C): see `docs/fpga.md`.
+FPGA (yosys + nextpnr-ecp5, LFE5U-45F-8BG381C): 12,227 LUT4 (27 %), 56 of 108 block RAM, core clock 81.7 - 91.0 MHz (4 of 6 seeds close 85.714) and D-PHY clock 201.5 - 217.5 MHz (6 of 6 close 200) over six seeds; see `docs/fpga.md`.

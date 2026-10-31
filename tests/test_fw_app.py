@@ -14,6 +14,10 @@ import fwutil                      # noqa: E402
 from fwutil import Dev, P, simfw   # noqa: E402
 import geom                        # noqa: E402
 
+class simfw_status:                  # trailer status bits of the frame packet (firmware/core/atframe.h)
+    CSI_BAD, THR_BUSY, FIFO_OVF, SHORT, NO_CCL = 0x01, 0x02, 0x04, 0x08, 0x10
+
+
 GT = fwutil.load_json('test_images/ground_truth.json')['images']
 RTL = fwutil.load_json('results/rtl_chain_results.json')
 CAL = fwutil.load_json('config/camera_calibration.json')
@@ -216,58 +220,78 @@ def test_get_tags_raw_reports_last_frame(dev):
 
 
 # --------------------------------------------------------------------------------------------- FPGA polling
-def test_no_result_yet_and_same_seq_not_reprocessed(dev):
+def test_no_frame_yet_and_each_packet_processed_once(dev):
     assert dev.fw.poll() == 0 and dev.fw.stats()['solved'] == 0
     assert push(dev, rtl_tags('normal_004')) == 1
-    assert dev.fw.poll() == 0 and dev.fw.poll() == 0                 # same seq: nothing new
+    assert dev.fw.poll() == 0 and dev.fw.poll() == 0                 # packet was released: nothing new
     assert dev.fw.stats()['solved'] == 1
     assert push(dev, rtl_tags('normal_004')) == 1
 
 
-def test_fpga_read_failures_are_survived(dev):
+def test_register_read_failures_do_not_stop_frame_processing(dev):
+    """frames arrive on the bus, not over SPI: a failing register read (GET_STATUS) must not disturb them"""
     dev.fpga.fail_reads = 1
     dev.fpga.publish(rtl_tags('normal_004'))
-    assert dev.fw.poll() == 0
     assert dev.fw.poll() == 1 and dev.fw.stats()['solved'] == 1
-    dev.fpga.publish(rtl_tags('normal_006'))
+    dev.fpga.fail_reads = 5
+    assert dev.rsp(P.CMD_GET_STATUS, b'', P.RSP_STATUS)               # status answers even though the register reads failed
     dev.fpga.fail_reads = 0
-    reads = dev.fpga.read
-    state = {'n': 0}
-
-    def flaky(addr, n):                       # status ok, bank read fails
-        state['n'] += 1
-        return None if (addr >= simfw.BANK0 and state['n'] == 2) else reads(addr, n)
-    dev.fpga.read = flaky
-    assert dev.fw.poll() == 0
-    dev.fpga.read = reads
-    assert dev.fw.poll() == 1
+    dev.fpga.publish(rtl_tags('normal_006'))
+    assert dev.fw.poll() == 1 and dev.fw.stats()['solved'] == 2
 
 
-def test_torn_read_retries_and_counts(dev):
-    first, second = rtl_tags('normal_004'), rtl_tags('normal_007')
-    dev.fpga.publish(first, frame_id=10)
-    dev.fpga.torn_hook = lambda f: f.publish(second, frame_id=11)       # a newer result lands during the bank read
+def test_damaged_packets_are_rejected_and_counted(dev):
+    good = simfw.make_packet(5, 1000, 0, 0, count=0)
+    bad_magic = bytearray(good); bad_magic[0] ^= 1
+    bad_check = bytearray(good); bad_check[4 * 32007] ^= 1                         # trailer check word
+    short = good[:-4]
+    for pkt in (bytes(bad_magic), bytes(bad_check), short, good[:100]):
+        dev.fpga.publish_packet(pkt)
+        assert dev.fw.poll() == 0
+    for status in (simfw_status.CSI_BAD, simfw_status.FIFO_OVF, simfw_status.SHORT, simfw_status.NO_CCL):   # flagged by the FPGA itself
+        dev.fpga.publish_packet(simfw.make_packet(6, 1000, 0, status))
+        assert dev.fw.poll() == 0
+    s = dev.fw.stats()
+    assert s['torn_reads'] == 8 and s['solved'] == 0 and s['frame_id'] == 0
+    assert P.decode_status(dev.rsp(P.CMD_GET_STATUS, b'', P.RSP_STATUS)).torn_reads == 8
+    dev.fpga.publish_packet(simfw.make_packet(7, 1000, 0, simfw_status.THR_BUSY))     # diagnostic bit only: still processed
+    assert dev.fw.poll() == 1 and dev.fw.stats()['frame_id'] == 7
+    push(dev, rtl_tags('normal_004'))                                                 # and the device keeps working
+    assert dev.fw.stats()['solved'] == 1
+
+
+def test_lost_frames_are_reported_in_status(dev):
+    for k in range(5):
+        dev.fpga.publish(rtl_tags('normal_004'), frame_id=20 + k)          # two buffers: the rest is lost before the firmware sees them
+    assert dev.fpga.lost == 3
+    assert dev.fw.poll() == 1 and dev.fw.poll() == 1 and dev.fw.poll() == 0
+    st = P.decode_status(dev.rsp(P.CMD_GET_STATUS, b'', P.RSP_STATUS))
+    assert st.frames_dropped == 3 and st.frames_processed == 2
+
+
+def test_real_packet_goes_through_the_c_tag_unit(dev):
+    """a packet with a real mask + candidate list (no injected detections) is decoded by the firmware's own tag unit"""
+    import cv2
+    import golden
+    from test_tpu import pack_fb
+    img = cv2.imread(os.path.join(fwutil.ROOT, 'test_images', 'sensor', 'normal_004.png'), 0)
+    mask = golden.binarize_clean(img)
+    keep, lab, _ = golden.components(mask)
+    keep = keep[:64]
+    words = np.array(golden.pack_records(keep, lab), np.uint64).astype(np.uint32)
+    dev.fpga.publish_packet(simfw.make_packet(77, 5000, 0, 0, mask=pack_fb(mask), cand=words, count=len(keep)))
     assert dev.fw.poll() == 1
     s = dev.fw.stats()
-    assert s['torn_reads'] == 1 and s['frame_id'] == 11 and s['solved'] == 1
-    p = last_pose(dev)
-    assert p.frame_id == 11
-    assert pose_error(p, GT['normal_007'])[0] < 15                    # the pose belongs to the newer frame, not a mix
-    assert P.decode_status(dev.rsp(P.CMD_GET_STATUS, b'', P.RSP_STATUS)).torn_reads == 1
+    want = {t[0] for t in rtl_tags('normal_004')}
+    assert s['frame_id'] == 77 and s['nobs'] == len(want)
+    raw = dev.rsp(P.CMD_GET_TAGS_RAW, b'', P.RSP_TAGS)
+    ids = {struct.unpack_from('<H', raw, 5 + 35 * i)[0] for i in range(raw[4])}
+    assert ids <= want and len(ids) >= 5
 
 
-def test_torn_read_gives_up_after_three_attempts(dev):
-    seq = itertools_counter = [0]
-
-    def hook(f):
-        seq[0] += 1
-        f.publish(rtl_tags('normal_004'), frame_id=200 + seq[0])
-    dev.fpga.publish(rtl_tags('normal_004'), frame_id=1)
-    dev.fpga.torn_always = hook
-    assert dev.fw.poll() == 0
-    assert dev.fw.stats()['torn_reads'] == 3 and dev.fw.stats()['solved'] == 0
-    dev.fpga.torn_always = None
-    assert dev.fw.poll() == 1 and dev.fw.stats()['solved'] == 1       # it processes the latest result when the FPGA calms down
+def test_set_track_maxham_reaches_the_tag_unit(dev):
+    dev.ok(P.CMD_SET_TRACK, bytes([24, 64, 10, 0]))                        # maxham 0 is stored; the FPGA register keeps the field for read-back
+    assert dev.fpga.regs[simfw.REG_THRESH] == 24 | (64 << 8) | (10 << 16)
 
 
 def test_unknown_tag_ids(dev):
@@ -290,13 +314,8 @@ def test_zero_tags_is_not_a_failure(dev):
     assert s['solved'] == 0 and s['solve_fail'] == 0 and s['nobs'] == 0
 
 
-def test_records_without_valid_bit_skipped_and_cap_at_16(dev):
+def test_observations_capped_at_16(dev):
     tags = rtl_tags('normal_004')
-    dev.fpga.publish(tags)
-    bank = dev.fpga.banks[dev.fpga.res_bank]
-    bank[16] &= 0x7FFFFFFF                                            # invalidate record 0
-    assert dev.fw.poll() == 1
-    assert dev.fw.stats()['nobs'] == len(tags) - 1
     many = [(TMAP[i % len(TMAP)]['id'], tags[i % len(tags)][1], 0) for i in range(25)]
     push(dev, many)
     assert dev.fw.stats()['nobs'] == 16

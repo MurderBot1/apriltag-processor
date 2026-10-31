@@ -115,7 +115,7 @@ def block_html(mods):
     a('<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="arh"/></marker></defs>')
     cx0, cx1 = X(1) - 16, X(6) + bw + 16
     a('<rect x="%d" y="34" width="%d" height="%d" rx="16" class="chipbox"/>' % (cx0, cx1 - cx0, Y['C'] + bh + 36 - 34))
-    a('<text x="%d" y="26" class="chipt">ECP5 LFE5U-85F-8BG381C &mdash; top level rtl/apriltag_cam_top.v</text>' % cx0)
+    a('<text x="%d" y="26" class="chipt">ECP5 LFE5U-45F-8BG381C &mdash; top level rtl/apriltag_cam_top.v</text>' % cx0)
     a('<rect x="%d" y="52" width="%d" height="%d" rx="12" class="dom dom-sensor"/>' % (X(1) - 8, bw + 16, bh + 52))
     a('<text x="%d" y="68" class="domt">sensor lane clocks</text>' % (X(1) - 2))
     a('<rect x="%d" y="52" width="%d" height="%d" rx="12" class="dom dom-core"/>' % (X(2) - 8, 5 * bw + 4 * gx + 16, Y['C'] + bh + 20 - 52))
@@ -147,19 +147,19 @@ def block_html(mods):
     blk(3, 'A', 'Adaptive threshold', 'thresh_binarize.v', ['2x2 bin, 8x8 tile min/max,', '3x3 tile neighbourhood,', '17-row ring ~20 BRAM (est.)'])
     blk(4, 'A', 'Despeckle', 'despeckle.v', ['3x3 majority (>= 4 of 9)', '2 small row buffers', 'latency 1 row'])
     blk(5, 'A', 'Connected components', 'run_ccl.v', ['run-based 4-connected', 'labeller, union-find,', 'area + 8 extremes,', '~17 BRAM (est.)'])
-    blk(6, 'A', 'Candidate store', 'cam_core.v', ['2 ping-pong candidate', 'banks of 64 x 16 words', '~4 BRAM (est.)'], 'mem')
+    blk(6, 'A', 'Candidate store', 'mask_stream.v', ['1 candidate RAM,', '64 x 16 words (2 BRAM),', 'read by the streamer'], 'mem')
     for c in range(0, 6):
         path('M%d %d L%d %d' % (X(c) + bw, Y['A'] + mid, X(c + 1), Y['A'] + mid))
     # row B
     blk(1, 'B', 'System PLL', 'sys_pll.v', ['24 MHz osc in; out:', '85.714 MHz core,', '24 MHz XVCLK to sensor,', '200 MHz spare'])
     blk(2, 'B', 'I2C bring-up', 'i2c_master.v', ['+ sensor_init.v ROM', '(sensor_init.hex):', 'programs the OV9281'])
-    blk(3, 'B', 'Registers / sequencer', 'cam_core.v', ['wrapper: status, config,', 'counters, ID 0x41544731,', 'bank sequencing, IRQ'])
-    blk(4, 'B', 'Binary frame banks', 'cam_core.v', ['2 x 1280x800 x 1 bit', '(2 x 1 Mbit) ~125 BRAM (est.)', 'TPU reads one bank while', 'the next frame streams in'], 'mem', span=2)
-    blk(6, 'B', 'Tag Processing Unit', 'tpu_core.v', ['custom 32-bit CPU, baked', '574-word program ROM,', 'tag36h11 ROM 587 codes,', 'TAGMATCH, Q16.16 MUL/DIV'], 'hot')
+    blk(3, 'B', 'Registers / sequencer', 'cam_core.v', ['wrapper: status, config,', 'counters, ID 0x41544731,', 'device clock, IRQ'])
+    blk(4, 'B', 'Mask streamer', 'mask_stream.v', ['packs 2 px/beat into words,', '16-word FIFO, 1 byte per', '4 clocks on the 8-bit bus;', 'no frame store in the FPGA'], 'mem', span=2)
+    blk(6, 'B', 'Tag unit (on the MCU)', None, ['attpu.c: C port of the', 'former FPGA processor', '(ref/tpu/tpu_core.v),', 'bit-exact, runs on RP2350'], 'ext')
     # row C
-    blk(0, 'C', 'RP2350 MCU', None, ['USB CDC, field map,', 'pose solve (LM),', 'auto-exposure', '(external part)'], 'ext')
-    blk(5, 'C', 'SPI slave', 'spi_slave.v', ['mode 0, <= 16 MHz,', '24-bit address space:', 'results, regs, debug'])
-    blk(6, 'C', 'Result banks', 'cam_core.v', ['2 x 512 words: count +', '16-word record per tag', '(id, 4 corners Q16.16)'], 'mem')
+    blk(0, 'C', 'RP2350 MCU', None, ['USB CDC, field map,', 'tag unit (C), pose', 'solve (LM), auto-exposure', '(external part)'], 'ext')
+    blk(5, 'C', 'SPI slave', 'spi_slave.v', ['mode 0, <= 16 MHz,', '24-bit address space:', 'registers only'])
+    blk(6, 'C', 'MCU frame bus', 'mask_stream.v', ['mcu_d[7:0], clk, fs:', '132,128-byte packet per', 'frame -> RP2350 PIO + DMA'], 'mem')
     # connections
     path('M%d %d L%d %d' % (X(4) + bw // 2, Y['A'] + bh, X(4) + bw // 2, Y['B']), 'binary rows', X(4) + bw // 2 + 6, Y['A'] + bh + 34)
     path('M%d %d L%d %d' % (X(6) + bw // 2, Y['A'] + bh, X(6) + bw // 2, Y['B']), 'candidates', X(6) + bw // 2 + 6, Y['A'] + bh + 34)
@@ -194,8 +194,8 @@ def block_html(mods):
 <tr><td>Adaptive threshold</td><td><a href="#/rtl/thresh_binarize.v"><code>thresh_binarize.v</code></a></td><td><a href="#/wave?s=thresh_tile">threshold tile</a></td></tr>
 <tr><td>Despeckle</td><td><a href="#/rtl/despeckle.v"><code>despeckle.v</code></a></td><td><a href="#/wave?s=despeckle_tile">despeckle crop</a></td></tr>
 <tr><td>Connected components</td><td><a href="#/rtl/run_ccl.v"><code>run_ccl.v</code></a></td><td><a href="#/wave?s=ccl_labels">CCL labelling</a></td></tr>
-<tr><td>TPU</td><td><a href="#/rtl/tpu_core.v"><code>tpu_core.v</code></a> (+ <code>tpu_prog.hex</code>, <code>tag36h11.hex</code>)</td><td><a href="#/wave?s=tpu_tag">TPU on one tag</a></td></tr>
-<tr><td>Bridge, banks, registers</td><td><a href="#/rtl/cam_core.v"><code>cam_core.v</code></a>, <a href="#/rtl/spi_slave.v"><code>spi_slave.v</code></a></td><td><a href="#/pipeline">pipeline page</a> (whole chain)</td></tr>
+<tr><td>Tag unit (now C on the MCU)</td><td><code>firmware/core/attpu.c</code>; reference RTL <code>ref/tpu/tpu_core.v</code> (+ <code>tpu_prog.hex</code>, <code>tag36h11.hex</code>)</td><td><a href="#/wave?s=tpu_tag">reference TPU on one tag</a></td></tr>
+<tr><td>Bridge, streamer, registers</td><td><a href="#/rtl/cam_core.v"><code>cam_core.v</code></a>, <a href="#/rtl/mask_stream.v"><code>mask_stream.v</code></a>, <a href="#/rtl/spi_slave.v"><code>spi_slave.v</code></a></td><td><a href="#/pipeline">pipeline page</a> (whole chain)</td></tr>
 <tr><td>Sensor bring-up</td><td><a href="#/rtl/i2c_master.v"><code>i2c_master.v</code></a>, <a href="#/rtl/sensor_init.v"><code>sensor_init.v</code></a></td><td>-</td></tr>
 <tr><td>Clocking, top level</td><td><a href="#/rtl/sys_pll.v"><code>sys_pll.v</code></a>, <a href="#/rtl/apriltag_cam_top.v"><code>apriltag_cam_top.v</code></a>, <a href="#/rtl/apriltag_cam.lpf"><code>apriltag_cam.lpf</code></a></td><td>-</td></tr>
 </tbody></table></div>''' % (''.join(legend), ''.join(o), tb)
