@@ -18,6 +18,7 @@ GROUPS = [
     ('firmware proto/storage/app', ['tests/test_fw_proto.py', 'tests/test_fw_storage.py', 'tests/test_fw_app.py'], False),
     ('host library',            ['tests/test_host_e2e.py', 'tests/test_host_fuzz.py'],        False),
     ('TPU ISA/algorithm/RTL',   ['tests/test_tpu.py'],                                         False),
+    ('TPU in C vs ISS (bit-exact)', ['tests/test_fw_tpu.py', 'tests/test_m33_cycles.py'],       False),
     ('D-PHY receiver (bit level)', ['tests/test_dphy.py'],                                     False),
     ('despeckle RTL',           ['tests/test_rtl_despeckle.py'],                               False),
     ('CCL RTL',                 ['tests/test_rtl_ccl.py'],                                     False),

@@ -238,6 +238,14 @@ A3 gives -$65 per unit at the LCSC prices read today; with the lens -$94 (-60 %)
 1. Port `tools/tpu_prog.py` to C (use `tools/tpu_isa.py` outputs as golden vectors) and run the 100 frames' candidates on a Pico 2 / RP2350 dev
    board with the binary frames in SRAM. Measure cycles per frame per category. Pass criterion: median <= 6 ms and worst <= 12 ms on one core,
    or the two-core split meets 8.33 ms for the categories that fit the TPU today (`results/tpu_budget_by_category.md`).
+   **Result (A3 branch, phase 1; emulated, not measured on silicon):** `firmware/core/attpu.c` is bit-exact with the ISS on all 100 frames
+   (full result RAM image, `tests/test_fw_tpu.py`, also thresholds 0..8, corrupted masks, garbage records, 20 000 random divides). Executed as
+   Cortex-M33 code (`tools/m33_cycles.py`, Unicorn + table-driven cycle model, 150 MHz, one core, -O3) it costs **median 1.59 ms, p95 6.1 ms,
+   worst 9.3 ms** (optimistic model 1.25 / 7.4, pessimistic model 1.89 / 11.0 ms); 3 of 100 frames exceed one 8.33 ms frame period (5 under the
+   pessimistic model). Gate passed (median <= 6 ms, worst <= 12 ms) under all three models. Per-category table: `results/tpu_c_m33_cycles.md`.
+   This is far below the estimate above (2.0-5.7 ms median, 12-34 ms worst): the C version needs about 160 k instructions for a median frame
+   against 213 k TPU instructions (427 k clocks / 2) of the RTL because the CPU has single-cycle multiply, hardware 32-bit divide and a bucket
+   index replaces the 2 348-entry tag scan (~590 clocks per candidate in hardware).
 2. Synthesise the reduced RTL (no TPU, no fb0/fb1, add a mask-stream output) with `--45k --package CABGA381 --speed 8` and with `--25k`
    to confirm the 58 / 51 block RAM estimate and the 85.7 MHz closure over several seeds.
 3. PIO capture of a 15.4 MB/s 8-bit bus at 120 fps into RP2350 SRAM with DMA, with USB and pose running.
