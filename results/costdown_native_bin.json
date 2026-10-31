@@ -1,0 +1,122 @@
+[
+ {
+  "decimate": 1,
+  "quad_sigma": 0,
+  "threads": 1,
+  "mean_ms": 7.967838383838383,
+  "p95_ms": 18.96059999999997,
+  "max_ms": 59.083,
+  "tags": 556,
+  "detectable": 647,
+  "false_ids": 6,
+  "frames_ok": 71,
+  "cat_mean_ms": {
+   "blur": 4.9136999999999995,
+   "bright": 4.7254000000000005,
+   "clutter": 22.1167,
+   "dark": 8.081,
+   "grad": 6.199299999999999,
+   "lowcon": 4.4071,
+   "noise": 11.6923,
+   "normal": 4.8746,
+   "persp": 4.995800000000001,
+   "shadow": 7.3581
+  }
+ },
+ {
+  "decimate": 1.5,
+  "quad_sigma": 0,
+  "threads": 1,
+  "mean_ms": 4.874626262626262,
+  "p95_ms": 13.164399999999992,
+  "max_ms": 41.392,
+  "tags": 556,
+  "detectable": 647,
+  "false_ids": 6,
+  "frames_ok": 71,
+  "cat_mean_ms": {
+   "blur": 2.7779999999999996,
+   "bright": 2.792,
+   "clutter": 14.369299999999999,
+   "dark": 5.4963,
+   "grad": 3.9448999999999996,
+   "lowcon": 2.184,
+   "noise": 7.047499999999999,
+   "normal": 2.7335000000000003,
+   "persp": 2.8689,
+   "shadow": 4.3362
+  }
+ },
+ {
+  "decimate": 2,
+  "quad_sigma": 0,
+  "threads": 1,
+  "mean_ms": 3.094818181818182,
+  "p95_ms": 10.962399999999997,
+  "max_ms": 26.407,
+  "tags": 553,
+  "detectable": 647,
+  "false_ids": 5,
+  "frames_ok": 71,
+  "cat_mean_ms": {
+   "blur": 1.8417999999999999,
+   "bright": 1.8031,
+   "clutter": 9.259,
+   "dark": 2.6474,
+   "grad": 2.0561,
+   "lowcon": 1.4529,
+   "noise": 5.0535000000000005,
+   "normal": 1.7951000000000001,
+   "persp": 1.8157000000000003,
+   "shadow": 3.1161000000000003
+  }
+ },
+ {
+  "decimate": 1,
+  "quad_sigma": 0,
+  "threads": 2,
+  "mean_ms": 6.167353535353536,
+  "p95_ms": 15.910199999999987,
+  "max_ms": 35.382,
+  "tags": 556,
+  "detectable": 647,
+  "false_ids": 6,
+  "frames_ok": 71,
+  "cat_mean_ms": {
+   "blur": 4.0603,
+   "bright": 3.6251999999999995,
+   "clutter": 15.147099999999998,
+   "dark": 6.3515,
+   "grad": 4.960400000000001,
+   "lowcon": 3.8569000000000004,
+   "noise": 9.171800000000001,
+   "normal": 4.0630999999999995,
+   "persp": 4.1707,
+   "shadow": 6.0512
+  }
+ },
+ {
+  "decimate": 1,
+  "quad_sigma": 0,
+  "threads": 4,
+  "mean_ms": 5.31110101010101,
+  "p95_ms": 11.777599999999996,
+  "max_ms": 24.988,
+  "tags": 556,
+  "detectable": 647,
+  "false_ids": 6,
+  "frames_ok": 71,
+  "cat_mean_ms": {
+   "blur": 4.380000000000001,
+   "bright": 3.7346000000000004,
+   "clutter": 11.9779,
+   "dark": 5.572699999999999,
+   "grad": 4.1856,
+   "lowcon": 3.5403,
+   "noise": 6.9548000000000005,
+   "normal": 3.4998999999999993,
+   "persp": 3.6978999999999997,
+   "shadow": 5.610100000000001
+  }
+ }
+]

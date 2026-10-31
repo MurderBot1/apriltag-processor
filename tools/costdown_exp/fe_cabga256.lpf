@@ -1,0 +1,9 @@
+# front-end experiment, LFE5U-25F/45F CABGA256: MIPI on left bank 7 with the same pad functions as the real design (PCLKT7_0 clock, PCLKT7_1 / GR_PCLK7_1 data)
+LOCATE COMP "mipi_clk_p" SITE "K1";
+IOBUF PORT "mipi_clk_p" IO_TYPE=LVDS DIFFRESISTOR=OFF;
+LOCATE COMP "mipi_d_p[0]" SITE "J1";
+IOBUF PORT "mipi_d_p[0]" IO_TYPE=LVDS DIFFRESISTOR=OFF;
+LOCATE COMP "mipi_d_p[1]" SITE "G1";
+IOBUF PORT "mipi_d_p[1]" IO_TYPE=LVDS DIFFRESISTOR=OFF;
+FREQUENCY PORT "clk_24m" 24 MHz;
+FREQUENCY PORT "mipi_clk_p" 400 MHz;

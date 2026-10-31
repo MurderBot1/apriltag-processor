@@ -1,0 +1,509 @@
+{
+ "ecp5_85f": {
+  "code": "C1551826",
+  "mpn": "LFE5U-85F-8BG381C",
+  "brand": "Lattice",
+  "package": "CABGA-381",
+  "stock": 8,
+  "min_buy": 1,
+  "ladder": [
+   [
+    1,
+    100.1279
+   ],
+   [
+    10,
+    96.846
+   ]
+  ],
+  "catalog": "FPGAs (Field Programmable Gate Array)",
+  "url": "https://www.lcsc.com/product-detail/C1551826.html",
+  "checked": "2026-10-30"
+ },
+ "ecp5_25f_bg256": {
+  "code": "C1521614",
+  "mpn": "LFE5U-25F-6BG256C",
+  "brand": "Lattice",
+  "package": "CABGA-256",
+  "stock": 153,
+  "min_buy": 1,
+  "ladder": [
+   [
+    1,
+    15.369
+   ],
+   [
+    10,
+    13.5498
+   ],
+   [
+    30,
+    12.4425
+   ],
+   [
+    100,
+    11.5132
+   ]
+  ],
+  "catalog": "FPGAs (Field Programmable Gate Array)",
+  "url": "https://www.lcsc.com/product-detail/C1521614.html",
+  "checked": "2026-10-30"
+ },
+ "ecp5_45f_bg381": {
+  "code": "C1551300",
+  "mpn": "LFE5U-45F-6BG381C",
+  "brand": "Lattice",
+  "package": "CABGA-381",
+  "stock": 0,
+  "min_buy": 1,
+  "ladder": [
+   [
+    1,
+    24.9547
+   ],
+   [
+    200,
+    9.6577
+   ],
+   [
+    500,
+    9.319
+   ],
+   [
+    1000,
+    9.1504
+   ]
+  ],
+  "catalog": "FPGAs (Field Programmable Gate Array)",
+  "url": "https://www.lcsc.com/product-detail/C1551300.html",
+  "checked": "2026-10-30"
+ },
+ "ecp5_45f_bg256": {
+  "code": "C1550834",
+  "mpn": "LFE5U-45F-6BG256C",
+  "brand": "Lattice",
+  "package": "CABGA-256",
+  "stock": 0,
+  "min_buy": 1,
+  "ladder": [
+   [
+    1,
+    15.9434
+   ],
+   [
+    10,
+    14.5892
+   ],
+   [
+    30,
+    13.3426
+   ],
+   [
+    100,
+    12.2554
+   ]
+  ],
+  "catalog": "FPGAs (Field Programmable Gate Array)",
+  "url": "https://www.lcsc.com/product-detail/C1550834.html",
+  "checked": "2026-10-30"
+ },
+ "artix35": {
+  "code": "C1521698",
+  "mpn": "XC7A35T-1FTG256C",
+  "brand": "AMD/XILINX",
+  "package": "FTBGA-256",
+  "stock": 166,
+  "min_buy": 1,
+  "ladder": [
+   [
+    1,
+    152.8657
+   ],
+   [
+    30,
+    147.7449
+   ]
+  ],
+  "catalog": "FPGAs (Field Programmable Gate Array)",
+  "url": "https://www.lcsc.com/product-detail/C1521698.html",
+  "checked": "2026-10-30"
+ },
+ "gw2a18": {
+  "code": "C5799574",
+  "mpn": "GW2A-LV18PG256C8/I7",
+  "brand": "GOWIN",
+  "package": "PBGA-256",
+  "stock": 68,
+  "min_buy": 1,
+  "ladder": [
+   [
+    1,
+    40.4999
+   ],
+   [
+    30,
+    38.2089
+   ]
+  ],
+  "catalog": "System On Chip (SoC)",
+  "url": "https://www.lcsc.com/product-detail/C5799574.html",
+  "checked": "2026-10-30"
+ },
+ "rv1106g3": {
+  "code": "C5328706",
+  "mpn": "RV1106G3",
+  "brand": "Rockchip",
+  "package": "QFN-128(12.3x12.3)",
+  "stock": 4,
+  "min_buy": 1,
+  "ladder": [
+   [
+    1,
+    25.3877
+   ],
+   [
+    30,
+    22.6582
+   ]
+  ],
+  "catalog": "Microcontrollers",
+  "url": "https://www.lcsc.com/product-detail/C5328706.html",
+  "checked": "2026-10-30"
+ },
+ "rk3566": {
+  "code": "C2943786",
+  "mpn": "RK3566",
+  "brand": "Rockchip",
+  "package": "BGA-565(15.5x14.4)",
+  "stock": 369,
+  "min_buy": 1,
+  "ladder": [
+   [
+    1,
+    14.6466
+   ],
+   [
+    10,
+    11.774
+   ],
+   [
+    30,
+    10.7438
+   ],
+   [
+    102,
+    9.8432
+   ]
+  ],
+  "catalog": "Microcontrollers",
+  "url": "https://www.lcsc.com/product-detail/C2943786.html",
+  "checked": "2026-10-30"
+ },
+ "rk3576": {
+  "code": "C42388007",
+  "mpn": "RK3576",
+  "brand": "Rockchip",
+  "package": "FCCSP-698L(16.1x17.2)",
+  "stock": 468,
+  "min_buy": 1,
+  "ladder": [
+   [
+    1,
+    22.8179
+   ],
+   [
+    3,
+    22.2571
+   ],
+   [
+    30,
+    21.1372
+   ]
+  ],
+  "catalog": "Microcontrollers",
+  "url": "https://www.lcsc.com/product-detail/C42388007.html",
+  "checked": "2026-10-30"
+ },
+ "rk3588": {
+  "code": "C5156490",
+  "mpn": "RK3588",
+  "brand": "Rockchip",
+  "package": "BGA-1088",
+  "stock": 196,
+  "min_buy": 1,
+  "ladder": [
+   [
+    1,
+    65.9546
+   ],
+   [
+    30,
+    62.4503
+   ]
+  ],
+  "catalog": "Microcontrollers",
+  "url": "https://www.lcsc.com/product-detail/C5156490.html",
+  "checked": "2026-10-30"
+ },
+ "rk3588s": {
+  "code": "C7422743",
+  "mpn": "RK3588S",
+  "brand": "Rockchip",
+  "package": "FCCSP-1253L(17x17)",
+  "stock": 20,
+  "min_buy": 1,
+  "ladder": [
+   [
+    1,
+    55.5175
+   ],
+   [
+    30,
+    52.6389
+   ]
+  ],
+  "catalog": "Microcontrollers",
+  "url": "https://www.lcsc.com/product-detail/C7422743.html",
+  "checked": "2026-10-30"
+ },
+ "imxrt1176": {
+  "code": "C1020239",
+  "mpn": "MIMXRT1176AVM8A",
+  "brand": "NXP",
+  "package": "MAPBGA-289",
+  "stock": 3,
+  "min_buy": 1,
+  "ladder": [
+   [
+    1,
+    21.7033
+   ],
+   [
+    10,
+    20.6764
+   ],
+   [
+    30,
+    18.8995
+   ],
+   [
+    100,
+    17.3502
+   ]
+  ],
+  "catalog": "Microcontrollers",
+  "url": "https://www.lcsc.com/product-detail/C1020239.html",
+  "checked": "2026-10-30"
+ },
+ "imx8mm": {
+  "code": "C880326",
+  "mpn": "MIMX8MM6DVTLZAA",
+  "brand": "NXP",
+  "package": "LFBGA-486",
+  "stock": 881,
+  "min_buy": 1,
+  "ladder": [
+   [
+    1,
+    23.4864
+   ],
+   [
+    30,
+    22.4362
+   ]
+  ],
+  "catalog": "Microprocessors",
+  "url": "https://www.lcsc.com/product-detail/C880326.html",
+  "checked": "2026-10-30"
+ },
+ "t113s3": {
+  "code": "C5197687",
+  "mpn": "T113-S3",
+  "brand": "Allwinner Tech",
+  "package": "ELQFP-128",
+  "stock": 5044,
+  "min_buy": 1,
+  "ladder": [
+   [
+    1,
+    21.4419
+   ],
+   [
+    10,
+    19.6976
+   ],
+   [
+    30,
+    18.856
+   ],
+   [
+    90,
+    17.6001
+   ]
+  ],
+  "catalog": "Microcontrollers",
+  "url": "https://www.lcsc.com/product-detail/C5197687.html",
+  "checked": "2026-10-30"
+ },
+ "v853": {
+  "code": "C5137799",
+  "mpn": "V853",
+  "brand": "Allwinner Tech",
+  "package": "LFBGA-318",
+  "stock": 81,
+  "min_buy": 1,
+  "ladder": [
+   [
+    1,
+    5.9369
+   ],
+   [
+    10,
+    5.0756
+   ],
+   [
+    30,
+    4.563
+   ],
+   [
+    168,
+    4.0455
+   ],
+   [
+    504,
+    3.8071
+   ],
+   [
+    1008,
+    3.6984
+   ]
+  ],
+  "catalog": "Microcontrollers",
+  "url": "https://www.lcsc.com/product-detail/C5137799.html",
+  "checked": "2026-10-30"
+ },
+ "rp2350a": {
+  "code": "C42411118",
+  "mpn": "RP2350A",
+  "brand": "Raspberry Pi",
+  "package": "QFN-60-EP(7x7)",
+  "stock": 5233,
+  "min_buy": 1,
+  "ladder": [
+   [
+    1,
+    1.299
+   ],
+   [
+    10,
+    1.212
+   ],
+   [
+    30,
+    1.1644
+   ],
+   [
+    100,
+    1.1348
+   ],
+   [
+    500,
+    1.1102
+   ],
+   [
+    1000,
+    1.0987
+   ]
+  ],
+  "catalog": "Microcontrollers",
+  "url": "https://www.lcsc.com/product-detail/C42411118.html",
+  "checked": "2026-10-30"
+ },
+ "flash": {
+  "code": "C190862",
+  "mpn": "W25Q128JVPIQ",
+  "brand": "Winbond",
+  "package": "WSON-8-EP(5x6)",
+  "stock": 9446,
+  "min_buy": 1,
+  "ladder": [
+   [
+    1,
+    3.4222
+   ],
+   [
+    10,
+    3.0194
+   ],
+   [
+    30,
+    2.8131
+   ],
+   [
+    100,
+    2.5374
+   ],
+   [
+    500,
+    2.1428
+   ],
+   [
+    1000,
+    2.0999
+   ]
+  ],
+  "catalog": "Memory",
+  "url": "https://www.lcsc.com/product-detail/C190862.html",
+  "checked": "2026-10-30"
+ },
+ "ecp5um45_8": {
+  "code": "C1550814",
+  "mpn": "LFE5UM-45F-8BG381C",
+  "brand": "Lattice",
+  "package": "CABGA-381",
+  "stock": 6,
+  "min_buy": 1,
+  "ladder": [
+   [
+    1,
+    35.28
+   ],
+   [
+    10,
+    34.1244
+   ]
+  ],
+  "catalog": "FPGAs (Field Programmable Gate Array)",
+  "url": "https://www.lcsc.com/product-detail/C1550814.html",
+  "checked": "2026-10-30"
+ },
+ "ecp5_25f_7": {
+  "code": "C1552129",
+  "mpn": "LFE5U-25F-7BG256C",
+  "brand": "Lattice",
+  "package": "CABGA-256",
+  "stock": 0,
+  "min_buy": 1,
+  "ladder": [
+   [
+    1,
+    12.0469
+   ],
+   [
+    200,
+    4.6632
+   ],
+   [
+    500,
+    4.4988
+   ],
+   [
+    1000,
+    4.4182
+   ]
+  ],
+  "catalog": "FPGAs (Field Programmable Gate Array)",
+  "url": "https://www.lcsc.com/product-detail/C1552129.html",
+  "checked": "2026-10-30"
+ }
+}

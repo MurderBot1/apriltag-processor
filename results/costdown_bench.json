@@ -1,0 +1,596 @@
+{
+ "cpu": "AMD Ryzen 9 7900X (Zen4, boost to ~4.7-5.6 GHz), Windows 11, pupil-apriltags 1.0.4 (apriltag C lib), single thread",
+ "undistort_image_ms": 4.778193000238389,
+ "results": [
+  {
+   "label": "raw1280x800 dec1.0 refine1",
+   "decimate": 1.0,
+   "refine": true,
+   "size": [
+    800,
+    1280
+   ],
+   "mean_ms": 111.19565800065175,
+   "median_ms": 119.27715002093464,
+   "p95_ms": 134.76292500272393,
+   "max_ms": 158.65100000519305,
+   "detectable": 647,
+   "found": 631,
+   "false_ids": 5,
+   "frames_ok": 88,
+   "by_cat": {
+    "blur": {
+     "mean_ms": 118.71519999112934,
+     "ok": 8
+    },
+    "bright": {
+     "mean_ms": 51.590529980603606,
+     "ok": 10
+    },
+    "clutter": {
+     "mean_ms": 86.70657998882234,
+     "ok": 10
+    },
+    "dark": {
+     "mean_ms": 130.58180999942124,
+     "ok": 9
+    },
+    "grad": {
+     "mean_ms": 129.34373999014497,
+     "ok": 10
+    },
+    "lowcon": {
+     "mean_ms": 123.75338000711054,
+     "ok": 10
+    },
+    "noise": {
+     "mean_ms": 118.61331001855433,
+     "ok": 8
+    },
+    "normal": {
+     "mean_ms": 119.49642001418397,
+     "ok": 9
+    },
+    "persp": {
+     "mean_ms": 119.97464001178741,
+     "ok": 7
+    },
+    "shadow": {
+     "mean_ms": 113.18097000475973,
+     "ok": 7
+    }
+   }
+  },
+  {
+   "label": "raw1280x800 dec1.0 refine0",
+   "decimate": 1.0,
+   "refine": false,
+   "size": [
+    800,
+    1280
+   ],
+   "mean_ms": 108.69608199689537,
+   "median_ms": 117.29904997628182,
+   "p95_ms": 132.19205992645584,
+   "max_ms": 139.65710008051246,
+   "detectable": 647,
+   "found": 629,
+   "false_ids": 5,
+   "frames_ok": 86,
+   "by_cat": {
+    "blur": {
+     "mean_ms": 123.51685999892652,
+     "ok": 8
+    },
+    "bright": {
+     "mean_ms": 50.05339001072571,
+     "ok": 10
+    },
+    "clutter": {
+     "mean_ms": 93.73845000518486,
+     "ok": 10
+    },
+    "dark": {
+     "mean_ms": 120.0323199853301,
+     "ok": 9
+    },
+    "grad": {
+     "mean_ms": 119.1987399943173,
+     "ok": 10
+    },
+    "lowcon": {
+     "mean_ms": 118.15228998893872,
+     "ok": 9
+    },
+    "noise": {
+     "mean_ms": 113.67211999604478,
+     "ok": 8
+    },
+    "normal": {
+     "mean_ms": 121.35496999835595,
+     "ok": 9
+    },
+    "persp": {
+     "mean_ms": 117.12260999483988,
+     "ok": 6
+    },
+    "shadow": {
+     "mean_ms": 110.11906999628991,
+     "ok": 7
+    }
+   }
+  },
+  {
+   "label": "raw1280x800 dec1.5 refine1",
+   "decimate": 1.5,
+   "refine": true,
+   "size": [
+    800,
+    1280
+   ],
+   "mean_ms": 48.368015999440104,
+   "median_ms": 51.49305006489158,
+   "p95_ms": 60.71486001601443,
+   "max_ms": 66.9289999641478,
+   "detectable": 647,
+   "found": 624,
+   "false_ids": 4,
+   "frames_ok": 86,
+   "by_cat": {
+    "blur": {
+     "mean_ms": 59.64557998813689,
+     "ok": 8
+    },
+    "bright": {
+     "mean_ms": 25.0516299973242,
+     "ok": 10
+    },
+    "clutter": {
+     "mean_ms": 37.70510999020189,
+     "ok": 10
+    },
+    "dark": {
+     "mean_ms": 53.814270021393895,
+     "ok": 10
+    },
+    "grad": {
+     "mean_ms": 48.59587999526411,
+     "ok": 10
+    },
+    "lowcon": {
+     "mean_ms": 53.22421998716891,
+     "ok": 10
+    },
+    "noise": {
+     "mean_ms": 54.487990017514676,
+     "ok": 8
+    },
+    "normal": {
+     "mean_ms": 51.77052998915315,
+     "ok": 9
+    },
+    "persp": {
+     "mean_ms": 51.1351199937053,
+     "ok": 5
+    },
+    "shadow": {
+     "mean_ms": 48.24983001453802,
+     "ok": 6
+    }
+   }
+  },
+  {
+   "label": "raw1280x800 dec1.5 refine0",
+   "decimate": 1.5,
+   "refine": false,
+   "size": [
+    800,
+    1280
+   ],
+   "mean_ms": 45.586648005992174,
+   "median_ms": 49.27485005464405,
+   "p95_ms": 53.004550049081445,
+   "max_ms": 55.609900038689375,
+   "detectable": 647,
+   "found": 623,
+   "false_ids": 4,
+   "frames_ok": 86,
+   "by_cat": {
+    "blur": {
+     "mean_ms": 51.29141000797972,
+     "ok": 8
+    },
+    "bright": {
+     "mean_ms": 24.568410008214414,
+     "ok": 10
+    },
+    "clutter": {
+     "mean_ms": 36.64912001695484,
+     "ok": 10
+    },
+    "dark": {
+     "mean_ms": 47.24398001562804,
+     "ok": 10
+    },
+    "grad": {
+     "mean_ms": 46.32566999644041,
+     "ok": 10
+    },
+    "lowcon": {
+     "mean_ms": 50.92075999127701,
+     "ok": 10
+    },
+    "noise": {
+     "mean_ms": 51.95604000473395,
+     "ok": 8
+    },
+    "normal": {
+     "mean_ms": 50.14487000880763,
+     "ok": 9
+    },
+    "persp": {
+     "mean_ms": 50.89258999796584,
+     "ok": 5
+    },
+    "shadow": {
+     "mean_ms": 45.873630011919886,
+     "ok": 6
+    }
+   }
+  },
+  {
+   "label": "raw1280x800 dec2.0 refine1",
+   "decimate": 2.0,
+   "refine": true,
+   "size": [
+    800,
+    1280
+   ],
+   "mean_ms": 26.881464002653956,
+   "median_ms": 28.951950022019446,
+   "p95_ms": 33.236279973061755,
+   "max_ms": 35.47979996073991,
+   "detectable": 647,
+   "found": 615,
+   "false_ids": 5,
+   "frames_ok": 81,
+   "by_cat": {
+    "blur": {
+     "mean_ms": 29.08358998829499,
+     "ok": 8
+    },
+    "bright": {
+     "mean_ms": 12.265330005902797,
+     "ok": 10
+    },
+    "clutter": {
+     "mean_ms": 20.94662997405976,
+     "ok": 9
+    },
+    "dark": {
+     "mean_ms": 28.922710032202303,
+     "ok": 9
+    },
+    "grad": {
+     "mean_ms": 28.573059989139438,
+     "ok": 10
+    },
+    "lowcon": {
+     "mean_ms": 29.457859974354506,
+     "ok": 9
+    },
+    "noise": {
+     "mean_ms": 30.687250022310764,
+     "ok": 8
+    },
+    "normal": {
+     "mean_ms": 32.98341998597607,
+     "ok": 9
+    },
+    "persp": {
+     "mean_ms": 28.599550027865916,
+     "ok": 4
+    },
+    "shadow": {
+     "mean_ms": 27.29524002643302,
+     "ok": 5
+    }
+   }
+  },
+  {
+   "label": "raw1280x800 dec2.0 refine0",
+   "decimate": 2.0,
+   "refine": false,
+   "size": [
+    800,
+    1280
+   ],
+   "mean_ms": 25.313530993880704,
+   "median_ms": 27.453499962575734,
+   "p95_ms": 28.983520029578358,
+   "max_ms": 30.50160000566393,
+   "detectable": 647,
+   "found": 613,
+   "false_ids": 4,
+   "frames_ok": 80,
+   "by_cat": {
+    "blur": {
+     "mean_ms": 28.322810016106814,
+     "ok": 8
+    },
+    "bright": {
+     "mean_ms": 12.189199985004961,
+     "ok": 10
+    },
+    "clutter": {
+     "mean_ms": 20.323129976168275,
+     "ok": 9
+    },
+    "dark": {
+     "mean_ms": 27.95207997551188,
+     "ok": 10
+    },
+    "grad": {
+     "mean_ms": 27.679069992154837,
+     "ok": 10
+    },
+    "lowcon": {
+     "mean_ms": 28.057090006768703,
+     "ok": 8
+    },
+    "noise": {
+     "mean_ms": 27.562729991041124,
+     "ok": 7
+    },
+    "normal": {
+     "mean_ms": 27.719629975035787,
+     "ok": 9
+    },
+    "persp": {
+     "mean_ms": 27.24721998674795,
+     "ok": 4
+    },
+    "shadow": {
+     "mean_ms": 26.08235003426671,
+     "ok": 5
+    }
+   }
+  },
+  {
+   "label": "padded2080x1600 (reference) dec1.0 refine1",
+   "decimate": 1.0,
+   "refine": true,
+   "size": [
+    1600,
+    2080
+   ],
+   "mean_ms": 218.33411499741487,
+   "median_ms": 227.17615001602098,
+   "p95_ms": 255.8673549676314,
+   "max_ms": 266.6088999249041,
+   "detectable": 647,
+   "found": 630,
+   "false_ids": 0,
+   "frames_ok": 93,
+   "by_cat": {
+    "blur": {
+     "mean_ms": 241.68118998641148,
+     "ok": 9
+    },
+    "bright": {
+     "mean_ms": 168.69768999749795,
+     "ok": 10
+    },
+    "clutter": {
+     "mean_ms": 182.26042998721823,
+     "ok": 10
+    },
+    "dark": {
+     "mean_ms": 218.67939998628572,
+     "ok": 10
+    },
+    "grad": {
+     "mean_ms": 206.17396000307053,
+     "ok": 10
+    },
+    "lowcon": {
+     "mean_ms": 237.52530000638217,
+     "ok": 10
+    },
+    "noise": {
+     "mean_ms": 250.44559999369085,
+     "ok": 10
+    },
+    "normal": {
+     "mean_ms": 227.87895002402365,
+     "ok": 10
+    },
+    "persp": {
+     "mean_ms": 229.64710999513045,
+     "ok": 7
+    },
+    "shadow": {
+     "mean_ms": 220.3515199944377,
+     "ok": 7
+    }
+   }
+  },
+  {
+   "label": "padded2080x1600 (reference) dec1.0 refine0",
+   "decimate": 1.0,
+   "refine": false,
+   "size": [
+    1600,
+    2080
+   ],
+   "mean_ms": 222.5746649946086,
+   "median_ms": 228.7557499948889,
+   "p95_ms": 258.83307501790114,
+   "max_ms": 351.33089998271316,
+   "detectable": 647,
+   "found": 630,
+   "false_ids": 0,
+   "frames_ok": 93,
+   "by_cat": {
+    "blur": {
+     "mean_ms": 237.75126000400633,
+     "ok": 9
+    },
+    "bright": {
+     "mean_ms": 171.53663999633864,
+     "ok": 10
+    },
+    "clutter": {
+     "mean_ms": 190.8251899993047,
+     "ok": 10
+    },
+    "dark": {
+     "mean_ms": 213.36986997630447,
+     "ok": 10
+    },
+    "grad": {
+     "mean_ms": 215.90467002242804,
+     "ok": 10
+    },
+    "lowcon": {
+     "mean_ms": 258.6380299879238,
+     "ok": 10
+    },
+    "noise": {
+     "mean_ms": 257.19299998600036,
+     "ok": 10
+    },
+    "normal": {
+     "mean_ms": 232.41435999516398,
+     "ok": 10
+    },
+    "persp": {
+     "mean_ms": 226.6916799824685,
+     "ok": 7
+    },
+    "shadow": {
+     "mean_ms": 221.4219499961473,
+     "ok": 7
+    }
+   }
+  },
+  {
+   "label": "padded2080x1600 (reference) dec1.5 refine1",
+   "decimate": 1.5,
+   "refine": true,
+   "size": [
+    1600,
+    2080
+   ],
+   "mean_ms": 102.3374070005957,
+   "median_ms": 105.1049999659881,
+   "p95_ms": 121.44160005846061,
+   "max_ms": 132.48669996391982,
+   "detectable": 647,
+   "found": 626,
+   "false_ids": 1,
+   "frames_ok": 91,
+   "by_cat": {
+    "blur": {
+     "mean_ms": 110.11593001894653,
+     "ok": 9
+    },
+    "bright": {
+     "mean_ms": 87.72487001260743,
+     "ok": 10
+    },
+    "clutter": {
+     "mean_ms": 88.56978000840172,
+     "ok": 10
+    },
+    "dark": {
+     "mean_ms": 100.09838999249041,
+     "ok": 9
+    },
+    "grad": {
+     "mean_ms": 97.09166998509318,
+     "ok": 10
+    },
+    "lowcon": {
+     "mean_ms": 108.08400000678375,
+     "ok": 10
+    },
+    "noise": {
+     "mean_ms": 120.32055000308901,
+     "ok": 10
+    },
+    "normal": {
+     "mean_ms": 105.70054999552667,
+     "ok": 10
+    },
+    "persp": {
+     "mean_ms": 103.21168997325003,
+     "ok": 7
+    },
+    "shadow": {
+     "mean_ms": 102.45664000976831,
+     "ok": 6
+    }
+   }
+  },
+  {
+   "label": "padded2080x1600 (reference) dec2.0 refine1",
+   "decimate": 2.0,
+   "refine": true,
+   "size": [
+    1600,
+    2080
+   ],
+   "mean_ms": 69.37610001070425,
+   "median_ms": 69.1099000396207,
+   "p95_ms": 82.82172509934753,
+   "max_ms": 163.7689999770373,
+   "detectable": 647,
+   "found": 622,
+   "false_ids": 1,
+   "frames_ok": 90,
+   "by_cat": {
+    "blur": {
+     "mean_ms": 68.80899000680074,
+     "ok": 9
+    },
+    "bright": {
+     "mean_ms": 44.10102000692859,
+     "ok": 10
+    },
+    "clutter": {
+     "mean_ms": 72.50441000796854,
+     "ok": 10
+    },
+    "dark": {
+     "mean_ms": 80.22310001542792,
+     "ok": 9
+    },
+    "grad": {
+     "mean_ms": 68.86171001242474,
+     "ok": 10
+    },
+    "lowcon": {
+     "mean_ms": 70.75223001884297,
+     "ok": 10
+    },
+    "noise": {
+     "mean_ms": 73.41886999784037,
+     "ok": 10
+    },
+    "normal": {
+     "mean_ms": 77.82137003960088,
+     "ok": 10
+    },
+    "persp": {
+     "mean_ms": 71.26901001902297,
+     "ok": 7
+    },
+    "shadow": {
+     "mean_ms": 66.00028998218477,
+     "ok": 5
+    }
+   }
+  }
+ ]
+}
