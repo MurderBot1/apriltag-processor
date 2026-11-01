@@ -262,11 +262,11 @@ def test_damaged_packets_are_rejected_and_counted(dev):
 
 def test_lost_frames_are_reported_in_status(dev):
     for k in range(5):
-        dev.fpga.publish(rtl_tags('normal_004'), frame_id=20 + k)          # two buffers: the rest is lost before the firmware sees them
-    assert dev.fpga.lost == 3
-    assert dev.fw.poll() == 1 and dev.fw.poll() == 1 and dev.fw.poll() == 0
+        dev.fpga.publish(rtl_tags('normal_004'), frame_id=20 + k)          # three buffers: the rest is lost before the firmware sees them
+    assert dev.fpga.lost == 2
+    assert [dev.fw.poll() for _ in range(4)] == [1, 1, 1, 0]
     st = P.decode_status(dev.rsp(P.CMD_GET_STATUS, b'', P.RSP_STATUS))
-    assert st.frames_dropped == 3 and st.frames_processed == 2
+    assert st.frames_dropped == 2 and st.frames_processed == 3
 
 
 def test_real_packet_goes_through_the_c_tag_unit(dev):

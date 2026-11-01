@@ -68,11 +68,24 @@ Java jar, Rust `.crate`/rlib, docs tarball and the committed PCB gerbers/BOM (co
 missing is recorded as `skipped` in the manifest (never faked); set `REQUIRE="fpga firmware ..."` to make that an error. A timing miss in the FPGA
 flow is recorded as a `warning`, and the bitstream is still produced.
 
+**RP2350 firmware image.** Build on Linux (the Windows msys `ld` 2.47 fails the Pico SDK link with "pico_flash_region.ld appears multiple times", so
+Windows is not a supported firmware build host). Needs `gcc-arm-none-eabi` (CI: Ubuntu 24.04 package, 13.2.1), `libnewlib-arm-none-eabi`, `cmake`, `ninja` and
+Pico SDK **2.1.1** with submodules (tinyusb); the SDK builds picotool from source on first configure (network needed):
+```
+git clone --depth 1 --branch 2.1.1 --recurse-submodules --shallow-submodules https://github.com/raspberrypi/pico-sdk.git ~/pico-sdk
+cmake -S firmware/rp2350 -B build/rp2350 -G Ninja -DPICO_SDK_PATH=~/pico-sdk && cmake --build build/rp2350
+python3 tools/fw_size.py build/rp2350/apriltag_cam.elf --bin build/rp2350/apriltag_cam.bin --uf2 build/rp2350/apriltag_cam.uf2
+```
+The workflow `.github/workflows/firmware.yml` does this on every pull request that touches `firmware/`, checks the `.uf2` structure, uploads
+`apriltag_cam.uf2/.elf/.bin/.elf.map` as the artifact `rp2350-firmware` and posts the size report (flash image vs 16 MB, static SRAM vs 520 KB) on the PR.
+It never creates a release. Flash the `.uf2` by holding BOOTSEL while plugging in USB and copying the file to the `RP2350` drive (not yet tried on hardware).
+
 **Releasing:** pushing to the `deploy` branch (`git push origin main:deploy`, or merge `main` into `deploy`) runs `.github/workflows/release.yml`.
 It installs the toolchains, runs `tools/build_all.sh --strict`, uploads `products/` as a workflow artifact, and creates a NEW GitHub Release
 tagged `deploy-<run_number>-<short sha>` with the products and manifest attached and notes listing the commit, date, tool versions and
 build/test results. Earlier releases are never overwritten. `main` does not trigger releases. The workflow can also be started manually
-(workflow_dispatch) from any ref. It uses `GITHUB_TOKEN` with `contents: write`.
+(workflow_dispatch) from any ref; the manual run has a `dry_run` input (default true) that does everything except `gh release create`
+(it still lists the assets and checks that `firmware_apriltag_cam.uf2/.elf` are present). It uses `GITHUB_TOKEN` with `contents: write`.
 
 ## Headline results (details and caveats in `docs/verification.md`, `docs/fpga.md`, `docs/hardware.md`)
 

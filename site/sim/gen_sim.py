@@ -177,7 +177,7 @@ def load_img(name):
     return np.array(Image.open(os.path.join(ROOT, 'test_images', 'sensor', name + '.png')).convert('L'))
 
 
-def scen_thresh(name='bright_b'):
+def scen_thresh(name='normal_000'):
     img = load_img(name)
     m = golden.binarize(img)
     gt = json.load(open(os.path.join(ROOT, 'test_images', 'ground_truth.json')))['images'][name]
@@ -225,7 +225,7 @@ def scen_thresh(name='bright_b'):
 
 
 # ------------------------------------------------------------------------------------------------- despeckle
-def find_speckle(names=('dark_b', 'dark_c', 'bright_b', 'roll_045', 'dist_35', 'dark_a')):
+def find_speckle(names=('noise_000', 'dark_000', 'normal_000', 'clutter_000', 'persp_000', 'blur_000')):
     for n in names:
         img = load_img(n)
         m = golden.binarize(img)
@@ -323,11 +323,13 @@ def scen_ccl():
         sig('in_row_first', g1, 'b'), sig('in_row_last', g1, 'b'), sig('frame_end', g1, 'b'),
         sig('seq_state', g2, 'd', 'run-labelling state machine; the S_U_* states are union-find merges (the U-shape arms joining)', names),
         sig('labelling_row', g2, 'd', 'row being labelled (runs of the previous row are compared against it)'),
+        sig('runs_in_row', g2, 'd', 'number of runs found in the row being labelled'), sig('runs_in_prev_row', g2, 'd'), sig('cur_run_index', g2, 'd', 'index of the run the walker is working on'),
         sig('cur_run_start', g2, 'd', 'x of the first pixel of the current run'), sig('cur_run_end', g2, 'd'),
-        sig('prev_run_start', g2, 'd', 'overlapping run in the previous row'), sig('prev_run_end', g2, 'd'),
-        sig('cur_label_w', g2, 'd', 'label assigned to the current run'), sig('prev_label', g2, 'd'),
-        sig('root_label', g2, 'd', 'root label after union-find'),
+        sig('prev_run_start', g2, 'd', 'head of the previous-row run FIFO: start x'), sig('prev_run_end', g2, 'd'),
+        sig('cur_label_w', g2, 'd', 'label of the current run'), sig('prev_label', g2, 'd', 'label of the overlapping previous-row run (follows parent links while hopping to its root)'),
+        sig('root_label', g2, 'd', 'root label found by the termination check'),
         sig('labels_allocated', g2, 'd', 'next free label (labels allocated so far + 1)'),
+        sig('stats_idle_w', g2, 'b', 'statistics pipeline drained (unions and terminations wait for it)', default=False),
         sig('cand_write', g3, 'b', 'candidate RAM write'), sig('cand_addr', g3, 'h', '{candidate index[5:0], word[3:0]}'),
         sig('cand_data', g3, 'h', 'record words: area, 8 directional extremes, label, bbox'),
         sig('cand_total', g3, 'd'), sig('frame_done', g3, 'b'), sig('ccl_flags', g3, 'b'), sig('worst_row_clocks', g3, 'd', 'worst per-row labelling time in clocks'),
@@ -336,17 +338,17 @@ def scen_ccl():
     sc = dict(id='ccl_labels', group='Connected components', title='Connected-components labelling: a U shape (merge), a block and a speckle',
               desc='run_ccl on a 64x40 binary frame at 150 clocks per line: a U-shaped component (two separate arms that are first labelled as different components, then merged where the bottom bar joins them), '
                    'a solid 18x22 block, and a 2x2 speckle that is dropped (area < 40). Black runs are captured per row; the sequencer then labels each run against the previous row '
-                   '(S_P_*), allocates new labels (S_WRLAB) or merges (S_U_*). After the frame end the label table is scanned (S_SC_*) and candidate records are written (cand_write). '
+                   '(S_CMP merge-walk, S_FSET/S_FW/S_FU follow parent links to the root), allocates new labels or merges two roots (S_U0..S_UB3). When a component has no run in the current row it is finished by the termination check (S_T, S_TF*, S_TR*, S_TC*, S_TOP) and, after the frame end, the surviving candidates are written out as 16-word records (S_EM*, S_WR; cand_write). '
                    'The RTL candidates equal tools/golden.py components(): ' + '; '.join(cands) + '.',
-              steps=['Rows 4..23: the arms are separate runs -> two labels (labels_allocated rises to 3, then 4 with the block).',
-                     'Row 24: the bottom bar overlaps both arms: S_U_* states perform the union; one root label survives.',
-                     'After frame_end: the scan writes 2 candidate records of 16 words (cand_data), cand_total = 2.'],
+              steps=['Rows 4..23: the arms are separate runs and get separate labels (labels_allocated rises).',
+                     'Row 24: the bottom bar overlaps both arms: the S_U* states perform the union; one root label survives.',
+                     'Termination and frame end: finished components are filtered (area, size) and the survivors are written as 16-word records (cand_data); cand_total = 2.'],
               module='run_ccl.v', tb='site/sim/tb/tb_ccl_wave.v (from tb/tb_ccl.v)')
     finish(sc, W('ccl.vcd'), sigs, [dict(sig='in_row_first', label='row start', max=0), dict(sig='cand_write', label='candidate word', max=1), dict(sig='frame_done', label='done', max=1)], squeeze=600)
 
 
 # ------------------------------------------------------------------------------------------------- TPU
-def scen_tpu(name='dist_15'):
+def scen_tpu(name='normal_000'):
     import tpu_prog
     from tpu_isa import s32
     img = load_img(name)
@@ -420,8 +422,8 @@ def scen_tpu(name='dist_15'):
         sig('clk', 'clock', 'b', default=False),
     ]
     corners = ', '.join('(%.2f, %.2f)' % tuple(c) for c in rt[0]['corners'])
-    sc = dict(id='tpu_tag', group='TPU', title='TPU running its baked program on one tag (%s, tag id %d)' % (name, rt[0]['id']),
-              desc='tpu_core executes the baked 574-instruction program (coarse quad from the 8 candidate extremes -> sub-pixel edge refinement on the binary frame -> homography -> 6x6 sampling -> TAGMATCH against the 587-code ROM) '
+    sc = dict(id='tpu_tag', group='Tag unit (reference RTL)', title='Reference TPU RTL running its baked program on one tag (%s, tag id %d)' % (name, rt[0]['id']),
+              desc='Architecture A3 runs the tag unit as C code on the RP2350 (firmware/core/attpu.c, a bit-exact port); this scenario simulates the former FPGA processor ref/tpu/tpu_core.v, which is the reference that port is checked against and is no longer in the FPGA. tpu_core executes the baked 574-instruction program (coarse quad from the 8 candidate extremes -> sub-pixel edge refinement on the binary frame -> homography -> 6x6 sampling -> TAGMATCH against the 587-code ROM) '
                    'for the smallest candidate of %s: component label %d, area %d. The full run is %d clocks (%.1f us at 85.7 MHz); three windows are dumped: start-up (candidate load, first instructions), '
                    'the first TAGMATCH (ROM scan), and the result write-back. Result (matches the Python ISS bit-exactly): tag id %d, rotation %d, hamming distance %d, corners %s.'
                    % (name, t0['label'], t0['area'], cycles, cycles / 85.714, rt[0]['id'], rt[0]['rot'], rt[0]['ham'], corners),
@@ -434,7 +436,38 @@ def scen_tpu(name='dist_15'):
     finish(sc, W('tpu.vcd'), sigs, [dict(sig='tpu_start', label='start', max=1), dict(sig='result_we', label='result write', max=2), dict(sig='tpu_done', label='done', max=1)], squeeze=300)
 
 
-SCENARIOS = {'csi2': scen_csi2, 'dphy': scen_dphy, 'thresh': scen_thresh, 'despeckle': scen_despeckle, 'ccl': scen_ccl, 'tpu': scen_tpu}
+# ------------------------------------------------------------------------------------------------- mask streamer
+def scen_mstream():
+    v = build('mstream', ['rtl/mask_stream.v', tb('tb_mstream_wave.v')])
+    t = time.time()
+    out = run(v, ['frames=1'], timeout=3000)
+    print('  mstream sim %.0fs:' % (time.time() - t), out.strip().splitlines()[-1] if out.strip() else '')
+    assert 'PASS' in out, out[-500:]
+    g1, g2, g3, g4 = 'binary stream in (from despeckle)', 'candidates in (from run_ccl)', 'packet state', 'MCU frame bus out'
+    names = {0: 'IDLE', 1: 'HDR', 2: 'MASK', 3: 'WAIT', 4: 'TRL', 5: 'CAND'}
+    sigs = [
+        sig('frame_start_in', g1, 'b', 'd_fs: pulse shortly before the first beat of the frame'), sig('in_valid', g1, 'b', 'beat valid (640 beats per 686-clock line)'),
+        sig('in_black0', g1, 'b'), sig('in_black1', g1, 'b'), sig('in_row_last', g1, 'b', default=False), sig('frame_end_in', g1, 'b', default=False),
+        sig('cand_write', g2, 'b', 'run_ccl writes the candidate RAM'), sig('labeller_done', g2, 'b', 'run_ccl finished: the streamer may send the trailer and the candidate list'), sig('labeller_count', g2, 'd'),
+        sig('pkt_state', g3, 'd', 'packet writer: HDR (4 words), MASK (32,000 words), WAIT (for run_ccl), TRL (4 words), CAND (1024 words)', names),
+        sig('word_index', g3, 'd', 'word counter inside the current section'), sig('fifo_fill', g3, 'd', '16-word FIFO between the packer and the bus transmitter'),
+        sig('mcu_fs', g4, 'b', 'high for the whole packet'), sig('mcu_clk', g4, 'b', 'strobe: high for 2 of the 4 clocks of a byte slot; the RP2350 samples mcu_d on the rising edge'),
+        sig('mcu_d', g4, 'h', 'byte, changes one clock before the strobe rises, little-endian words'),
+        sig('streamer_busy', g4, 'b', default=False), sig('pkt_done', g4, 'b', 'pulse when the packet is fully sent'),
+        sig('clk', 'clock', 'b', default=False),
+    ]
+    sc = dict(id='mask_stream', group='Mask streamer', title='mask_stream: one frame packet to the MCU (header, mask, trailer, candidates)',
+              desc='rtl/mask_stream.v with the stimulus of tb/tb_mstream.v: one frame of 800 rows x 640 beats at the real 686-clock line timing, a pseudo-random binary pattern (not a real image; the point is the protocol), 7 candidate records, followed by the full self-check of all 132,128 bytes of the packet (the testbench printed PASS). '
+                   'Architecture A3 has no frame store in the FPGA: the mask leaves at the pixel rate, one byte per 4 core clocks, over the 8-bit bus that the RP2350 captures with a PIO state machine and DMA. '
+                   'Only short windows are dumped: the frame start, the 16-byte header and first mask words, the last mask words, the wait for run_ccl, the trailer and the first candidate words.',
+              steps=['mcu_fs rises, then HDR sends the magic 0x4D335441 ("AT3M"), the sequence number and the device time, one byte per strobe.',
+                     'MASK: 40 words per row; fifo_fill shows the packer running ahead of the transmitter.',
+                     'WAIT ends when run_ccl pulses labeller_done; TRL sends candidate count, flags, frame sum, max row clocks and ~sequence; CAND sends the 1024-word record RAM; pkt_done ends the packet.'],
+              module='mask_stream.v', tb='site/sim/tb/tb_mstream_wave.v (from tb/tb_mstream.v)')
+    finish(sc, W('ms.vcd'), sigs, [dict(sig='mcu_fs', label='packet start/end', edge='any', max=4), dict(sig='labeller_done', label='labeller done', max=2)], squeeze=300)
+
+
+SCENARIOS = {'csi2': scen_csi2, 'dphy': scen_dphy, 'thresh': scen_thresh, 'despeckle': scen_despeckle, 'ccl': scen_ccl, 'mstream': scen_mstream, 'tpu': scen_tpu}
 
 
 def main():
@@ -449,7 +482,7 @@ def main():
             old = json.loads(open(p).read()[len('window.WAVES='):-1])
             new_ids = {s['id'] for s in SCEN}
             SCEN[:0] = [s for s in old if s['id'] not in new_ids]
-    order = ['CSI-2 packet layer', 'D-PHY receive', 'Threshold / binarize', 'Despeckle', 'Connected components', 'TPU']
+    order = ['CSI-2 packet layer', 'D-PHY receive', 'Threshold / binarize', 'Despeckle', 'Connected components', 'Mask streamer', 'Tag unit (reference RTL)']
     SCEN.sort(key=lambda s: order.index(s['group']))
     js = 'window.WAVES=' + json.dumps(SCEN, separators=(',', ':')) + ';'
     open(os.path.join(OUT, 'waves.js'), 'w').write(js)

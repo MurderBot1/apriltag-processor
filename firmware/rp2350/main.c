@@ -3,7 +3,7 @@
  * Everything runs on core 0 in one cooperative loop, so the shared at_app_t needs no locking:
  *   tud_task()            USB device stack
  *   CDC rx  -> at_app_rx  protocol commands (replies leave through the HAL tx callback)
- *   at_app_poll           frame packet from the FPGA (PIO + DMA, hal_frame_rx.c) -> tag unit (attpu.c, runs here) -> pose solve ->
+ *   at_app_poll           frame packet from the FPGA (PIO + DMA into AT_NBUF = 3 buffers, hal_frame_rx.c; the buffer is released after the tag unit) -> tag unit (attpu.c, runs here) -> pose solve ->
  *                         optional POSE streaming, auto exposure
  *   watchdog_update       2 s watchdog; a hang resets the MCU (config is reloaded from flash, FPGA is reconfigured)
  * Core 1 is unused; flash programming therefore only has to stop core 0's interrupts (flash_safe_execute). */
