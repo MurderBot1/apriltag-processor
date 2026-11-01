@@ -44,7 +44,7 @@ elif have yosys && have nextpnr-ecp5 && have ecppack; then
     { grep -E "Max frequency for clock" sim/nextpnr.log | tail -4; grep -A14 "Device utilisation" sim/nextpnr.log | tail -15; } > "$OUT/fpga/summary.txt"
     if grep -q "FAIL at" "$OUT/fpga/summary.txt"; then record fpga-timing warning "timing NOT met at ${FPGA_FREQ:-85.714} MHz target (see fpga/summary.txt); bitstream still produced"; fi
   else
-    record fpga-bitstream failed "no bitstream / FLOW_DONE marker (see logs/)"; cp sim/*.out sim/*.log "$OUT/logs/" 2>/dev/null
+    record fpga-bitstream failed "no bitstream / FLOW_DONE marker (see logs/)"; cp sim/*.out sim/*.log "$OUT/logs/" 2>/dev/null; tail -n 15 sim/yosys_top.out sim/nextpnr.out 2>/dev/null
   fi
 else unavailable fpga "yosys/nextpnr-ecp5/ecppack not installed"; fi
 

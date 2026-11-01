@@ -27,12 +27,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'   # tools/fpga_flow.sh calls `python` (Ubuntu has only python3)
+
       - name: Install toolchains
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends yosys nextpnr-ecp5 fpga-trellis iverilog \
             gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib cmake ninja-build \
             build-essential default-jdk-headless python3-pip python3-pytest python3-setuptools python3-wheel
+          python -m pip install -r requirements-ci.txt setuptools wheel
           rustup toolchain install stable --profile minimal
           git clone --depth 1 --branch 2.1.1 --recurse-submodules --shallow-submodules \
             https://github.com/raspberrypi/pico-sdk.git "$RUNNER_TEMP/pico-sdk"
