@@ -61,9 +61,9 @@ start), 32,000 mask words (800 rows x 40 words, bit x%32 of word y*40+x/32 = pix
 retract it; a frame with missing lines is zero padded); the MCU discards flagged packets. Format: `rtl/mask_stream.v`, `firmware/core/atframe.h`.
 
 RP2350 side (`firmware/rp2350/frame_rx.pio`, `hal_frame_rx.c`): a PIO state machine samples D on the rising edge of the strobe (3 PIO cycles per byte,
-7 available at 150 MHz), autopush every 4 bytes, a DMA channel moves each packet (33,032 words) into one of two 132 KB frame buffers in SRAM; the channel
-is re-armed from its completion interrupt (to a dummy word when both buffers are busy, so the stream never loses alignment); a packet that ends early is
-detected 100 us after `mcu_fs` falls and repaired by restarting the state machine. Firmware RAM use (bss, linked locally): 348 KB of 520 KB.
+7 available at 150 MHz), autopush every 4 bytes, a DMA channel moves each packet (33,032 words) into one of three 132 KB frame buffers in SRAM (`AT_NBUF`); the channel
+is re-armed from its completion interrupt (to a dummy word when all buffers are busy, so the stream never loses alignment) and switched to a buffer that became free in the gap when `mcu_fs` rises (`late_claim`); a packet that ends early is
+detected 100 us after `mcu_fs` falls and repaired by restarting the state machine. Firmware RAM use: 348 KB bss of 520 KB with two buffers (linked locally); with three buffers about 480 - 488 KB of the 512 KiB main SRAM (computed, see `results/frame_budget.md`, not linked).
 
 **Not verified on hardware:** the input timing margin (the PIO input synchroniser adds about 13 ns; the data window around the strobe edge is 11.7 ns
 before / 35 ns after), DMA/CPU SRAM arbitration at 21 MB/s while the tag unit runs, the PIO program itself (no PIO simulator was available; it compiles

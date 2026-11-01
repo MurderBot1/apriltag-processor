@@ -55,9 +55,12 @@ OV9281 settings (`tools/ov9281_init.py`, register values from the mainline Linux
   real 85.714 MHz core. Unions of several components, new labels and finished components cost more (10-20 clocks each); a
   row that still cannot be labelled in time is dropped with a flag (`max_row_cycles` is exported in the status registers) -
   never a hang. 7 of 500 frames of an earlier (historical) evaluation set lose 1-5 rows that way, none of the current 100, see `docs/verification.md`
-* two frame buffers in the MCU's SRAM (2 x 132 KB): frame N is processed by the tag unit (median 1.6 ms, worst 9.3 ms, estimated) while frame N+1
-  streams into the other buffer, so capture never stalls; a packet is lost (and counted) only if both buffers are busy when it starts, which needs the
-  processing of a frame to take more than ~10 ms (`results/frame_budget.md`)
+* three frame buffers in the MCU's SRAM (3 x 132,128 B = 396,384 B, `AT_NBUF` in `firmware/core/atframe.h`): frame N is processed by the tag unit
+  (median 1.6 ms, worst 9.3 ms, estimated) while frames N+1 and N+2 can stream in, so capture never stalls; the buffer is handed back as soon as the tag
+  unit has copied its tags out (before the 1.8 - 3.6 ms pose solve), and a buffer released between two packets is still used by the next one
+  (`late_claim`, rising edge of `mcu_fs`). A packet is lost (and counted, `frames dropped` in STATUS) only if all three buffers are busy when it starts.
+  Estimated drops (emulated M33, not measured): 0 % nominal, 1 % pessimistic (the slowest frame of one category) with the first-build 2 buffers at 3 %;
+  SRAM about 480 - 488 KB of 512 KiB (computed, not linked here). Decision, SRAM budget and the dual-core alternative: `results/frame_budget.md`
 * end-to-end latency (last pixel -> tag list on the MCU) = 17-row threshold delay + 1 row despeckle + ~2-3 rows CCL + the candidate list
   (~0.2 ms) + tag unit time
 

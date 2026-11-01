@@ -20,6 +20,7 @@ PKT_MAGIC = 0x4D335441
 PKT_WORDS = 4 + 32000 + 4 + 1024
 PKT_BYTES = 4 * PKT_WORDS
 SLOT_BYTES = 4096
+NBUF = 3                       # AT_NBUF
 FRAME_PIXELS = 1024000
 
 
@@ -64,6 +65,22 @@ def lib():
         L.atfw_stats.argtypes = [C.c_void_p, C.POINTER(C.c_uint32)]
         L.atfw_ae_mean.argtypes = [C.c_void_p]
         L.atfw_ae_mean.restype = C.c_float
+        for n in ('atfw_rx_max_depth', 'atfw_rx_lost'):
+            getattr(L, n).argtypes = [C.c_void_p]
+            getattr(L, n).restype = C.c_uint32
+        L.atfw_pool_new.argtypes = [C.c_uint]
+        L.atfw_pool_new.restype = C.c_void_p
+        L.atfw_pool_free.argtypes = [C.c_void_p]
+        L.atfw_pool_state.argtypes = [C.c_void_p, C.c_uint]
+        L.atfw_pool_state.restype = C.c_uint
+        for n in ('at_buf_claim', 'at_buf_acquire'):
+            getattr(L, n).argtypes = [C.c_void_p]
+            getattr(L, n).restype = C.c_int
+        for n in ('at_buf_complete', 'at_buf_abort'):
+            getattr(L, n).argtypes = [C.c_void_p, C.c_int]
+        L.at_buf_release.argtypes = [C.c_void_p]
+        L.at_buf_lost.argtypes = [C.c_void_p]
+        L.at_buf_lost.restype = C.c_uint32
         L.at_app_init.argtypes = [C.c_void_p, C.c_void_p]
         L.at_app_rx.argtypes = [C.c_void_p, C.c_char_p, C.c_size_t]
         L.at_app_poll.argtypes = [C.c_void_p]
@@ -198,7 +215,7 @@ class FakeFpga:
         self.read_log = []
         self._i2c_data = 0
         self.lost = 0                  # packets the receiver dropped (reported through the HAL like the DMA layer does)
-        self.max_queue = 2             # frame buffers: a third packet is lost
+        self.max_queue = NBUF          # frame buffers (AT_NBUF in firmware/core/atframe.h): one more packet is lost
         self.inject = {}               # seq -> list of tag records
         self.last_ts = 0
 
@@ -301,7 +318,7 @@ class HalStruct(C.Structure):
 
 
 class FrameBuf(C.Structure):          # at_frame_buf_t
-    _fields_ = [('data', C.c_void_p), ('bytes', C.c_size_t), ('lost', C.c_uint32)]
+    _fields_ = [('data', C.c_void_p), ('bytes', C.c_size_t), ('lost', C.c_uint32), ('max_depth', C.c_uint32)]
 
 
 class FrameInfo(C.Structure):         # at_frame_t
@@ -337,6 +354,8 @@ class NativeFirmware:
         self.flash = flash or FakeFlash()
         self.tx = bytearray()
         self.errors = []
+        self.put_log = []
+        self._max_depth = 0
         self.micros_step = micros_step
         self._clock = 0
         self.app = None
@@ -386,6 +405,8 @@ class NativeFirmware:
 
         def frame_get(ctx, b):
             b[0].lost = self.fpga.lost
+            self._max_depth = max(self._max_depth, len(self.fpga.queue))
+            b[0].max_depth = self._max_depth
             if not self.fpga.queue:
                 return 0
             pkt = self.fpga.queue[0]
@@ -394,6 +415,7 @@ class NativeFirmware:
             return 1
 
         def frame_put(ctx):
+            self.put_log.append(len(self.tx))              # tx bytes sent so far: shows whether the buffer was released before the pose message
             if self.fpga.queue:
                 self.fpga.queue.popleft()
 
@@ -456,6 +478,10 @@ class NativeFirmware:
         return dict(zip(STAT_NAMES, arr))
 
     @property
+    def rx_stats(self):
+        """(packets lost reported by the receiver, most packets ever waiting or in processing)"""
+        return self.L.atfw_rx_lost(self.app), self.L.atfw_rx_max_depth(self.app)
+
     def ae_mean(self):
         return self.L.atfw_ae_mean(self.app)
 

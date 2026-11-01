@@ -20,8 +20,9 @@ import golden, geom, atcore, analyze_chain
 
 OUT = os.path.join(os.path.dirname(HERE), 'simout')
 PIPE_DIR = os.path.join(OUT, 'pipe')
-IMAGES = [('bright_b', 'Bright (bright_b)'), ('roll_045', 'Rotated 45 deg (roll_045)'), ('dist_35', 'Distant, tags ~28 px (dist_35)'),
-          ('dark_b', 'Dark (dark_b)'), ('dark_a', 'Dark, chip fails (dark_a)')]
+IMAGES = [('normal_000', 'Normal (normal_000)'), ('dark_000', 'Dark (dark_000)'), ('noise_000', 'Sensor noise (noise_000)'),
+          ('clutter_000', 'Clutter (clutter_000)'), ('persp_008', 'Strong perspective (persp_008)'),
+          ('blur_009', 'Blur (blur_009)')]
 CLK_MHZ = 85.714
 
 STAGES = [
@@ -169,7 +170,22 @@ def main():
         row_info = ('<b>%s</b> &middot; category <code>%s</code> &middot; %d / %d visible tags decoded by the chip' % (label, g['category'], len(found), len(vis))
                     + (' &middot; position error <b>%.1f mm</b>, orientation error <b>%.3f deg</b>, %d tags in the solve' % (info['terr'], info['rerr'], info['n']) if pose else ' &middot; <b>no pose</b>') + tbl)
         images.append(dict(name=name, label=label, cat=g['category'], info=row_info, notes=notes, ccl=cc, tags=tags, reproj=reproj, pose=info, checks={k: (bool(v) if isinstance(v, (bool, np.bool_)) else v) for k, v in chk.items()}))
-    data = dict(dir='simout/pipe', w=1280, h=800, stages=STAGES, images=images)
+    # simulation notes: derived from the checks of this run (never hand-written numbers)
+    notes = []
+    td = [(i['name'], i['checks']['thr_diff'], i['checks']['thr_rows']) for i in images if i['checks']['thr_diff']]
+    if td:
+        notes.append('<b>Threshold RTL vs golden.</b> ' + '; '.join('%s: %d pixels differ (image rows %s)' % (n_, d_, ', '.join(map(str, r_[:6])) + (' ...' if len(r_) > 6 else '')) for n_, d_, r_ in td)
+                     + '. The RTL was not modified and the cause was not investigated; the table above lists every frame.')
+    else:
+        notes.append('<b>Threshold RTL vs golden.</b> Identical on all %d frames shown.' % len(images))
+    dd = [i['name'] for i in images if i['checks']['desp_diff']]
+    notes.append('<b>Despeckle RTL vs golden.</b> ' + ('differs on ' + ', '.join(dd) + '.' if dd else 'Identical on all %d frames shown.' % len(images)))
+    cc_ = [i for i in images if not i['checks']['ccl_match']]
+    if cc_:
+        notes.append('<b>run_ccl RTL vs golden components().</b> ' + '; '.join('%s: RTL %d candidates, golden %d, status flags %s, worst row %d clocks' % (i['name'], i['checks']['ccl_n_rtl'], i['checks']['ccl_n_gold'], bin(i['checks']['ccl_flags']), i['checks']['ccl_row_cycles']) for i in cc_) + '.')
+    else:
+        notes.append('<b>run_ccl RTL vs golden components().</b> Candidate lists (area + bounding box) identical on all %d frames shown.' % len(images))
+    data = dict(dir='simout/pipe', w=1280, h=800, stages=STAGES, images=images, notes=notes)
     open(os.path.join(OUT, 'pipe.js'), 'w').write('window.PIPE=' + json.dumps(data, separators=(',', ':')) + ';')
     for f in os.listdir(WORK):
         fp = os.path.join(WORK, f)

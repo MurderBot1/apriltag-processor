@@ -1,5 +1,11 @@
 # Production sourcing (checked 2026-10-31)
 
+## Summary: U1 FPGA status
+
+- **U1 LFE5U-45F-8BG381C is out of stock everywhere on 2026-10-31** (LCSC, JLC, Mouser, DigiKey, Arrow all 0; Avnet "Part Not Found"). Lead time 43 to 46 weeks, 90-piece lots due 2026-11-30 (DigiKey) and 2027-06-15 (Mouser).
+- **LFE5UM-45F-8BG381C (SERDES variant) is NOT a drop-in.** This PCB ties the 16 SERDES supply balls (T6-T15, U6, U15, V10, V11, V17, V18) to GND, but on the UM part they are VCCA, VCCHTX, VCCHRX and VCCAUXA supplies. A PCB change is needed.
+- **The -6 speed grade (LFE5U-45F-6BG381C) is in stock** (DigiKey 46, Mouser 5), same package and balls, but **timing at grade 6 is unchecked**. Run place-and-route for grade 6 before ordering.
+
 All stock and prices below were read from the vendor's own site on 2026-10-31 (LCSC product API, JLCPCB parts API, Mouser, DigiKey, Arrow, Commonlands, Amazon, MatterHackers, JLCPCB fee page). Raw LCSC/JLC readings: `results/bom_prices_2026-10-31.json`. Anything not read is marked unverified. `docs/bom/bom.json` is the source of truth for the BOM.
 
 ## 1. U1 FPGA: stock and the LFE5UM question
