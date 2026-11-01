@@ -44,3 +44,14 @@ and 181 - 191 MHz at grade 7, and `docs/costdown.md` section 4 already states th
 A 650 Mb/s lane rate leaves 7.8 us of an 8.0 us line for 1280 payload bytes on two lanes, with no room for the low-power / SoT gap and packet overhead (arithmetic only; sensor register set for a lower rate not
 verified). So the 120 fps budget (1041 lines x 8.0 us = 8.328 ms) cannot be kept at grade 6/7, and the core clock must not be relaxed (`LINE_CYC_DEFAULT=686` clocks per line at 85.714 MHz).
 Conclusion: **no speed 6 or 7 build closes; only grade 8 (45F or 25F) does.** Sourcing -8 parts, or another design (lower lane rate and a longer line, i.e. fewer fps), is needed if -8 stays unavailable.
+
+## Update 2026-11-01: sweep on main 828bf22 (GitHub Actions fpga-timing, pinned OSS CAD Suite 2025-09-01, speed 8, seeds 1 3 5 4 7 2 6)
+
+Run 41313996641 (25F) and run 41313999079 (85F), same Yosys 0.56+197. Same RTL as the table above plus the THRESH ratio field (13,389 LUT4, 56 DP16KD). nextpnr estimates, not signoff.
+
+| device | seeds closing both clocks | core clk100 fmax (need 85.714) | D-PHY sclk fmax (need 200) | LUT4 / DP16KD |
+|---|---|---|---|---|
+| LFE5U-25F | 7 of 7 | 92.27 - 94.91 MHz | 206.06 - 226.71 MHz | 13389 / 24288 (55 %), 56 / 56 (100 %) |
+| LFE5U-85F | 6 of 7 (seed 3: D-PHY 197.51 FAIL) | 88.17 - 96.12 MHz | 197.51 - 230.73 MHz | 13389 / 83640 (16 %), 56 / 208 (26 %) |
+
+25F seed 1 (the default seed of tools/build_all.sh): core 93.81 MHz, D-PHY 211.15 MHz. The 25F-8BG381I and -8BG381C are the same speed grade 8 (industrial vs commercial temperature only). The earlier "5 of 6" 25F result above used older RTL; the 25F is now the board part (docs/bom/PRODUCTION.md).

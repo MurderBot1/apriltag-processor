@@ -79,8 +79,8 @@ for ball, name, typ in fpga_pin_tab:
         elif fn == 'D1/MISO/IO1': ball_net[ball] = 'FPGA_CFG_MISO'
         elif fn.startswith('HOLDN/DI/BUSY/CSSPIN'): ball_net[ball] = 'FPGA_CFG_CS'
 fpga_nets = {b: n for b, n in ball_net.items()}
-add('U', 'Package_BGA', 'Lattice_caBGA-381_17x17mm_Layout20x20_P0.8mm', 'LFE5U-45F-8BG381C', FPGA_POS[0], FPGA_POS[1], 0, 'bottom',
-    fpga_nets, ref_='U1', note='Lattice ECP5-45F (custom RTL: CSI-2/D-PHY RX, threshold, despeckle, CCL, frame bus to the MCU)')
+add('U', 'Package_BGA', 'Lattice_caBGA-381_17x17mm_Layout20x20_P0.8mm', 'LFE5U-25F-8BG381I', FPGA_POS[0], FPGA_POS[1], 0, 'bottom',
+    fpga_nets, ref_='U1', note='Lattice ECP5-25F (custom RTL: CSI-2/D-PHY RX, threshold, despeckle, CCL, frame bus to the MCU)')
 
 # ---------------------------------------------------------------------------------------------- MCU U2 (RP2350A)
 mcu_pin_tab = json.load(open(os.path.join(HERE, 'rp2350a_pins.json')))              # [number, name, type]
