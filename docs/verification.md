@@ -77,7 +77,7 @@ measured 474 s for the 100 frames with 12 workers):
 per row, ~3 clocks per run on the common path, label recycling, the 64 largest candidates by area; CCL flags are diagnostics of a degraded
 frame, never a rejection). Before that rework the same harness gave **450 / 647 (70 %)**: dark 72 %, noise 70 %, shadow 68 %, clutter 14 %.
 The `lowcon` weakness (0 % with the reset values) was traced to the tile ratio test `2*diff >= max`, not to the 24-level margin: with the new THRESH `ratio`
-field set to 2 or 1 the chip detects 66 / 66 (see `results/lowcon_ratio.md`). The reset value stays 0 because the ratio tests 3x / 4x cost `noise` frames (57 -> 31 / 24 of 57) through labeller row drops.
+field set to 2 or 1 the chip detects 66 / 66 (see `results/lowcon_ratio.md`). The reset value stays 0 because the ratio tests 3x / 4x cost `noise` frames (57 -> 31 / 24 of 57) through labeller row drops. The firmware therefore picks the ratio per frame (`firmware/core/atratio.c`, on after boot): ratio 1 after 3 tagless frames, back to 0 on a CCL `row dropped` flag, with lockout and backoff. Simulated on the measured per-frame chain results (`tools/auto_ratio_sim.py`, `tests/test_fw_ratio.py`, `results/auto_ratio.md`): lowcon 66 / 66 in steady state after 4 lost frames at the scene start, every other category identical to ratio 0 (562 + 66 = 628 / 647 in steady state; noise stays 57). The switching latency is modelled, not measured on hardware.
 The chip now misses only a few tags in `blur`, `persp` and `shadow` (small / grazing / shadowed tags).
 CCL status flag set on 6 of the 100 frames (candidate table full, i.e. more than 64 candidates, only the 64 largest kept), no dropped rows.
 

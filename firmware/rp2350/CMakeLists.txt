@@ -29,6 +29,7 @@ add_executable(apriltag_cam
     ${CORE}/atproto.c
     ${CORE}/atapp.c
     ${CORE}/atae.c
+    ${CORE}/atratio.c
     ${CORE}/atframe.c
     ${CORE}/attpu.c
 )

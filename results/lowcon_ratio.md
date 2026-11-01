@@ -32,6 +32,8 @@ Full 100-frame RTL chain (CSI-2 at 120 fps timing -> `cam_core` -> C tag unit), 
 | shadow | 47 | 43 | 43 | 43 |
 | **all** | 647 | 562 | 603 | 596 |
 
+Automatic per-frame ratio selection in the MCU firmware (lowcon 66 / 66 without the noise loss, simulated): `results/auto_ratio.md`.
+
 Files: `rtl_chain_results.json` (ratio 0), `rtl_chain_results_ratio1.json`, `rtl_chain_results_ratio2.json`; reproduce with
 `CHAIN_THR=420A4018 CHAIN_TAG=_r1 CHAIN_OUT=results/x.json py -3.12 tests/run_chain_dataset.py` (ratio 1; `820A4018` = ratio 2) and
 `CHAIN_OUT=results/x.json py -3.12 tests/analyze_chain.py`. `chain.thr_word()` builds the register value. Bright gains one tag at ratio 1 / 2 (80 -> 81).

@@ -4,6 +4,7 @@
 #include "attpu.h"
 #include "atproto.h"
 #include "atae.h"
+#include "atratio.h"
 #include "atframe.h"
 
 #define AT_FW_VERSION 0x00010000u
@@ -25,6 +26,7 @@
 #define FPGA_REG_FRAME_SUM 0x000060u   /* sum of all pixels of the last frame; mean = sum / AT_FRAME_PIXELS */
 #define FPGA_REG_TIME_LO  0x000064u    /* device clock, 64 bit us counter; reading LO latches HI */
 #define FPGA_REG_TIME_HI  0x000068u
+#define AT_THRESH_RESET   0x020A4018u  /* FPGA reset value: diff 24, abs_black 64, mindim 10, maxham 2, ratio 0 */
 #define AT_CLOCK_HZ       1000000u
 #define AT_FRAME_PIXELS   1024000u
 #define AT_SENSOR_EXP_LIMIT 800        /* SET_SENSOR accepts 1..800 lines, gain >= 0x10 */
@@ -65,6 +67,7 @@ typedef struct {
     at_pose_t pose; int pose_valid; uint32_t pose_frame; uint32_t pose_us; uint64_t pose_ts, frame_ts;
     at_tag_obs_t obs[AT_MAX_MEAS]; int nobs;
     uint32_t store_seq;
+    uint32_t thresh; at_ar_t ar; uint8_t ar_enabled;            /* THRESH register as last written (reset value 0x020A4018); automatic ratio policy */
     at_ae_t ae; uint8_t ae_enabled, ae_synced; float ae_mean; uint32_t ae_updates;
 } at_app_t;
 

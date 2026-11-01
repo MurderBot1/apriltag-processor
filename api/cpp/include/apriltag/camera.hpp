@@ -79,6 +79,7 @@ public:
     // Manual exposure (lines, 1..800) and gain register (0x10 = 1x); disables auto exposure.
     void set_sensor(uint16_t exposure, uint8_t gain = 0x10);
     void set_ae(bool enable);
+    void set_auto_ratio(bool enable);   // automatic tile contrast ratio (on after boot); false fixes ratio 0; set_track(ratio 1..3) switches it off
     void set_track(uint8_t diff = 24, uint8_t abs_black = 64, uint8_t mindim = 10, uint8_t maxham = 2, uint8_t ratio = 0);   // ratio: tile contrast test 0: 2x, 1: 3x, 2: 4x, 3: off
     Status get_status();
     Pose get_pose();   // NakError(ERR_NO_POSE) if none yet

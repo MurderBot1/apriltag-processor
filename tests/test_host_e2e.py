@@ -134,6 +134,13 @@ def test_sensor_ae_and_tracking_commands():
     assert cam.get_status().ae_enabled
     cam.set_tracking_params(diff=30, abs_black=50, mindim=8, maxham=1)
     assert st.fpga.regs[simfw.REG_THRESH] == 30 | 50 << 8 | 8 << 16 | 1 << 24
+    assert cam.get_status().auto_ratio
+    cam.set_auto_ratio(False)
+    assert not cam.get_status().auto_ratio
+    cam.set_auto_ratio(True)
+    cam.set_tracking_params(ratio=2)
+    st_ = cam.get_status()
+    assert (st_.ratio, st_.auto_ratio) == (2, False)
     cam.set_tracking_params(maxham=3)
     assert st.fpga.regs[simfw.REG_THRESH] == 24 | 64 << 8 | 10 << 16 | 3 << 24
     cam.set_tracking_params(ratio=2)

@@ -256,6 +256,11 @@ impl<T: Transport> Camera<T> {
         self.ack(CMD_SET_AE, &[enable as u8])
     }
 
+    /// Automatic tile contrast ratio (on after boot); false fixes ratio 0; `set_track` with ratio 1..3 switches it off.
+    pub fn set_auto_ratio(&mut self, enable: bool) -> Result<()> {
+        self.ack(CMD_SET_AUTO_RATIO, &[enable as u8])
+    }
+
     /// diff, abs_black, mindim, maxham (<= 63). Reset values 24, 64, 10, 2 (ratio 0).
     pub fn set_track(&mut self, diff: u8, abs_black: u8, mindim: u8, maxham: u8) -> Result<()> {
         self.set_track_ratio(diff, abs_black, mindim, maxham, 0)

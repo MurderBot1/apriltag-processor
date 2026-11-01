@@ -123,7 +123,7 @@ def test_reboot_without_commit_loses_changes(dev):
 
 # --------------------------------------------------------------------------------------------- NAK paths
 @pytest.mark.parametrize('cmd,good', [(P.CMD_SET_CALIB, 36), (P.CMD_ADD_TAG, 34), (P.CMD_GET_TAG, 2), (P.CMD_STREAM, 3),
-                                      (P.CMD_SET_SENSOR, 3), (P.CMD_SET_TRACK, 4), (P.CMD_SET_AE, 1)])
+                                      (P.CMD_SET_SENSOR, 3), (P.CMD_SET_TRACK, 4), (P.CMD_SET_AE, 1), (P.CMD_SET_AUTO_RATIO, 1)])
 def test_bad_length_nak(cmd, good):
     d = Dev()
     for n in (0, good - 1, good + 1, 255):
@@ -134,7 +134,7 @@ def test_bad_length_nak(cmd, good):
 
 def test_unknown_commands_nak_and_survive():
     d = Dev()
-    for c in (0x00, 0x10, 0x11, 0x55, 0x7F, 0x80, 0x82, 0xFE):
+    for c in (0x00, 0x11, 0x12, 0x55, 0x7F, 0x80, 0x82, 0xFE):
         assert d.nak(c, b'\x01\x02') == P.ERR_UNKNOWN
     assert d.rsp(P.CMD_PING, b'xxxx', P.RSP_PONG)[:4] == b'xxxx'
 
