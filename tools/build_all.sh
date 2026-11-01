@@ -7,7 +7,10 @@
 #   --skip-tests  do not run the unit tests that accompany each client build
 #   --skip-fpga   skip the (slow) yosys/nextpnr flow
 # Nothing is faked: a step that cannot run is recorded in the manifest as skipped/failed with a note.
-# Environment: PICO_SDK_PATH (RP2350 firmware), FPGA_SEED, FPGA_FREQ, RUN_SUITE=1 (also run tests/run_all.py).
+# Environment: PICO_SDK_PATH (RP2350 firmware), FPGA_SEEDS (space separated, default "1 3 5 4 7": first seed whose final
+#   post-route timing closes both clocks is kept; if none closes, the best-core-fmax seed is kept and a warning is recorded),
+#   FPGA_FREQ, FPGA_SPEED (ECP5 speed grade 6|7|8, default 8; grade 6/7 do not close, see docs/fpga.md), FPGA_DEVICE (45k|25k),
+#   RUN_SUITE=1 (also run tests/run_all.py).
 set -u
 STRICT=0; TESTS=1; FPGA=1
 ROOT=$(cd "$(dirname "$0")/.." && pwd); OUT="$ROOT/products"
@@ -36,13 +39,27 @@ unavailable() { case " ${REQUIRE:-} " in *" $1 "*) record "$1" failed "required 
 if [ $FPGA = 0 ]; then skip fpga "--skip-fpga given"
 elif have yosys && have nextpnr-ecp5 && have ecppack; then
   mkdir -p sim
-  step fpga fpga bash tools/fpga_flow.sh "${FPGA_SEED:-1}" "${FPGA_FREQ:-85.714}"
-  if [ -f sim/apriltag_cam.bit ] && grep -q FLOW_DONE sim/nextpnr.out 2>/dev/null; then
+  # try seeds in order; keep the first whose FINAL (post-route) report closes every clock. nextpnr also logs a post-placement
+  # estimate (usually lower) before routing: only the last report per clock counts.
+  fpga_final() { grep -E "Max frequency for clock" "$1/nextpnr.log" | tail -2; }   # two clocks: dphy.sclk, clk100
+  BESTSEED=""; BESTF=0; GOODSEED=""
+  for sd in ${FPGA_SEEDS:-${FPGA_SEED:-1 3 5 4 7}}; do
+    mkdir -p "sim/seed_$sd"
+    FPGA_OUT="sim/seed_$sd" bash tools/fpga_flow.sh "$sd" "${FPGA_FREQ:-85.714}" > "$OUT/logs/fpga_seed_$sd.log" 2>&1
+    grep -q FLOW_DONE "sim/seed_$sd/nextpnr.out" 2>/dev/null || continue
+    f=$(fpga_final "sim/seed_$sd" | grep -o "clk100': [0-9.]*" | grep -o "[0-9.]*$" | head -1)
+    if ! fpga_final "sim/seed_$sd" | grep -q "FAIL at"; then GOODSEED=$sd; break; fi
+    if [ -z "$BESTSEED" ] || awk -v a="${f:-0}" -v b="$BESTF" 'BEGIN{exit !(a>b)}'; then BESTSEED=$sd; BESTF=${f:-0}; fi
+  done
+  USESEED=${GOODSEED:-$BESTSEED}
+  if [ -n "$USESEED" ]; then cp sim/seed_$USESEED/* sim/ 2>/dev/null; fi
+  if [ -n "$USESEED" ] && [ -f sim/apriltag_cam.bit ] && grep -q FLOW_DONE sim/nextpnr.out 2>/dev/null; then
+    record fpga ok "seed $USESEED, speed grade ${FPGA_SPEED:-8}, device ${FPGA_DEVICE:-45k}"
     cp sim/apriltag_cam.bit sim/timing.json sim/yosys_top.out sim/nextpnr.log "$OUT/fpga/" 2>/dev/null
     gzip -9 -c sim/top.json > "$OUT/fpga/top.json.gz"; gzip -9 -c sim/top.cfg > "$OUT/fpga/top.cfg.gz"   # netlist + textual config (large)
     cp rtl/apriltag_cam.lpf "$OUT/fpga/"
-    { grep -E "Max frequency for clock" sim/nextpnr.log | tail -4; grep -A14 "Device utilisation" sim/nextpnr.log | tail -15; } > "$OUT/fpga/summary.txt"
-    if grep -q "FAIL at" "$OUT/fpga/summary.txt"; then record fpga-timing warning "timing NOT met at ${FPGA_FREQ:-85.714} MHz target (see fpga/summary.txt); bitstream still produced"; fi
+    { echo "seed $USESEED, speed grade ${FPGA_SPEED:-8}, device ${FPGA_DEVICE:-45k}, target ${FPGA_FREQ:-85.714} MHz (final post-route report)"; grep -E "Max frequency for clock" sim/nextpnr.log | tail -2; grep -A14 "Device utilisation" sim/nextpnr.log | tail -15; } > "$OUT/fpga/summary.txt"
+    if [ -z "$GOODSEED" ]; then record fpga-timing warning "timing NOT met at ${FPGA_FREQ:-85.714} MHz target for any of seeds ${FPGA_SEEDS:-${FPGA_SEED:-1 3 5 4 7}} (see fpga/summary.txt); best seed $USESEED, bitstream still produced"; fi
   else
     record fpga-bitstream failed "no bitstream / FLOW_DONE marker (see logs/)"; cp sim/*.out sim/*.log "$OUT/logs/" 2>/dev/null; tail -n 15 sim/yosys_top.out sim/nextpnr.out 2>/dev/null
   fi
