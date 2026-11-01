@@ -24,7 +24,7 @@ def _fpga_totals():
         return []
     rows = []
     for l in t.splitlines():
-        m = re.match(r'^\|\s*([^|]+?)\s*\|\s*([\d,]+)\s*\|\s*([\d,]+)\s*\|\s*\**(\d+)\**\s*\|\s*$', l)
+        m = re.match(r'^\|\s*([^|]+?)\s*\|\s*([\d,]+)\s*\|\s*([\d,]+)\s*\|\s*\**(\d+)\**\s*\|\s*([^|]*?)\s*\|\s*$', l)
         if m: rows.append(m.groups())
     return rows
 
@@ -70,11 +70,23 @@ Pick a scenario, then zoom with the mouse wheel, pan by dragging, click to place
 
 
 # ------------------------------------------------------------------------------------------------ pipeline page
+def _pipe_notes():
+    """simulation notes computed by gen_pipeline.py from the checks of its run (stored in pipe.js)"""
+    import json
+    try:
+        t = open(os.path.join(SITE, 'simout', 'pipe.js'), encoding='utf-8').read()
+        return json.loads(t[len('window.PIPE='):t.rindex(';')]).get('notes', [])
+    except (OSError, ValueError):
+        return []
+
+
+
 def pipe_html():
     if not _have('simout', 'pipe.js'):
         return '<h1>Frame pipeline</h1><p class="warn">Pipeline data not generated yet: run <code>py -3.12 site/sim/gen_pipeline.py</code>, then rebuild the site.</p>'
+    notes = ''.join('  <li>%s</li>' % n for n in _pipe_notes())
     return '''<h1>Frame pipeline: what each block does to a real test frame</h1>
-<p class="lead">Five of the rendered test frames pushed through the chip RTL, stage by stage. Use the stage buttons or the slider; tick <i>side by side</i> to compare a stage with the one before it. Wheel zooms (try the despeckle stage at 8x), drag pans, double-click resets.</p>
+<p class="lead">Six of the 100 rendered test frames (different categories of the dataset) pushed through the FPGA RTL, stage by stage, then through the tag unit and pose solver that run on the RP2350. Use the stage buttons or the slider; tick <i>side by side</i> to compare a stage with the one before it. Wheel zooms (try the despeckle stage at 8x), drag pans, double-click resets.</p>
 <div id="pv-root">
  <div class="pv-bar">
   <label>Frame <select id="pv-img"></select></label>
@@ -91,12 +103,11 @@ def pipe_html():
  <div id="pv-sum" class="tablewrap"></div>
  <h2>Simulation notes</h2>
  <ul>
-  <li><b>Threshold, row 783.</b> On two of the five frames (roll_045: 17 pixels, dist_35: 44 pixels) the RTL <code>thresh_binarize</code> output differs from <code>tools/golden.py binarize()</code>, always and only in image row 783 (= 800 - 17, the first row that the end-of-frame flush emits; the other 799 rows are identical). The difference does not depend on the line pacing (reproduced with 686, 800, 905 and 1041 clocks per line). The RTL was not modified and the cause was not investigated further; the despeckle and CCL results are unaffected on these frames (the RTL candidate lists still equal the golden model's).</li>
-  <li><b>dark_a.</b> The RTL <code>run_ccl</code> reports no candidates: its status flags show row overrun, run overflow and label overflow (the worst row needed 1391 clocks against a budget of 686). The golden model, which has no such limits, would find 17 candidates. This is the frame where the stored full-chain result also finds no tag.</li>
-  <li>Every RTL block above was run on the full 1280x800 frame with the project's own testbenches (about 10 s per block per frame in Icarus Verilog); the whole chip (including the TPU) was simulated earlier for all 100 frames and those stored results are what the tag overlay and pose use.</li>
+%s
+  <li><b>Scope.</b> The FPGA blocks (threshold, despeckle, run_ccl) are simulated here on the full 1280x800 frame with the project's own testbenches (a few seconds per block per frame in Icarus Verilog). The tag unit is no longer in the FPGA: the stored tag results come from the full-chain RTL simulation with the reference processor <code>ref/tpu/tpu_core.v</code> over all 100 frames, which <code>firmware/core/attpu.c</code> reproduces bit-exactly (<code>tests/test_fw_tpu.py</code>, all 100 frames). Tag unit timing on the MCU is an estimate from <code>tools/m33_cycles.py</code>, not a measurement on hardware.</li>
  </ul>
  <p class="muted">The stage images are the outputs of the RTL (<code>tb/tb_thresh.v</code> &rarr; <code>tb/tb_despeckle.v</code> &rarr; <code>tb/tb_ccl.v</code>, the unmodified project testbenches, each run on the whole 1280x800 frame in Icarus Verilog and fed with the previous block's RTL output). The labelled-component picture and the extreme points are drawn from <code>tools/golden.py</code> components() applied to the RTL mask (the RTL candidate records are compared with it). Tag corners and IDs are the stored full-chain RTL results (<code>results/rtl_chain_results.json</code>, the whole chip simulated from CSI-2 packets to the result bank); the pose is the firmware C solver (<code>firmware/core/atpose.c</code>, float32 build) run on those corners, exactly as for the Test images page. Frames are stored as 1280x800 JPEG (raw) and 2-3 colour PNGs (masks) under <code>site/simout/pipe/</code>.</p>
-</div>'''
+</div>''' % notes
 
 
 # ------------------------------------------------------------------------------------------------ block diagram
@@ -144,10 +155,10 @@ def block_html(mods):
     blk(0, 'A', 'OV9281 sensor', None, ['1280x800 RAW8, 120.08 fps', 'global shutter', '2-lane MIPI, 400 MHz DDR', '(external part)'], 'ext')
     blk(1, 'A', 'D-PHY receiver', 'dphy_rx.v', ['LVDS DDR 4:1 gearing,', 'sync hunt 0xB8, deskew,', 'CDC FIFO to core clock', '(+ dphy_lane, async_fifo)'], 'sens')
     blk(2, 'A', 'CSI-2 packet layer', 'csi2_rx.v', ['header ECC (1-bit fix),', 'CRC-16, FS/FE, 2 px/clk', 'latency 3 clocks'])
-    blk(3, 'A', 'Adaptive threshold', 'thresh_binarize.v', ['2x2 bin, 8x8 tile min/max,', '3x3 tile neighbourhood,', '17-row ring ~20 BRAM (est.)'])
+    blk(3, 'A', 'Adaptive threshold', 'thresh_binarize.v', ['2x2 bin, 8x8 tile min/max,', '3x3 tile neighbourhood,', '17-row delay line,', '27 BRAM (docs/fpga.md)'])
     blk(4, 'A', 'Despeckle', 'despeckle.v', ['3x3 majority (>= 4 of 9)', '2 small row buffers', 'latency 1 row'])
-    blk(5, 'A', 'Connected components', 'run_ccl.v', ['run-based 4-connected', 'labeller, union-find,', 'area + 8 extremes,', '~17 BRAM (est.)'])
-    blk(6, 'A', 'Candidate store', 'mask_stream.v', ['1 candidate RAM,', '64 x 16 words (2 BRAM),', 'read by the streamer'], 'mem')
+    blk(5, 'A', 'Connected components', 'run_ccl.v', ['run-based 4-connected', 'labeller, union-find,', 'area + 8 extremes,', '~26 BRAM (docs/fpga.md)'])
+    blk(6, 'A', 'Candidate store', 'mask_stream.v', ['candidate RAM 1024 x 32', '(2 BRAM), written by', 'run_ccl, read by the', 'streamer'], 'mem')
     for c in range(0, 6):
         path('M%d %d L%d %d' % (X(c) + bw, Y['A'] + mid, X(c + 1), Y['A'] + mid))
     # row B
@@ -173,20 +184,20 @@ def block_html(mods):
     path('M%d %d L%d %d L%d %d L%d %d' % (X(2) + bw // 2, Y['B'] + bh, X(2) + bw // 2, Y['B'] + bh + 14, X(0) + bw // 2 - 24, Y['B'] + bh + 14, X(0) + bw // 2 - 24, Y['A'] + bh), 'I2C (SCL, SDA)', X(0) + bw // 2 - 20, Y['B'] + bh + 28, both=True)
     path('M%d %d L%d %d L%d %d' % (X(1), Y['B'] + 30, X(0) + bw // 2 + 24, Y['B'] + 30, X(0) + bw // 2 + 24, Y['A'] + bh), '24 MHz XVCLK', X(0) + bw // 2 + 28, Y['B'] + 24)
     a('</svg>')
-    legend = ['<div class="bd-leg"><span class="lg sens"></span> sensor-side clocks (eclk 400 MHz DDR / sclk, target 200 MHz, closes at 215-254 MHz) '
-              '<span class="lg core"></span> core clock 85.714 MHz (best seed closes 87.7 MHz; 100 MHz did not close) '
+    legend = ['<div class="bd-leg"><span class="lg sens"></span> sensor-side clocks (eclk 400 MHz DDR / sclk, target 200 MHz, closes at 201.5-217.5 MHz over 6 seeds) '
+              '<span class="lg core"></span> core clock 85.714 MHz (4 of 6 seeds close; default seed 1: 90.99 MHz; nextpnr estimates) '
               '<span class="lg spi"></span> SPI SCK domain (synchronised into the core clock) '
-              '<span class="lg hot"></span> custom CPU <span class="lg mem"></span> block-RAM storage <span class="lg ext"></span> external part</div>']
+              '<span class="lg mem"></span> block-RAM storage <span class="lg ext"></span> external part</div>']
     tb = ''
     if tot:
-        tb = ('<h2>Whole-chip resources (docs/fpga.md, seed 2, Yosys + nextpnr-ecp5)</h2><div class="tablewrap"><table><thead><tr><th>resource</th><th>used</th><th>available</th><th>%</th></tr></thead><tbody>' +
-              ''.join('<tr><td>%s</td><td>%s</td><td>%s</td><td>%s%%</td></tr>' % tuple(esc(x) for x in r) for r in tot) + '</tbody></table></div>')
+        tb = ('<h2>Whole-chip resources, LFE5U-45F (docs/fpga.md, seed 1, Yosys + nextpnr-ecp5 estimates)</h2><div class="tablewrap"><table><thead><tr><th>resource</th><th>used</th><th>available</th><th>%</th><th>old all-FPGA design (85F)</th></tr></thead><tbody>' +
+              ''.join('<tr><td>%s</td><td>%s</td><td>%s</td><td>%s%%</td><td>%s</td></tr>' % tuple(esc(x) for x in r) for r in tot) + '</tbody></table></div>')
     return '''<h1>Chip block diagram</h1>
-<p class="lead">Click a block to open its RTL source in the RTL browser. Pixels flow left to right along the top row; the binary frame is kept in two RAM banks so the TPU can work on frame N while frame N+1 streams in; only tag IDs and corners (a few hundred bytes) leave the chip over SPI.</p>
+<p class="lead">Click a block to open its RTL source in the RTL browser. Pixels flow left to right along the top row; the FPGA keeps no frame store: the binary mask is streamed out at the pixel rate and the RP2350 stores it in its SRAM (two frame buffers) while it decodes the previous frame; only the registers and the 132,128-byte frame packet (binary mask plus candidate list) are exchanged with the RP2350: the mask goes over the 8-bit frame bus, registers over SPI. Tag decoding and pose run on the RP2350.</p>
 %s
 %s
 %s
-<p class="muted">Per-block block-RAM figures marked <i>est.</i> are computed from the array sizes declared in the RTL (16 Kbit per DP16KD), not from a synthesis report: the build only reports the whole-chip total (190 of 208 DP16KD, 91%%), which also includes FIFOs, the sensor-init ROM and the candidate / result banks. LUT and flip-flop counts are likewise only available for the whole chip. Lines of Verilog are counted from <code>rtl/</code>. Clock numbers: <a href="#/fpga">FPGA results</a>.</p>
+<p class="muted">Resource numbers are from <code>docs/fpga.md</code> (Yosys + nextpnr-ecp5 estimates, not signoff; nothing has been loaded onto a device): whole chip 56 of 108 DP16KD (52%%). The per-block block-RAM figures are the ones listed there; LUT and flip-flop counts are only available for the whole chip. Lines of Verilog are counted from <code>rtl/</code>. Clock numbers: <a href="#/fpga">FPGA results</a>.</p>
 <h2>Blocks and where they are specified</h2>
 <div class="tablewrap"><table><thead><tr><th>block</th><th>RTL</th><th>testbench / waveform scenario</th></tr></thead><tbody>
 <tr><td>D-PHY receiver</td><td><a href="#/rtl/dphy_rx.v"><code>dphy_rx.v</code></a>, <a href="#/rtl/dphy_lane.v"><code>dphy_lane.v</code></a>, <a href="#/rtl/async_fifo.v"><code>async_fifo.v</code></a></td><td><a href="#/wave?s=dphy_burst">D-PHY receive</a></td></tr>
@@ -195,7 +206,7 @@ def block_html(mods):
 <tr><td>Despeckle</td><td><a href="#/rtl/despeckle.v"><code>despeckle.v</code></a></td><td><a href="#/wave?s=despeckle_tile">despeckle crop</a></td></tr>
 <tr><td>Connected components</td><td><a href="#/rtl/run_ccl.v"><code>run_ccl.v</code></a></td><td><a href="#/wave?s=ccl_labels">CCL labelling</a></td></tr>
 <tr><td>Tag unit (now C on the MCU)</td><td><code>firmware/core/attpu.c</code>; reference RTL <code>ref/tpu/tpu_core.v</code> (+ <code>tpu_prog.hex</code>, <code>tag36h11.hex</code>)</td><td><a href="#/wave?s=tpu_tag">reference TPU on one tag</a></td></tr>
-<tr><td>Bridge, streamer, registers</td><td><a href="#/rtl/cam_core.v"><code>cam_core.v</code></a>, <a href="#/rtl/mask_stream.v"><code>mask_stream.v</code></a>, <a href="#/rtl/spi_slave.v"><code>spi_slave.v</code></a></td><td><a href="#/pipeline">pipeline page</a> (whole chain)</td></tr>
+<tr><td>Bridge, streamer, registers</td><td><a href="#/rtl/cam_core.v"><code>cam_core.v</code></a>, <a href="#/rtl/mask_stream.v"><code>mask_stream.v</code></a>, <a href="#/rtl/spi_slave.v"><code>spi_slave.v</code></a></td><td><a href="#/wave?s=mask_stream">mask streamer packet</a>, <a href="#/pipeline">pipeline page</a> (whole chain)</td></tr>
 <tr><td>Sensor bring-up</td><td><a href="#/rtl/i2c_master.v"><code>i2c_master.v</code></a>, <a href="#/rtl/sensor_init.v"><code>sensor_init.v</code></a></td><td>-</td></tr>
 <tr><td>Clocking, top level</td><td><a href="#/rtl/sys_pll.v"><code>sys_pll.v</code></a>, <a href="#/rtl/apriltag_cam_top.v"><code>apriltag_cam_top.v</code></a>, <a href="#/rtl/apriltag_cam.lpf"><code>apriltag_cam.lpf</code></a></td><td>-</td></tr>
 </tbody></table></div>''' % (''.join(legend), ''.join(o), tb)
