@@ -8,6 +8,17 @@ This is research only. `docs/bom/bom.json` and the design are unchanged. Every n
 `results/` (list at the end) or from a vendor page named next to it. Anything I could not read from a vendor is marked **UNVERIFIED**.
 
 
+## SOURCING UPDATE (2026-11-01): U1 is now LFE5U-25F-8BG381I
+
+The design closes timing only at ECP5 speed grade 8 (`results/fpga_speed_grades.md`), and the LFE5U-45F-8BG381C is out of stock at every channel read on 2026-10-31 (DigiKey 90 expected 2026-11-30, Mouser 90 expected 2027-06-15).
+The speed-8 parts in the same CABGA-381 footprint that are in stock on 2026-11-01 are the **LFE5U-25F-8BG381I** (DigiKey 18 at USD 36.85, Mouser 90 at USD 43.60) and the LFE5U-85F-8BG381C / -8BG381I (DigiKey 17 / 37 at USD 90.70 / 99.88, Mouser 10 / 1, LCSC 8 for the 85F-C).
+The commercial 25F-8BG381C is out of stock at DigiKey, Mouser, Newark and Arrow (LCSC has 5 at USD 44.17). Full table and links: `docs/bom/PRODUCTION.md` section 1a. Broker-only stock is not used (not authorised, counterfeit risk).
+
+* **Pin and PCB:** `tools/pin_compat.py` reports all 31 used balls identical in bank and function for 45F / 25F and 85F / 25F. The footprint is shared, supplies and banks are the same, so no PCB re-route is needed; only the U1 value text changed.
+* **Fit and timing (nextpnr estimate, not signoff, pinned OSS CAD Suite 2025-09-01, RTL at main 828bf22, seeds 1 3 5 4 7 2 6):** 25F speed 8: 7 of 7 seeds close both clocks (core 92.27 - 94.91 MHz, D-PHY 206.06 - 226.71 MHz), 13,389 LUT4 (55 %), 56 of 56 block RAM. 85F speed 8: 6 of 7 close (seed 3: D-PHY 197.51 MHz fails). The earlier 5-of-6 result for the 25F was measured on the older RTL (before the THRESH ratio field).
+* **Risks:** the 25F has no block RAM margin, stock is 108 pieces at authorised channels, and the -I part costs more than the -C part. The 85F is the drop-in fallback at about 2.5 times the price; the 45F-8BG381C returns when the backorder lands.
+* **Cost:** with U1 = DigiKey 25F-8I at USD 36.85, the recurring parts+fees total is USD 238.93 (1 board), 107.07 (10), 85.58 (100) in `docs/bom/PRODUCTION.md` section 4; the A3 table below used the LCSC UM-45F price (USD 35.28, 6 pieces) and is historical.
+
 ## STATUS (2026-10-30): option A3 is implemented on branch `a3-arch`
 
 The TPU and the two binary frame banks moved out of the FPGA into the RP2350 firmware / SRAM; the FPGA is now the LFE5U-45F-8BG381C. What was built and what

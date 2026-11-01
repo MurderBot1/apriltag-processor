@@ -1,4 +1,6 @@
-# FPGA implementation results (Yosys + nextpnr-ecp5, LFE5U-45F-8BG381C, speed grade 8)
+# FPGA implementation results (Yosys + nextpnr-ecp5, LFE5U-45F / LFE5U-25F, speed grade 8)
+
+**Part on the board (2026-11-01): LFE5U-25F-8BG381I** (the 45F-8BG381C is out of stock; the design closes timing only at speed grade 8). Same CABGA-381 footprint and balls (`tools/pin_compat.py`: 31 used balls identical), so no PCB re-route. nextpnr on the 25F at speed 8 (pinned OSS CAD Suite 2025-09-01, RTL at main 828bf22): 7 of 7 seeds close both clocks, 13,389 LUT4 (55 %), 56 of 56 block RAM (100 %, no margin); seed 1: core 93.81 MHz, D-PHY 211.15 MHz. The 45F and 85F are drop-in fallbacks (85F: 6 of 7 seeds close). The tables below were produced for the 45F with the older tool versions. Sources and stock: `docs/bom/PRODUCTION.md` section 1a.
 
 Architecture A3 (`docs/costdown.md`): the FPGA keeps CSI-2/D-PHY receive, threshold, despeckle, the connected-component labeller
 and a streamer; the tag processing unit (TPU) and the two binary frame banks moved into the RP2350 (firmware C code + SRAM). That is
@@ -47,7 +49,7 @@ reason the core clock now closes on most seeds; that causal link was not isolate
 `FPGA_SPEED=6|7|8` (default 8) and `FPGA_DEVICE=45k|25k` select the part; `tools/fpga_sweep.sh "<seeds>" <speed> <device>` runs several seeds in parallel and prints the table.
 Full study with per-seed numbers: `results/fpga_speed_grades.md`. Result (nextpnr estimate, not signoff, OSS CAD Suite 2025-09-01 as pinned in `release.yml`, 6 seeds):
 LFE5U-45F speed 8: 6 of 6 seeds close both clocks; speed 7: 0 of 6 (core 72 - 78 MHz, D-PHY 181 - 191 MHz); speed 6: 0 of 6 (core 62 - 70 MHz, D-PHY 155 - 172 MHz).
-LFE5U-25F speed 8: 5 of 6 close (56/56 block RAM); speeds 7 and 6: 0 of 6. A -6 or -7 FPGA therefore cannot be used with this design: the labeller carry chains limit the core clock, and the 800 Mb/s lanes need a faster
+LFE5U-25F speed 8: 5 of 6 close on the RTL of 33e0207 (56/56 block RAM), 7 of 7 on main 828bf22 (see top of this file); speeds 7 and 6: 0 of 6. A -6 or -7 FPGA therefore cannot be used with this design: the labeller carry chains limit the core clock, and the 800 Mb/s lanes need a faster
 grade anyway (`docs/costdown.md` section 4).
 
 The release workflow measures with the same pinned tools (`.github/workflows/fpga-timing.yml` also runs the sweep on PRs that touch `rtl/`). nextpnr prints a post-placement estimate before routing, which is

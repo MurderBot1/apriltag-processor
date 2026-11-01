@@ -1,10 +1,14 @@
 # Production sourcing (checked 2026-10-31)
 
-## Summary: U1 FPGA status
+## Summary: U1 FPGA status (updated 2026-11-01)
 
-- **U1 LFE5U-45F-8BG381C is out of stock everywhere on 2026-10-31** (LCSC, JLC, Mouser, DigiKey, Arrow all 0; Avnet "Part Not Found"). Lead time 43 to 46 weeks, 90-piece lots due 2026-11-30 (DigiKey) and 2027-06-15 (Mouser).
+- **U1 is now LFE5U-25F-8BG381I** (ECP5, 25k LUT, speed grade 8, industrial -40 to 100 C, same CABGA-381 footprint). It is buyable today: DigiKey 18 in stock (USD 36.85 @1), Mouser 90 in stock (USD 43.60 @1, 35.15 @90). Read on 2026-11-01.
+- Why: the design closes timing only at speed grade 8 (`results/fpga_speed_grades.md`; grades 6 and 7 fail the core and D-PHY clocks). The previous part LFE5U-45F-8BG381C is out of stock everywhere (DigiKey 90 expected 2026-11-30, Mouser 90 expected 2027-06-15). The -I (industrial) part is the same speed grade 8 as the -C part; only the temperature range differs.
+- **No PCB re-route is needed.** The 25F, 45F and 85F share the CABGA-381 footprint; `tools/pin_compat.py LFE5U-45F LFE5U-25F` and `LFE5U-85F LFE5U-25F` report all 31 used balls identical in bank and function. Supply balls and banks are the same, so only the value text of U1 changes (`pcb/design.py` and the files in `pcb/output/`).
+- Design fit: nextpnr-ecp5 on the 25F at speed 8 (pinned OSS CAD Suite 2025-09-01, RTL at main 828bf22): 7 of 7 seeds close both clocks, 13,389 LUT4 (55 %), 56 of 56 block RAM (100 %, no margin). Seed 1 (the default of `tools/build_all.sh`): core 93.81 MHz (need 85.714), D-PHY 211.15 MHz (need 200). Estimates, not signoff. Run: GitHub Actions `fpga-timing` run 41313996641.
+- Fallback: LFE5U-85F-8BG381C (same footprint, drop-in, about 2.5 times the price): DigiKey 17 in stock USD 90.70, Mouser 10, LCSC 8. nextpnr 85F speed 8: 6 of 7 seeds close (seed 3 fails the D-PHY clock), 16 % LUT, 26 % block RAM; seed 1 closes (88.17 / 220.95 MHz).
 - **LFE5UM-45F-8BG381C (SERDES variant) is NOT a drop-in.** This PCB ties the 16 SERDES supply balls (T6-T15, U6, U15, V10, V11, V17, V18) to GND, but on the UM part they are VCCA, VCCHTX, VCCHRX and VCCAUXA supplies. A PCB change is needed.
-- **The -6 speed grade (LFE5U-45F-6BG381C) is in stock** (DigiKey 46, Mouser 5), same package and balls, but **timing at grade 6 is unchecked**. Run place-and-route for grade 6 before ordering.
+- Speed grade 6 and 7 parts (in stock in small numbers) do not close timing and must not be used.
 
 All stock and prices below were read from the vendor's own site on 2026-10-31 (LCSC product API, JLCPCB parts API, Mouser, DigiKey, Arrow, Commonlands, Amazon, MatterHackers, JLCPCB fee page). Raw LCSC/JLC readings: `results/bom_prices_2026-10-31.json`. Anything not read is marked unverified. `docs/bom/bom.json` is the source of truth for the BOM.
 
@@ -28,7 +32,36 @@ All stock and prices below were read from the vendor's own site on 2026-10-31 (L
 
 Not read: Lattice has no stock page on its product page, and Future, Win Source and other brokers were not opened. Aggregator snapshots without a date are not used.
 
-The only stock found for a buildable part today is the speed grade 6 (-6) part: 46 at DigiKey and 5 at Mouser, which covers a 10-board build at most (DigiKey 46). Footprint and balls are the same as the -8 part (same package, same die family). Whether the design closes timing at speed grade 6 is not checked: `docs/fpga.md` reports a core clock of 81.7 to 91.0 MHz at grade 8 and nobody has run place-and-route for grade 6. That must be run before ordering -6.
+The -6 part is in stock but is not usable: speed grade 6 does not close timing (`results/fpga_speed_grades.md`). Section 1a lists the speed-8 parts that can be bought.
+
+### 1a. Speed-8 ECP5 parts in CABGA-381 that can be bought (read 2026-11-01)
+
+Pages read in the browser on 2026-11-01 (DigiKey, Mouser, Arrow, Newark via Findchips) and LCSC/JLC through the LCSC product API. Avnet's search page returned no results for the 25F (not a stock statement) and the Newark/Farnell/element14 product pages did not load (HTTP 403 or empty), so those two were not read directly; Newark's price and stock came from Findchips (0 in stock for the 25F-C). Snippets without a date from search engines are not used.
+
+| Part | Channel | Stock | Price (USD) | Lead time |
+|---|---|---|---|---|
+| **LFE5U-25F-8BG381I** (chosen) | [DigiKey](https://www.digikey.com/en/products/detail/lattice-semiconductor-corporation/LFE5U-25F-8BG381I/5358092) 220-2056-ND | **18** | 36.85 @1, 32.07 @25, 29.70 @100 | 40 weeks (standard) |
+| LFE5U-25F-8BG381I | [Mouser](https://www.mouser.com/c/?q=LFE5U-25F-8BG381I) 842-LFE5U25F8BG381I | **90** | 43.60 @1, 37.95 @25, 35.15 @90 | 40 weeks |
+| LFE5U-25F-8BG381I | [Arrow](https://www.arrow.com/en/products/lfe5u-25f-8bg381i/lattice-semiconductor) | out of stock | | |
+| LFE5U-25F-8BG381C | [DigiKey](https://www.digikey.com/en/products/detail/lattice-semiconductor-corporation/LFE5U-25F-8BG381C/5358091) 220-2055-ND | 0, 90 expected 2027-08-04 | 33.39 @1, 29.10 @25, 26.95 @100 | 40 weeks |
+| LFE5U-25F-8BG381C | [Mouser](https://www.mouser.com/c/?q=LFE5U-25F-8BG381C) | non-stocked | 39.50 @1, 34.45 @25, 31.90 @90 | 40 weeks |
+| LFE5U-25F-8BG381C | Newark (via Findchips) | 0 | CAD 33.95 @1 (not USD) | not read |
+| LFE5U-25F-8BG381C | [Arrow](https://www.arrow.com/en/products/lfe5u-25f-8bg381c/lattice-semiconductor) | out of stock | | |
+| LFE5U-25F-8BG381C | LCSC C1550939 / JLC | 5 / 5 | 44.17 @1, 40.00 @30 (LCSC API); JLC 44.24 @1 | none stated |
+| **LFE5U-85F-8BG381C** (fallback) | [DigiKey](https://www.digikey.com/en/products/detail/lattice-semiconductor-corporation/LFE5U-85F-8BG381C/5395911) 220-2077-ND | **17** | 90.70 @1, 78.98 @25, 73.15 @100 | 43 weeks |
+| LFE5U-85F-8BG381C | [Mouser](https://www.mouser.com/c/?q=LFE5U-85F-8BG381C) | **10**, 270 expected 2027-05-28 | 107.20 @1, 93.35 @25 | 46 weeks |
+| LFE5U-85F-8BG381C | LCSC C1551826 / JLC | 8 / 8 | 100.13 @1, 96.85 @10 | none stated |
+| LFE5U-85F-8BG381I | [DigiKey](https://www.digikey.com/en/products/detail/lattice-semiconductor-corporation/LFE5U-85F-8BG381I/5398971) 220-2177-ND | 37 | 99.88 @1, 86.96 @25, 80.58 @100 | 43 weeks |
+| LFE5U-85F-8BG381I | Mouser | 1, 90 on order | 118.10 @1, 102.85 @25 | 40 weeks |
+| LFE5U-45F-8BG381C (previous) | DigiKey / Mouser / LCSC | 0 / 0 / 0 | see section 1 | 43 / 46 weeks |
+| LFE5U-45F-8BG381I | [DigiKey](https://www.digikey.com/en/products/detail/lattice-semiconductor-corporation/LFE5U-45F-8BG381I/5250569) 220-1993-ND | 0, 90 expected 2027-02-09 | 62.37 @1, 54.34 @25 | 43 weeks |
+| LFE5U-45F-8BG381I | Mouser | 0, 41 expected 2026-12-28, 90 expected 2027-08-02 | | 44 weeks |
+
+Industrial -I parts (TJ -40 to 100 C per the DigiKey page) have the same speed grade 8 and package as the -C parts (TJ 0 to 85 C), so the pin plan and the nextpnr timing are the same. The price is higher than the -C part where both exist (DigiKey 25F: 36.85 vs 33.39).
+
+Unauthorised brokers: Findchips lists LFE5U-25F-8BG381C with Chip Stock 1,345, Shengyu Electronics 1,954 and Sense Electronic 440, all request-for-quote with no price shown (read 2026-11-01). These are **not authorised distributors**; parts bought there can be counterfeit, remarked or old stock, and they are not used in this BOM. The 25F-8BG381C also appears at other sites in search snippets without a date (for example USD 13 to 20); those were not accepted as prices. If a broker is used anyway, X-ray and decap/electrical test the parts on receipt.
+
+Total stock at authorised channels for the chosen part is 108 pieces (DigiKey 18, Mouser 90), so a 100-board run cannot be built from stock today. DigiKey's 25F-8I shows "check for additional incoming stock"; Mouser's 25F-8I price list quotes 1,080 on request. For larger runs ask DigiKey/Mouser for a quote or order the 85F fallback.
 
 ### Is LFE5UM-45F-8BG381C a drop-in? No, not without a PCB change
 
@@ -84,19 +117,21 @@ Method: LCSC price at the largest break not above (qty per board x boards), or t
 | SMT placement (771 joints) | 1.23 | 1.23 | 1.23 |
 | JLCPCB fixed fees, spread | 127.73 | 12.77 | 1.28 |
 | Subtotal without FPGA | 202.08 | 70.22 | 55.88 |
-| U1 at LCSC list price (0 stock, not buyable) | 11.28 | 10.91 | 10.91 |
-| U1 LFE5U-45F-6BG381C, DigiKey (in stock 46, timing at grade 6 unchecked) | 46.64 | 46.64 | 37.62 (more than the 46 in stock) |
-| U1 LFE5U-45F-8BG381C, DigiKey (0 stock, 43 weeks) | 56.76 | 56.76 | 45.76 |
-| U1 LFE5U-45F-8BG381C, Mouser (0 stock, 46 weeks) | 67.15 | 67.15 | 58.45 |
-| **Total with U1 DigiKey -6** | **248.72** | **116.86** | **93.50** |
-| **Total with U1 DigiKey -8 (backorder)** | **258.84** | **126.98** | **101.64** |
-| Total with U1 at LCSC list (not buyable) | 213.36 | 81.13 | 66.79 |
+| U1 LFE5U-45F-8BG381C at LCSC list price (0 stock, not buyable) | 11.28 | 10.91 | 10.91 |
+| U1 LFE5U-25F-8BG381I, DigiKey (stock 18; 25 / 100 tiers need more than that) | 36.85 | 36.85 | 29.70 (needs 100, only 18 + 90 at Mouser in stock) |
+| U1 LFE5U-25F-8BG381I, Mouser (stock 90) | 43.60 | 43.60 | 35.15 (90 tier, 90 in stock) |
+| U1 LFE5U-85F-8BG381C fallback, DigiKey (stock 17) | 90.70 | 90.70 | 73.15 (needs 100, 17 in stock) |
+| U1 LFE5U-45F-8BG381C, DigiKey (0 stock, previous design part) | 56.76 | 56.76 | 45.76 |
+| **Total with U1 DigiKey 25F-8I** | **238.93** | **107.07** | **85.58** |
+| **Total with U1 Mouser 25F-8I** | **245.68** | **113.82** | **91.03** |
+| Total with U1 DigiKey 85F-8C (fallback) | 292.78 | 160.92 | 129.03 |
+| Total with U1 45F at LCSC list (not buyable) | 213.36 | 81.13 | 66.79 |
 
-Notes on the table: the 100-board DigiKey -6 price needs 100 pieces but only 46 are in stock. The lens line dominates small builds (Commonlands lens 39.00 each, flat, no volume price was read). The `bom.json` page total (verified lines only) is generated by `docs/bom/build_bom.py`.
+Notes on the table: the 100-board 25F prices need 100 pieces but only 108 are in stock at DigiKey and Mouser together (and the tier prices are per vendor); the DigiKey 25F-8I totals use DigiKey's tier price (36.85 at 1 and 10 boards because the 25 tier needs 25 pieces). The lens line dominates small builds (Commonlands lens 39.00 each, flat, no volume price was read). The `bom.json` page total (verified lines only) is generated by `docs/bom/build_bom.py`.
 
 ## 5. Risks and second sources
 
-- U1 supply (largest risk). Both exact -8 part and the UM part have 40 to 46 week lead times and 90-piece incoming lots. Second sources: LFE5U-45F-6BG381C (same footprint, in stock in small numbers, needs a timing check). LFE5UM-45F-8BG381C needs a PCB change (section 1).
+- U1 supply (largest risk). The chosen 25F-8I has 108 pieces in stock at authorised channels (DigiKey 18, Mouser 90) and 40 week lead time for more. Second sources: LFE5U-85F-8BG381C (drop-in, DigiKey 17, Mouser 10, LCSC 8, about 2.5 times the price, timing closes on 6 of 7 seeds) and the LFE5U-45F-8BG381C when it returns (DigiKey 90 expected 2026-11-30). Speed grade 6 or 7 parts do not close timing. LFE5UM-45F-8BG381C needs a PCB change (section 1). The 25F uses 56 of 56 block RAM: any RTL growth in block RAM needs the 45F or 85F.
 - U10 OV9281. No priced seller found. Needs a quote from an OmniVision distributor or a module re-spin. This blocks a priced production BOM.
 - Bare PCB price. No JLCPCB 4-layer price was obtained. Get a live quote.
 - U6 and U8 LDOs are out of stock in the SOT-23-5 package at LCSC/JLC. An alternate in the same package exists only for the 2.8 V part (TLV75528PDYDR, 24 at LCSC) and its pinout is not checked. Plan a footprint change (WSON-6) or buy elsewhere (not read).
@@ -109,6 +144,8 @@ Notes on the table: the 100-board DigiKey -6 price needs 100 pieces but only 46 
 
 - LFE5U-45F-8BG381C: Mouser 46 weeks, DigiKey 43 weeks (standard), incoming 90 pcs at each (DigiKey 2026-11-30, Mouser 2027-06-15).
 - LFE5UM-45F-8BG381C: Mouser 40 weeks, DigiKey 43 weeks.
-- LFE5U-45F-6BG381C: DigiKey standard 43 weeks, 46 in stock now.
+- LFE5U-25F-8BG381I: DigiKey 40 weeks standard, Mouser 40 weeks; 18 (DigiKey) and 90 (Mouser) in stock on 2026-11-01.
+- LFE5U-85F-8BG381C: DigiKey 43 weeks, Mouser 46 weeks.
+- LFE5U-45F-6BG381C: DigiKey standard 43 weeks (grade 6, does not close timing).
 - Camemake OV9281 module: about 25 days (DigiKey Marketplace).
 - All other parts are bought from LCSC/JLC stock. No lead time is stated on those pages, so none is claimed.
