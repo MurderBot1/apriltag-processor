@@ -54,6 +54,9 @@ if have arm-none-eabi-gcc && have cmake && [ -n "${PICO_SDK_PATH:-}" ] && [ -f "
   if step firmware firmware bash -c "cmake -S firmware/rp2350 -B build/rp2350 $GEN -DPICO_SDK_PATH='$PICO_SDK_PATH' && cmake --build build/rp2350 -j"; then
     for e in uf2 elf bin hex elf.map; do [ -f "build/rp2350/apriltag_cam.$e" ] && cp "build/rp2350/apriltag_cam.$e" "$OUT/firmware/"; done
     [ -f "$OUT/firmware/apriltag_cam.uf2" ] || record firmware-uf2 failed "build ok but no uf2 produced"
+    if [ -f "$OUT/firmware/apriltag_cam.elf" ] && have arm-none-eabi-size; then
+      step firmware-size firmware_size $PY tools/fw_size.py "$OUT/firmware/apriltag_cam.elf"         $([ -f "$OUT/firmware/apriltag_cam.bin" ] && echo --bin "$OUT/firmware/apriltag_cam.bin")         $([ -f "$OUT/firmware/apriltag_cam.uf2" ] && echo --uf2 "$OUT/firmware/apriltag_cam.uf2") --out "$OUT/firmware/size.md"
+    fi
   fi
 else unavailable firmware "arm-none-eabi-gcc, cmake or PICO_SDK_PATH (Pico SDK 2.x with tinyusb) not available"; fi
 

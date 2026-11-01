@@ -7,6 +7,11 @@ on:
   push:
     branches: [deploy]
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Build and upload the workflow artifact, but do NOT create a GitHub Release (assets are still assembled and listed)"
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -73,4 +78,11 @@ jobs:
           for f in $(cd products && find fpga firmware host api docs config -type f); do
             cp "products/$f" "assets/$(echo "$f" | tr '/' '_')"
           done
+          echo "== release assets =="; ls -l assets/
+          for need in firmware_apriltag_cam.uf2 firmware_apriltag_cam.elf; do
+            test -s "assets/$need" || { echo "missing release asset $need" >&2; exit 1; }
+          done
+          if [ "${{ github.event_name }}" = workflow_dispatch ] && [ "${{ inputs.dry_run }}" = true ]; then
+            echo "DRY RUN: skipping gh release create for tag $TAG"; head -40 release_notes.md; exit 0
+          fi
           gh release create "$TAG" assets/* --target "$GITHUB_SHA" --title "Build $TAG" --notes-file release_notes.md

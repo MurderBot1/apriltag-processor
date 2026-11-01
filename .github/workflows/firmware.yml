@@ -1,0 +1,88 @@
+# Builds the RP2350 firmware (Pico SDK 2.1.1, arm-none-eabi-gcc from Ubuntu 24.04) on Linux and uploads the .uf2/.elf as a
+# workflow artifact. It is NOT a release: releases come only from a push to `deploy` (release.yml).
+# Reports the image size against the 16 MB flash and the 520 KB SRAM in the job summary and ONE PR comment.
+# NOT checked here (no hardware in CI): PIO frame capture, 21 MB/s frame bus timing, DMA/CPU SRAM contention, USB enumeration.
+name: firmware
+on:
+  pull_request:
+    paths: ['firmware/**', 'tools/fw_size.py', 'tools/build_all.sh', '.github/workflows/firmware.yml']
+  workflow_dispatch:
+
+concurrency:
+  group: firmware-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+env:
+  PICO_SDK_TAG: "2.1.1"
+
+jobs:
+  firmware:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install ARM toolchain and cmake
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends gcc-arm-none-eabi libnewlib-arm-none-eabi \
+            libstdc++-arm-none-eabi-newlib cmake ninja-build python3
+          arm-none-eabi-gcc --version | head -1
+          cmake --version | head -1
+      - name: Fetch Pico SDK ${{ env.PICO_SDK_TAG }}
+        run: |
+          git clone --depth 1 --branch "$PICO_SDK_TAG" --recurse-submodules --shallow-submodules \
+            https://github.com/raspberrypi/pico-sdk.git "$RUNNER_TEMP/pico-sdk"
+          echo "PICO_SDK_PATH=$RUNNER_TEMP/pico-sdk" >> "$GITHUB_ENV"
+      - name: Build firmware
+        run: |
+          cmake -S firmware/rp2350 -B build/rp2350 -G Ninja -DPICO_SDK_PATH="$PICO_SDK_PATH"
+          cmake --build build/rp2350 -j
+          ls -l build/rp2350/apriltag_cam.*
+      - name: Check the image
+        run: |
+          set -eu
+          test -s build/rp2350/apriltag_cam.uf2
+          test -s build/rp2350/apriltag_cam.elf
+          # UF2 sanity: magic words in the first block, family id RP2350 ARM-S (0xe48bff59)
+          python3 - <<'PY'
+          import struct
+          d = open('build/rp2350/apriltag_cam.uf2', 'rb').read()
+          assert len(d) % 512 == 0, 'uf2 size not a multiple of 512'
+          m0, m1, flags, addr, n, blk, nblk, fam = struct.unpack('<8I', d[:32])
+          assert (m0, m1) == (0x0A324655, 0x9E5D5157), 'bad uf2 magic'
+          assert flags & 0x2000 and fam == 0xE48BFF59, f'family id {fam:#x} is not RP2350 ARM-S'
+          assert addr == 0x10000000, f'first block at {addr:#x}, expected XIP flash 0x10000000'
+          print(f'uf2 ok: {len(d)//512} blocks, family {fam:#x}, first address {addr:#x}')
+          PY
+          python3 tools/fw_size.py build/rp2350/apriltag_cam.elf --bin build/rp2350/apriltag_cam.bin \
+            --uf2 build/rp2350/apriltag_cam.uf2 --out build/rp2350/size.md
+      - name: Job summary and PR comment
+        if: ${{ !cancelled() }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -f build/rp2350/size.md ]; then
+            { cat build/rp2350/size.md; echo; echo "Toolchain: $(arm-none-eabi-gcc --version | head -1); Pico SDK $PICO_SDK_TAG."; echo "Not verified (no hardware): PIO frame capture, frame bus timing, DMA/SRAM contention, USB enumeration."; } > /tmp/fw.md
+          else
+            echo "### Firmware build FAILED (see the job log)" > /tmp/fw.md
+          fi
+          if [ "${{ github.event_name }}" = pull_request ]; then
+            python3 tools/ci_report.py --marker firmware --body-file /tmp/fw.md
+          else
+            cat /tmp/fw.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rp2350-firmware
+          path: |
+            build/rp2350/apriltag_cam.uf2
+            build/rp2350/apriltag_cam.elf
+            build/rp2350/apriltag_cam.bin
+            build/rp2350/apriltag_cam.elf.map
+            build/rp2350/size.md
+          if-no-files-found: warn
