@@ -115,14 +115,14 @@ res('33R', '+3V3', 'ADC_AVDD', mx - 3.0, my - 6.8)
 cap('100n', 'ADC_AVDD', mx - 4.6, my - 6.8)
 res('10k', 'MCU_RUN', '+3V3', mx + 3.0, my - 5.6)
 cap('100n', 'MCU_RUN', mx + 4.6, my - 5.6)
-# 12 MHz crystal
-add('Y', 'Crystal', 'Crystal_SMD_3225-4Pin_3.2x2.5mm', '12MHz', mx - 0.5, my + 8.6, 0, 'bottom', {'1': 'XIN', '2': 'GND', '3': 'XOUT', '4': 'GND'})
+# 12 MHz crystal, CL = 10 pF (ABM8-272-T3).  Load seen by the crystal = C15*C16/(C15+C16) + Cstray = 15*15/30 + ~3 = 10.5 pF.
+add('Y', 'Crystal', 'Crystal_SMD_3225-4Pin_3.2x2.5mm', '12MHz 10pF', mx - 0.5, my + 8.6, 0, 'bottom', {'1': 'XIN', '2': 'GND', '3': 'XOUT', '4': 'GND'})
 cap('15p', 'XIN', mx - 2.8, my + 6.8)
 cap('15p', 'XOUT', mx + 1.8, my + 6.8)
 res('1k', 'XOUT', 'XOUT_R', mx - 0.5, my + 6.2)
 # flash W25Q128 (WSON-8 6x5)
 FL = (18.5, -5.0)
-add('U', 'Package_SON', 'WSON-8-1EP_6x5mm_P1.27mm_EP3.4x4.3mm', 'W25Q128JVSIQ', FL[0], FL[1], 90, 'bottom',
+add('U', 'Package_SON', 'WSON-8-1EP_6x5mm_P1.27mm_EP3.4x4.3mm', 'W25Q128JVPIQ', FL[0], FL[1], 90, 'bottom',
     {'1': 'QSPI_SS', '2': 'QSPI_SD1', '3': 'QSPI_SD2', '4': 'GND', '5': 'QSPI_SD0', '6': 'QSPI_SCLK', '7': 'QSPI_SD3', '8': '+3V3', '9': 'GND'}, ref_='U3',
     note='16 MB QSPI flash: firmware, FPGA bitstream, field map/calibration slots')
 cap('100n', '+3V3', FL[0] + 3.6, FL[1] + 3.0)
@@ -164,8 +164,10 @@ def buck(refn, x, y, vout, rtop, rbot, net_sw):
 buck('U4', -8.5, -21.5, '+3V3', '453k', '100k', 'SW3V3')
 buck('U5', 2.5, -21.5, '+1V1', '82k5', '100k', 'SW1V1')
 cap('22u', '+1V1', 10.2, -21.0, size=C0805)
-LDOS = [('U6', '+2V5', 'TLV75525', -21.0, 4.0), ('U7', '+1V8', 'TLV75518', -21.0, 9.0),
-        ('U8', '+2V8', 'TLV75528', -21.0, 14.0), ('U9', '+1V2', 'TLV75512', -21.0, 19.0)]
+# U6/U8 were TLV75525/TLV75528 (out of stock at LCSC/JLCPCB, 2026-10-29 and 2026-10-31).  ME6211C25M5G-N (400 mA) and ME6211C28M5G-N (450 mA) are SOT-23-5
+# with the same pinout (1 VIN, 2 VSS, 3 CE, 4 NC, 5 VOUT), so footprint, CE-to-VIN tie and the 1u/2u2 capacitors stay as they are (see docs/bom/bom.json).
+LDOS = [('U6', '+2V5', 'ME6211C25', -21.0, 4.0), ('U7', '+1V8', 'TLV75518', -21.0, 9.0),
+        ('U8', '+2V8', 'ME6211C28', -21.0, 14.0), ('U9', '+1V2', 'TLV75512', -21.0, 19.0)]
 for refn, out, val, x, y in LDOS:
     add('U', 'Package_TO_SOT_SMD', 'SOT-23-5', val, x, y, 0, 'bottom', {'1': '+3V3', '2': 'GND', '3': '+3V3', '4': '', '5': out}, ref_=refn,
         note=f'LDO {out}')

@@ -1,7 +1,7 @@
 {
  "project": "AprilTag camera PCB (48x48 mm, 4-layer)",
  "sources": "pcb/output/bom.csv, pcb/design.py, pcb/output/apriltag_cam.kicad_pcb, housing/README.md, docs/bom/AUDIT.md",
- "price_checked": "2026-10-30",
+ "price_checked": "2026-11-01",
  "notes": "Prices re-checked 2026-10-29. LCSC rows come from LCSC's product API (price tier used is noted per row; tier = the largest quantity break not above the quantity needed, or the minimum order quantity). Commonlands rows come from commonlands.com products.json / product pages. DigiKey, Mouser, Zoro, GoPhotonics and Edmund pages block automated fetches, so anything sourced only from them stays 'unverified'. 'verified' = exact MPN, a link, and an explicitly stated unit price read from the vendor on the check date. fixed = one-time per order (not multiplied by board count). See AUDIT.md for every discrepancy.",
  "items": [
   {
@@ -47,13 +47,13 @@
    "mfr": "Winbond",
    "link": "https://www.lcsc.com/product-detail/C190862.html",
    "unit_price": 3.4222,
-   "checked": "2026-10-29",
+   "checked": "2026-11-01",
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "DESIGN MISMATCH (still open): bom.csv/design.py value is W25Q128JVSIQ, the SOIC-8 208mil package; the WSON-8 6x5 footprint needs W25Q128JVPIQ (priced here; LCSC package WSON-8-EP(5x6)). Update the design.py value label. Price corrected: was 0.8679 (stale), LCSC/JLC now 3.42 at 1+. LCSC C190862: stock 11,700, JLC stock 12,396, JLC Extended; price is the 1+ tier at $3.4222.",
+   "notes": "Value label in design.py/bom.csv is W25Q128JVPIQ, which matches the WSON-8 6x5 footprint (the earlier JVSIQ label was the SOIC-8 208mil part: mismatch, fixed). LCSC C190862: stock 9,404 on 2026-11-01 (11,700 on 2026-10-29); price is the 1+ tier at $3.4222.",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 1+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-11-01; 1+ tier"
   },
   {
    "category": "ICs",
@@ -76,18 +76,18 @@
    "category": "ICs",
    "designators": "U6",
    "qty": 1,
-   "value": "TLV75525 500mA LDO 2.5V, SOT-23-5",
-   "mpn": "TLV75525PDBVR",
-   "mfr": "Texas Instruments",
-   "link": "https://www.lcsc.com/product-detail/C2867155.html",
-   "unit_price": 0.2347,
-   "checked": "2026-10-29",
+   "value": "ME6211C25 400mA LDO 2.5V, SOT-23-5",
+   "mpn": "ME6211C25M5G-N",
+   "mfr": "MICRONE (Nanjing Micro One Elec)",
+   "link": "https://www.lcsc.com/product-detail/C194395.html",
+   "unit_price": 0.0562,
+   "checked": "2026-11-01",
    "status": "verified",
    "fixed": false,
-   "hard": "OUT OF STOCK at LCSC and JLC on 2026-10-29 (LCSC 0, JLC 0). Needs an alternate source or a substitute; a different package would need a footprint change. Same-voltage alternates exist only in other packages (TLV75525PDRVR WSON-6 C544744, stock 1,162).",
-   "notes": "LCSC C2867155: stock 0, JLC stock 0, JLC Extended; price is the 1+ tier at $0.2347.",
+   "hard": "",
+   "notes": "REPLACES TLV75525PDBVR (LCSC stock 0 on 2026-10-29 and 2026-10-31). Same SOT-23-5 pinout as the board uses: 1 VIN, 2 VSS, 3 CE, 4 NC, 5 VOUT (pinout read from the LCSC-derived library entry of the ME6211 family; the datasheet PDF itself could not be downloaded here, so re-check against the MICRONE datasheet before ordering). 2.5 V fixed, 400 mA (LCSC attribute; TLV75525: 500 mA); the 2.5 V rail feeds only light loads. CE is tied to VIN as before, 1u in / 2u2 out ceramics stay. LCSC C194395: stock 31,280 on 2026-11-01; price is the lowest quoted tier (10+) at $0.0562 (100+: $0.0440).",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 1+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-11-01; 10+ tier"
   },
   {
    "category": "ICs",
@@ -110,18 +110,18 @@
    "category": "ICs",
    "designators": "U8",
    "qty": 1,
-   "value": "TLV75528 LDO 2.8V, SOT-23-5",
-   "mpn": "TLV75528PDBVR",
-   "mfr": "Texas Instruments",
-   "link": "https://www.lcsc.com/product-detail/C2868951.html",
-   "unit_price": 0.3719,
-   "checked": "2026-10-29",
+   "value": "ME6211C28 450mA LDO 2.8V, SOT-23-5",
+   "mpn": "ME6211C28M5G-N",
+   "mfr": "MICRONE (Nanjing Micro One Elec)",
+   "link": "https://www.lcsc.com/product-detail/C53099.html",
+   "unit_price": 0.0667,
+   "checked": "2026-11-01",
    "status": "verified",
    "fixed": false,
-   "hard": "OUT OF STOCK at LCSC and JLC on 2026-10-29 (LCSC 0, JLC 0). Needs an alternate source or a substitute; a different package would need a footprint change. Alternates: TLV75528PDYDR C35061966 (SOT-23-5, stock 25, pinout NOT checked), TLV75528PDRVR C2865214 (WSON-6, stock 130).",
-   "notes": "LCSC C2868951: stock 0, JLC stock 0, JLC Extended; price is the 1+ tier at $0.3719.",
+   "hard": "",
+   "notes": "REPLACES TLV75528PDBVR (LCSC stock 0). The TLV75528PDYDR alternative has only 24 pcs and its pinout was not checked, so it was not used; AP2125K-2.8 (C176952) has 50 pcs. Same SOT-23-5 pinout as the board uses: 1 VIN, 2 VSS, 3 CE, 4 NC, 5 VOUT (from the LCSC-derived library entry; re-check against the MICRONE datasheet before ordering). 2.8 V fixed, 450 mA (TLV75528: 500 mA); load is the OV9281 AVDD/EVDD rail only (sensor supply current not verified here, expected tens of mA). LCSC C53099: stock 17,280 on 2026-11-01; price is the lowest quoted tier (10+) at $0.0667 (100+: $0.0535).",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 1+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-11-01; 10+ tier"
   },
   {
    "category": "ICs",
@@ -233,14 +233,14 @@
    "mpn": "ABM8-272-T3",
    "mfr": "Abracon",
    "link": "https://www.lcsc.com/product-detail/C20625731.html",
-   "unit_price": 0.6647,
-   "checked": "2026-10-29",
+   "unit_price": 0.6617,
+   "checked": "2026-11-01",
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "MPN CHANGED from ABM8-12.000MHZ-D2Y-T: that part is an 18 pF load crystal (LCSC spec) but C15/C16 are 15 pF (series 7.5 pF + stray = ~10-12 pF effective), which fits a 10 pF crystal. ABM8-272-T3: 12 MHz, 10 pF, +-30 ppm, 3225 4-pad. Alternative: keep the 18 pF crystal and change C15/C16 to ~27-33 pF (design change). LCSC C20625731: stock 845, JLC stock 845, JLC Extended; price is the 1+ tier at $0.6647.",
+   "notes": "ABM8-272-T3: 12 MHz, CL = 10 pF, +-30 ppm, ESR 50 ohm max, 3225 4-pad. Load check: CL = C15*C16/(C15+C16) + Cstray = 15*15/30 + 3 = 7.5 + 3 = 10.5 pF (Cstray about 3 pF: pads, trace, RP2350 XIN/XOUT pin), 0.5 pF above the 10 pF rating, about 6 ppm of pulling at a typical 12 ppm/pF trim sensitivity (assumed C1 = 4 fF, C0 = 3 pF, not from the datasheet), far inside the +-30 ppm tolerance. C15/C16 stay 15 pF (nearest standard value to the ideal 2*(10-3) = 14 pF). Stock: the LCSC API returned 0 on one query and 10,155 on a later query on 2026-11-01 (845 on 2026-10-29), so stock is volatile; re-check before ordering. Price is the lowest quoted tier (5+) at $0.6617. LCSC C20625731.",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 1+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-11-01; 5+ tier"
   },
   {
    "category": "Timing",

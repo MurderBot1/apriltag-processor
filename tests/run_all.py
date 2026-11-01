@@ -14,6 +14,7 @@ GROUPS = [
     ('dataset (Blender/GT)',    ['tests/test_dataset.py'],                                     False),
     ('housing',                 ['tests/test_housing.py'],                                     False),
     ('pcb netlist/pin plan',    ['tests/test_pcb.py'],                                         False),
+    ('pcb ERC + fab package',   ['tests/test_pcb_erc.py'],                                     False),
     ('pose solver (C)',         ['tests/test_pose_solver.py'],                                 False),
     ('firmware proto/storage/app', ['tests/test_fw_proto.py', 'tests/test_fw_storage.py', 'tests/test_fw_app.py', 'tests/test_fw_sched.py'], False),
     ('host library',            ['tests/test_host_e2e.py', 'tests/test_host_fuzz.py'],        False),
