@@ -126,7 +126,7 @@ def block_html(mods):
     a('<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="arh"/></marker></defs>')
     cx0, cx1 = X(1) - 16, X(6) + bw + 16
     a('<rect x="%d" y="34" width="%d" height="%d" rx="16" class="chipbox"/>' % (cx0, cx1 - cx0, Y['C'] + bh + 36 - 34))
-    a('<text x="%d" y="26" class="chipt">ECP5 LFE5U-45F-8BG381C &mdash; top level rtl/apriltag_cam_top.v</text>' % cx0)
+    a('<text x="%d" y="26" class="chipt">ECP5 LFE5U-25F-8BG381I &mdash; top level rtl/apriltag_cam_top.v</text>' % cx0)
     a('<rect x="%d" y="52" width="%d" height="%d" rx="12" class="dom dom-sensor"/>' % (X(1) - 8, bw + 16, bh + 52))
     a('<text x="%d" y="68" class="domt">sensor lane clocks</text>' % (X(1) - 2))
     a('<rect x="%d" y="52" width="%d" height="%d" rx="12" class="dom dom-core"/>' % (X(2) - 8, 5 * bw + 4 * gx + 16, Y['C'] + bh + 20 - 52))
@@ -190,14 +190,14 @@ def block_html(mods):
               '<span class="lg mem"></span> block-RAM storage <span class="lg ext"></span> external part</div>']
     tb = ''
     if tot:
-        tb = ('<h2>Whole-chip resources, LFE5U-45F (docs/fpga.md, seed 1, Yosys + nextpnr-ecp5 estimates)</h2><div class="tablewrap"><table><thead><tr><th>resource</th><th>used</th><th>available</th><th>%</th><th>old all-FPGA design (85F)</th></tr></thead><tbody>' +
+        tb = ('<h2>Whole-chip resources, measured on the LFE5U-45F with older RTL (docs/fpga.md, seed 1, Yosys + nextpnr-ecp5 estimates). Shipping LFE5U-25F: 13,389 LUT4 (55%), 56 of 56 DP16KD (100%)</h2><div class="tablewrap"><table><thead><tr><th>resource</th><th>used</th><th>available</th><th>%</th><th>old all-FPGA design (85F)</th></tr></thead><tbody>' +
               ''.join('<tr><td>%s</td><td>%s</td><td>%s</td><td>%s%%</td><td>%s</td></tr>' % tuple(esc(x) for x in r) for r in tot) + '</tbody></table></div>')
     return '''<h1>Chip block diagram</h1>
-<p class="lead">Click a block to open its RTL source in the RTL browser. Pixels flow left to right along the top row; the FPGA keeps no frame store: the binary mask is streamed out at the pixel rate and the RP2350 stores it in its SRAM (two frame buffers) while it decodes the previous frame; only the registers and the 132,128-byte frame packet (binary mask plus candidate list) are exchanged with the RP2350: the mask goes over the 8-bit frame bus, registers over SPI. Tag decoding and pose run on the RP2350.</p>
+<p class="lead">Click a block to open its RTL source in the RTL browser. Pixels flow left to right along the top row; the FPGA keeps no frame store: the binary mask is streamed out at the pixel rate and the RP2350 stores it in its SRAM (three frame buffers) while it decodes the previous frame; only the registers and the 132,128-byte frame packet (binary mask plus candidate list) are exchanged with the RP2350: the mask goes over the 8-bit frame bus, registers over SPI. Tag decoding and pose run on the RP2350.</p>
 %s
 %s
 %s
-<p class="muted">Resource numbers are from <code>docs/fpga.md</code> (Yosys + nextpnr-ecp5 estimates, not signoff; nothing has been loaded onto a device): whole chip 56 of 108 DP16KD (52%%). The per-block block-RAM figures are the ones listed there; LUT and flip-flop counts are only available for the whole chip. Lines of Verilog are counted from <code>rtl/</code>. Clock numbers: <a href="#/fpga">FPGA results</a>.</p>
+<p class="muted">Resource numbers are from <code>docs/fpga.md</code> (Yosys + nextpnr-ecp5 estimates, not signoff; nothing has been loaded onto a device): whole chip 56 DP16KD (52%% of the 108 on the 45F where this was measured; 100%% of the 56 on the shipping 25F). The per-block block-RAM figures are the ones listed there; LUT and flip-flop counts are only available for the whole chip. Lines of Verilog are counted from <code>rtl/</code>. Clock numbers: <a href="#/fpga">FPGA results</a>.</p>
 <h2>Blocks and where they are specified</h2>
 <div class="tablewrap"><table><thead><tr><th>block</th><th>RTL</th><th>testbench / waveform scenario</th></tr></thead><tbody>
 <tr><td>D-PHY receiver</td><td><a href="#/rtl/dphy_rx.v"><code>dphy_rx.v</code></a>, <a href="#/rtl/dphy_lane.v"><code>dphy_lane.v</code></a>, <a href="#/rtl/async_fifo.v"><code>async_fifo.v</code></a></td><td><a href="#/wave?s=dphy_burst">D-PHY receive</a></td></tr>

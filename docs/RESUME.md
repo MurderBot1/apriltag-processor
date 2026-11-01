@@ -1,52 +1,72 @@
-# Resume notes (written 2026-10-30)
+# Project state (rewritten 2026-11-01)
 
-All agents were cancelled on request. Everything below is the exact state to continue from.
-Project rules are in `CLAUDE.md` (manager/worker flow, `gh` for all GitHub work, BOM and site updates, folder cleanup).
+Rules for agents and the manager are in `CLAUDE.md`. This file is the current state of the project: what is done, how well each item is known, what can still go wrong, and what remains before a production run. Numbers come from the files named next to them; regenerate them with the tool named there.
 
-## 1. Unfinished work: A3 architecture (PR #9, draft)
+## 1. What the product is
 
-- **Goal:** keep 1280x800@120 fps on the unit. Move the TPU and the two binary frame banks out of the FPGA into RP2350 firmware/SRAM, so U1 shrinks from `LFE5U-85F-8BG381C` ($100.13) to an ECP5 45F ($35.28 seen for the UM variant). Spec and numbers: `docs/costdown.md`.
-- **PR:** https://github.com/MurderBot1/apriltag-processor/pull/9 (draft, not merged). Branch `a3-arch`, head `a004487`. Everything is pushed.
-- **Clone (kept on purpose, do not delete):** `D:/claude/a3/apriltag-proccessor`. Only local change is the rebuilt `api/java/apriltag-camera.jar` (build artefact, ignore).
-- **Commits on the branch:**
-  - `26d3403` phase 1: TPU in C (`firmware/core/attpu.c`), bit-exact with the Python ISS on all 100 frames. Cortex-M33 cycle estimate (emulated, not silicon): median 1.25 / 1.59 / 1.89 ms and worst 7.4 / 9.3 / 11.0 ms (optimistic / nominal / pessimistic) at 150 MHz, one core. See `results/tpu_c_m33_cycles.md`.
-  - `e5e2a8e` phase 2: `rtl/mask_stream.v` (132,128-byte packet over an 8-bit strobed bus), `cam_core.v` without TPU/frame banks, firmware receiver (`frame_rx.pio`, `hal_frame_rx.c`, GPIO16-25), `atframe.c`, `atapp.c`, fake FPGA in `simfw.py`. Old TPU RTL kept in `ref/tpu/`.
-  - `aa13efd` phases 3-4 (per the commit message, NOT checked by the manager): 100-frame RTL chain 562/647 tags, same ids and corners as before; M33 estimates for tag unit and pose; frame drop model (`results/frame_budget.md`); 6-seed place-and-route of the LFE5U-45F: 12,227 LUT4, 56/108 BRAM, core 84-91 MHz (`results/fpga_45f_seeds.md`); `pcb/design.py` maps the frame bus nets; docs updated.
-  - `a004487` removes a 67 MB Freerouting jar committed by mistake in `aa13efd`. **It is still in the branch history, so merge with squash** to keep it out of `main`.
-- **CI:** the manager never saw CI results for `aa13efd` / `a004487`. Run `gh pr checks 9` first.
+OV9281 global-shutter sensor (1280x800, 120 fps, 2-lane MIPI) -> ECP5 **LFE5U-25F-8BG381I** (custom RTL: D-PHY/CSI-2 receive, adaptive threshold, despeckle, connected-component labelling, `mask_stream`) -> 8-bit strobed frame bus (21.4 MB/s) -> RP2350A (PIO + DMA into 3 frame buffers, tag unit in C `firmware/core/attpu.c`, pose solve, field map and calibration in flash, USB CDC) -> host. This is architecture "A3" (`docs/architecture.md`, `docs/costdown.md`). The old FPGA processor (TPU) is kept only as the bit-exact reference in `ref/tpu`. All of A3, the sourcing changes, the PCB fixes and the lowcon register are merged into `main` (PRs #9 to #18).
 
-### Still to do for A3
-1. Check CI on PR #9 and read `docs/costdown.md`, `results/frame_budget.md`, `results/fpga_45f_seeds.md` to confirm the commit-message claims. 45F timing: core 84-91 MHz against the 85.714 MHz target means some seeds fail. Pick the seed and check D-PHY clock.
-2. **Phase 5 (not started):**
-   - Swap U1 in `pcb/design.py`, the board and the exports. Regenerate gerbers/renders with the repo scripts. Run DRC and compare with the previous 72 violations + 12 unconnected. Re-route only what changed.
-   - **Pick one exact MPN.** The $35.28 price is the **LFE5UM-45F** (UM = with SERDES), not `LFE5U-45F-8BG381C`. Verify the live price, stock and link. Check the UM part works in this design (D-PHY, bank voltages). `bom.json`, `design.py` and the docs must name the same part.
-   - Run `python docs/bom/build_bom.py` and `py -3.12 site/build_site.py`, then update the docs (architecture, fpga, verification, protocol, hardware, README, costdown).
-3. Pose-solve time on the MCU shares the core with the tag unit. Confirm the drop rates include it.
-4. **Pico SDK link (fixed by PR #11, branch `fw-image`):** the Linux build links cleanly with Pico SDK 2.1.1 and arm-none-eabi-gcc 13.2.1 and produces `apriltag_cam.uf2/.elf/.bin` (UF2 family ARM-S, first block 0x10000000, plus the SDK's absolute-family block). Windows msys `ld` 2.47 still fails; do not build firmware on Windows. `.github/workflows/firmware.yml` builds on PRs touching `firmware/` and reports the size (`tools/fw_size.py`); `tools/build_all.sh` and `release.yml` ship the uf2/elf/bin plus `firmware/size.md`; `release.yml` has a `dry_run` input. Verified: it compiles, links, the UF2 structure is valid, the image fits. NOT verified: running on the chip (no hardware).
-5. **Cannot be checked without hardware:** PIO capture, 21 MB/s bus timing margin, DMA/CPU SRAM contention, real RP2350 timing.
-6. Mark the PR ready, wait for CI (all-tests takes 15-30 min), review, **squash merge**, pull `main` here, delete `D:/claude/a3`.
+## 2. Done, by how well it is known
 
-## 2. Open design decisions (from the BOM audit, `docs/bom/AUDIT.md`)
+### Verified by tests in CI (`tests.yml`, `tests/run_all.py`; about 230 tests, see `docs/verification.md`)
 
-- **Lens and holder (resolved in PR housing-optics):** CIL023-F2.2-M12B650 (82.2 deg rectilinear, $39.00) on CLA021-LCP (7.4 mm, $4.50); CIL018 needs a 9 to 13 mm holder. Housing stack re-derived (lens top allowance 22.0 mm; lens STP not public). See `docs/bom/AUDIT.md` section 6 and `housing/README.md`.
-- **U6, U8** (TLV75525 / TLV75528): out of stock at LCSC and JLCPCB. Needs a footprint decision.
-- **Flash label:** `pcb/design.py` says W25Q128JVSIQ (SOIC-8), footprint is WSON-8, so it should be JVPIQ. `bom.csv` and the KiCad file were not regenerated.
-- **Crystal Y1:** BOM says ABM8-272-T3 (10 pF) because C15/C16 are 15 pF. Needs design-owner confirmation, or change C15/C16.
-- **Check the 85F price** at Mouser/DigiKey if the 85F is kept (LCSC live price $100.13, an earlier snippet showed about $35).
-- **M1.6 holder screws (open, PCB):** head diameter not published (ISO 7045 M1.6 is 3.2 mm; second-hand McMaster listing 2.6 mm). The 2.6 mm PCB holes at (+-10, 9) are too large: change them to about 1.9 mm in `pcb/build_pcb.py`.
-- **Unverified BOM lines (3 of 50):** OV9281 sensor U10 (quote only), PCB fab fee, JLCPCB assembly fees.
+- RTL blocks are bit-exact against Python golden models (threshold, despeckle, labeller, CSI-2, D-PHY with lane skew, mask stream packet format and byte timing, I2C sensor init).
+- The C tag unit `attpu.c` equals the instruction-set simulator of the old FPGA processor word for word on all 100 dataset frames.
+- Whole-chip RTL chain on the 100-frame dataset at 120 fps timing: 562 of 647 tags detected, no false positives (`results/rtl_chain_results.json`); the reference detector finds 630 of 647 detectable tags.
+- Firmware logic on the PC: COBS/CRC framing, flash storage with simulated power loss at every byte, command handling, host library end to end, pose solver (`test_pose_solver.py`).
+- Board data (`tests/test_pcb.py`, `tests/test_pcb_erc.py`): every net has at least two pins, every FPGA power ball is on the right rail (the floating power pads of the earlier layout are connected), pin plan rules, BOM designators agree with `pcb/output/bom.csv`.
+- Housing (`tests/test_housing.py`): watertight STLs, screw posts against PCB holes, FOV cone clearance for the 82.2 degree lens.
+- Per-category dataset workflows report N/10 per category on PRs.
+- Firmware image: `.github/workflows/firmware.yml` builds `apriltag_cam.uf2/.elf/.bin` on Linux with Pico SDK 2.1.1 and arm-none-eabi-gcc 13.2.1 and checks the size. Do not build firmware on Windows (msys `ld` fails).
 
-## 3. Other open items
+### Estimated by tools, not signoff (treat as ± a margin)
 
-- **Simulation pages:** `site/simout/` and the text in `site/sim/pages.py` still describe the old dataset. Needs Icarus Verilog (`iverilog`, not installed on this machine) and new frame names in `gen_pipeline.py`, `gen_sim.py`, `pages.py`.
-- **`lowcon` category:** cause found: tile ratio test `2*diff >= max`. New THRESH bits 31:30 `ratio` (RTL + golden, `results/lowcon_ratio.md`): ratio 2 gives 66 / 66, but noise drops to 24 / 57, so the reset value stays 0 (562 / 647 unchanged). SET_TRACK / host / API wrappers carry `ratio` (bits 7:6 of the maxham byte). An adaptive per-frame choice would fix lowcon and noise together (open).
-- **Frame drops:** 20 of 100 dataset frames exceed one frame period on the all-FPGA design (stale "0.2 ms" in `docs/architecture.md`).
-- **Release workflow** (`.github/workflows/release.yml`) has never run. Pushing to `deploy` triggers it. 45F timing and seed choice matter there (default seed in `tools/build_all.sh` is 1).
-- **`todo.md`** in the manager repo is still untracked.
-- **Windows git push hangs** on the credential manager. Use `GIT_TERMINAL_PROMPT=0 git -c credential.helper= -c credential.helper='!gh auth git-credential' push ...`.
-- **Stuck folders:** Windows reports an agent folder as busy when an agent left a hung `git` process behind. Kill only those `git`/`git-credential-manager` processes, then delete the folder.
+- FPGA timing and area, LFE5U-25F speed 8 (nextpnr estimates, pinned OSS CAD Suite 2025-09-01, `results/fpga_speed_grades.md`): 13,389 LUT4 (55 %), 56 of 56 block RAM (100 %), core 92.27 - 94.91 MHz against 85.714 MHz needed, D-PHY 206.06 - 226.71 MHz against 200, 7 of 7 seeds close. Only speed grade 8 closes; grades 6 and 7 fail on both clocks. Numbers marked 45F in `docs/fpga.md` (12,227 LUT4, 56 of 108 block RAM, 4 of 6 seeds) are older RTL and older tools on the 45F.
+- Tag unit and pose time on the Cortex-M33: emulated cycle counts, not silicon (`results/tpu_c_m33_cycles.md`, `results/pose_m33_cycles.json`): tag unit median about 1.6 ms, worst about 9.3 ms (nominal, 150 MHz, one core). Frame drop model (`results/frame_budget.md`): 3 buffers with early release, 0 % nominal and 1 % pessimistic drops. SRAM about 480 to 488 KB of 520 KiB (computed, not linked here).
+- Cost per board (`docs/bom/PRODUCTION.md` section 4, generated by `tools/bom_cost_table.py`): 249.49 USD at 1 board, 106.98 at 10, 85.37 at 100 with the DigiKey 25F. This is a floor: no bare PCB, no OV9281, no shipping or taxes.
+- Lens field of view: 82.2 degrees rectilinear HFOV from the focal length and sensor width; with the stated -5 % TV distortion the real value is about 84 to 85 degrees (one published data point). Calibrate it.
 
-## 4. State of `main` at time of writing
+### Needs hardware (nothing below has been run on a real board)
 
-- `main` head: `90940f6` plus this file. All earlier agent PRs (#1 to #8) are merged. No agent is running. `D:/claude` holds only `a3`.
-- Merged so far: noise-robust CCL (chip 562/647 on the 100-image set), 100-image dataset and CI workflows, deploy pipeline, BOM audit and prices, LEDs on the flat roof with engraved symbols, site regeneration, cost-down study.
+- No board has been built or powered. No bitstream has been loaded on an ECP5; no firmware has run on an RP2350.
+- PIO capture of the frame bus and the 21.4 MB/s timing margin (the PIO input synchroniser adds about 13 ns; the data window is 11.7 ns before and 35 ns after the strobe edge, from the model). DMA and CPU SRAM contention while the tag unit runs.
+- Bus timing between FPGA and MCU, 3.3 V LVCMOS33 at DRIVE=8, trace delays.
+- D-PHY at 800 Mb/s lane rate on the real sensor (the RTL receiver is only tested against a bit-level model), sensor register set and I2C bring-up on a real OV9281.
+- Boot chain: flash, ECP5 configuration from SPI flash, MCU boot, power sequencing of the 1.2 V, 1.8 V, 2.5 V, 2.8 V, 3.3 V rails, USB enumeration.
+- Real accuracy: the dataset is simulated.
+
+## 3. Remaining risks
+
+1. **25F block RAM is 100 % full (56 of 56).** Any RTL growth in block RAM needs the 45F or 85F. Both are pin- and footprint-compatible (`tools/pin_compat.py`: 31 used balls identical), the 85F closes timing on 6 of 7 seeds (seed 3 fails the D-PHY clock). The 45F speed 8 is out of stock.
+2. **U1 supply.** Only 108 authorised LFE5U-25F-8BG381I pieces on 2026-11-01 (DigiKey 18, Mouser 90). Lead time for more is 40 weeks. A 100-board run cannot be built from stock today. Second source: 85F-8BG381C (about 2.5 times the price, DigiKey 17 / Mouser 10 / LCSC 8). Speed 6 and 7 parts do not close timing. The UM (SERDES) variant is not a drop-in (SERDES supply balls are tied to GND on this PCB).
+3. **U6/U8 ME6211.** The datasheet was fetched on 2026-11-01 (MICRONE ME6211 V20, PDF copies from chipdip.ru and elecfans.com; the LCSC-hosted PDF could not be downloaded). Verified from it: SOT23-5 pinout 1 VIN, 2 VSS, 3 CE, 4 NC, 5 VOUT (matches the board), maximum output current 400 mA (2.5 V) and 450 mA (2.8 V), dropout typical 110 mV at 100 mA and 220 mV at 200 mA, VIN maximum 6.5 V. Still open: compare the revision with the LCSC-hosted datasheet at order time; the OV9281 AVDD/EVDD current from the OmniVision datasheet is not read, so the 450 mA margin on the 2.8 V rail is unchecked.
+4. **OV9281 price is unverified.** No priced seller found (quote-only listings). It blocks a priced production BOM. Fallback: the Camemake module, which needs a PCB re-spin.
+5. **Bare PCB price is unverified.** The JLCPCB 4-layer quote page could not be read; the BOM excludes it. Get a live quote (ENIG, impedance control for MIPI).
+6. **Simulated dataset is still a 90 degree camera** (`tools/geom.py`, 640 px focal length basis). The shipping lens is 82.2 degrees with -5 % distortion. Results on real optics will differ (tag pixel size, perspective, distortion). Regenerating the dataset needs Blender and changes every committed frame and the committed results.
+7. **lowcon ratio trade-off.** The THRESH `ratio` register fixes `lowcon` (ratio 2: 66 of 66 tags) but costs the `noise` category (24 of 57 at ratio 2) because speckle floods the labeller, so the reset value stays 0 (562 of 647 overall). A per-frame automatic choice is being built by another agent (firmware, host, API); it is not part of this state.
+8. **No hardware tests at all** (see the needs-hardware list above): a first board bring-up will find problems that simulation cannot.
+9. Y1 crystal (ABM8-272-T3, 10 pF) is out of stock at LCSC (5 at JLC) with the 15 pF load capacitors C15/C16: confirm the load capacitance or change C15/C16, and pick a second source.
+10. Y2 oscillator is low stock (114 at LCSC and JLC). LH1 holder CLA021-LCP is in stock (1074 at Commonlands), the earlier CLA020-PC is sold out.
+11. Simulation pages (`site/simout/`) were regenerated for the 100-frame dataset in PR #13; they need Icarus Verilog to regenerate (`iverilog`, not installed on the manager machine).
+12. Release workflow (`release.yml`) has a dry-run input but no real release has been published. Pushing to `deploy` publishes one; default seed in `tools/build_all.sh` is 1 (closes on the 25F).
+
+## 4. Production checklist (in order)
+
+1. Re-check U1 stock and price at DigiKey, Mouser and LCSC; decide quantity against the 108 piece stock and the 40 week lead time; place the order or choose the 85F fallback.
+2. Get a live JLCPCB 4-layer quote for the 48x48 mm board (ENIG, impedance control, 5 or more pieces) and put it in `bom.json` as a verified line.
+3. Get a quote for the OV9281 (OmniVision distributor, CSP, MOQ) or decide on the module re-spin.
+4. Read the OmniVision datasheet: sensor supply currents (U8 margin), ordering code (H64A or other), MIPI rate, register set.
+5. Compare the ME6211 datasheet revision from LCSC with V20 used here; check the C15/C16 against the Y1 load capacitance; choose a Y1 second source.
+6. Re-run DRC on the final board, regenerate gerbers, BOM and pick-and-place with the repo scripts; check `pcb/output/bom.csv` against `docs/bom/bom.json` (`tests/test_pcb_erc.py`).
+7. Order a small run (5 boards). Before power-up: check rail resistances, then bring up rails one at a time (3.3 V, 1.2 V, 1.8 V, 2.5 V, 2.8 V).
+8. Bring-up: JTAG to the ECP5, load the bitstream from the release (`tools/build_all.sh` output), flash the UF2 to the RP2350, enumerate USB, read the sensor ID 0x9281 over I2C, check the D-PHY clock lane, capture one frame, check the PIO capture and packet counters (frames dropped), run the host library.
+9. Measure on hardware what is now estimated: FPGA clocks and margin, frame bus timing, tag unit and pose time, drop rate at 120 fps, power.
+10. Calibrate the real lens (fx, fy, cx, cy, k1 to k3), recompute HFOV, and build a real image set with ground truth to replace or add to the simulated one.
+11. Tag the release: merge `main` into `deploy` (`git push origin main:deploy`), which builds everything and creates a new GitHub Release; check the release assets.
+
+## 5. Working notes
+
+- Windows `git push` hangs on the credential manager; use the command in `CLAUDE.md` (empty `credential.helper` first, then the `gh` helper).
+- Windows reports an agent folder as busy when an agent left a hung `git` process behind: kill only those `git` / `git-credential-manager` processes, then delete the folder.
+- `todo.md` in the manager repo is untracked.
+- BOM or site changes: edit `docs/bom/bom.json`, run `python docs/bom/build_bom.py` and `py -3.12 site/build_site.py`, commit the generated files, keep `pcb/output/bom.csv` consistent. Cost table: `python tools/bom_cost_table.py`.

@@ -4,8 +4,8 @@
                   24 MHz osc                                    USB-C (power + data, FS device)
                       |                                                   |
   +-----------+   +---v---------------------------------+  8-bit frame bus  +-----v----------------------+
-  |  OV9281   |   |  ECP5 LFE5U-45F-8BG381C (custom RTL) |  21 MB/s strobe   |  RP2350A (MCU, 2 x M33)   |
-  | 1280x800  |MIPI  dphy_rx -> csi2_rx -> thresh_binarize ->  mask_stream ----->  PIO + DMA -> 2 x 132 KB  |
+  |  OV9281   |   |  ECP5 LFE5U-25F-8BG381I (custom RTL) |  21 MB/s strobe   |  RP2350A (MCU, 2 x M33)   |
+  | 1280x800  |MIPI  dphy_rx -> csi2_rx -> thresh_binarize ->  mask_stream ----->  PIO + DMA -> 3 x 132 KB  |
   | global    |2-lane|  (LVDS gearing,  (packet     (adaptive   |  (mask +   |   frame buffers (SRAM)    |
   | shutter   +----->|   sync, deskew)   layer)      threshold)  |  cand. list)|  - tag unit in C (attpu.c) |
   | 120 fps   |      |        -> despeckle -> run_ccl -----------+            |  - pose solve (LM)         |
@@ -18,7 +18,7 @@
 The FPGA does everything that is per pixel and streaming: it never stores a frame. The binary (thresholded, despeckled) frame leaves it at the pixel rate
 together with the candidate list of the labeller; the MCU receives it into SRAM, decodes the tags (sub-pixel corners, tag36h11 match, `firmware/core/attpu.c`),
 solves the camera pose from the stored field map, and streams it to the host. (Architecture "A3" of `docs/costdown.md`: this is what lets the FPGA
-be the 45k-LUT part instead of the 85k one. The old design ran the tag decoder in a custom FPGA processor, the TPU, and held two frame banks in block RAM.)
+be a 25k-LUT part (LFE5U-25F, 56 of 56 block RAM used) instead of the 85k one. The old design ran the tag decoder in a custom FPGA processor, the TPU, and held two frame banks in block RAM.)
 
 ## Pixel path (what the chip does to every frame)
 
@@ -36,7 +36,7 @@ be the 45k-LUT part instead of the 85k one. The old design ran the tag decoder i
 ### Where the tag decoder runs, and why it is bit-exact with the old FPGA processor
 The decoder is a small *fixed program* with a lot of fixed-point multiply/divide and pixel look-ups. It was first built as a custom FPGA processor
 (the TPU, `ref/tpu/tpu_core.v`, program `tools/tpu_prog.py`, golden Python model `tools/tpu_isa.py`), which needed 10 k LUT4, 8 block RAMs and, with the
-two 1 Mbit frame banks it read, most of the 85k-LUT part. `firmware/core/attpu.c` is a line-by-line port of that program to C (Q16.16 integer arithmetic, 64-bit
+two 1 Mbit frame banks it read, most of the 85k-LUT part (196 of 208 block RAMs). `firmware/core/attpu.c` is a line-by-line port of that program to C (Q16.16 integer arithmetic, 64-bit
 multiply/shift, 48/32-bit divide on the Cortex-M33's 32-bit divider, a bucket index instead of scanning all 2,348 tag codes). `tests/test_fw_tpu.py` checks the
 whole result image against the ISS word for word on all 100 dataset frames (and thresholds, corrupted masks, random candidate records); the RTL chain
 (`tests/run_chain_dataset.py`) gives the same tags and corners as the old all-FPGA chain on every one of the 100 frames (0 px difference).
@@ -62,7 +62,7 @@ OV9281 settings (`tools/ov9281_init.py`, register values from the mainline Linux
   Estimated drops (emulated M33, not measured): 0 % nominal, 1 % pessimistic (the slowest frame of one category) with the first-build 2 buffers at 3 %;
   SRAM about 480 - 488 KB of 512 KiB (computed, not linked here). Decision, SRAM budget and the dual-core alternative: `results/frame_budget.md`
 * end-to-end latency (last pixel -> tag list on the MCU) = 17-row threshold delay + 1 row despeckle + ~2-3 rows CCL + the candidate list
-  (~0.2 ms) + tag unit time
+  (4,096 bytes at 21.4 MB/s, about 0.2 ms) + tag unit time
 
 ## Memory map (SPI, 24-bit byte addresses; registers only, frames travel on the frame bus)
 

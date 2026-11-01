@@ -365,7 +365,8 @@ def build_verification(imgs, rows, ref):
     o.append('<rect x="%d" y="4" width="11" height="11" class="bar c1"/><text x="%d" y="14" class="cl">chip (bar)</text><circle cx="%d" cy="9" r="4" class="dot c2"/><text x="%d" y="14" class="cl">reference (dot)</text></svg>' % (w - 250, w - 234, w - 120, w - 112))
     h.append(''.join(o))
     # (c) FPGA
-    h.append('<h2>FPGA resources and timing (yosys + nextpnr-ecp5, LFE5U-45F-8BG381C)</h2>')
+    h.append('<h2>FPGA resources and timing (yosys + nextpnr-ecp5)</h2>')
+    h.append('<p><b>Shipping part LFE5U-25F-8BG381I:</b> 13,389 LUT4 (55 %), 56 of 56 block RAM (100 %), core 92.27 - 94.91 MHz, D-PHY 206.06 - 226.71 MHz, 7 of 7 seeds close (nextpnr estimates, pinned OSS CAD Suite 2025-09-01; <code>results/fpga_speed_grades.md</code>). <b>The table and the seed chart below were measured on the LFE5U-45F</b> with older RTL (12,227 LUT4) and older tools.</p>')
     ft = md_tables(ftxt)
     for hd, rs in ft:
         if hd[0] == 'resource':
@@ -645,7 +646,7 @@ def main():
 
 def home_html(imgs_, imgs, models, mods):
     return '''<h1>AprilTag camera: project browser</h1>
-<p class="lead">Custom vision chip (ECP5 FPGA + own TPU CPU) + OV9281 120 fps global-shutter sensor + RP2350 pose solver, one USB-C cable.
+<p class="lead">Custom vision chip (ECP5 FPGA with custom RTL for the per-pixel work, RP2350 MCU for the tag unit and pose solve) + OV9281 120 fps global-shutter sensor, one USB-C cable.
 Everything below is generated from the repository by <code>site/build_site.py</code> and works offline (file://).</p>
 <div class="cards">
 <a class="card link" href="#/models"><b>3D</b><span>housing assembly with explode slider, PCB from STEP</span></a>
@@ -655,8 +656,8 @@ Everything below is generated from the repository by <code>site/build_site.py</c
 <a class="card link" href="#/netlist"><b>Hardware</b><span>netlist, pin plan, board, DRC, BOM</span></a>
 <a class="card link" href="#/readme"><b>Docs</b><span>README, architecture, protocol, FPGA, verification</span></a>
 </div>
-<pre class="diagram">OV9281 (MIPI, 120 fps) -> ECP5 FPGA: D-PHY/CSI-2 RX, threshold, despeckle, CCL, TPU (tag decoder in ROM)
-                        -> RP2350 MCU (USB, stored field map, pose solve) -> host</pre>
+<pre class="diagram">OV9281 (MIPI, 120 fps) -> ECP5 LFE5U-25F: D-PHY/CSI-2 RX, threshold, despeckle, CCL, mask stream
+                        -> 8-bit frame bus -> RP2350 MCU: 3 frame buffers, tag unit (C), pose solve, USB, field map -> host</pre>
 <img class="hero" src="%s" alt="housing assembly render">''' % (len(imgs), len(mods), sum(m['lines'] for m in mods if m['kind'] == 'verilog'), imgs_.get('r_hero_s', imgs_.get('r_hero', '')))
 
 
@@ -676,7 +677,7 @@ def models_html(imgs_, m):
         big('r_exploded', 'Exploded view: front cover, PCB with lens holder, back shell. Dotted guides pass through the four M2 screw positions.'),
         big('r_pcb_top', 'PCB top (lens side), routed board: soldermask-covered copper traces and vias, ENIG pads and silkscreen come from the KiCad layout (textured from the kicad-cli layer export); the sensor sits under the M12 holder. 3840x2160.'),
         big('r_pcb_bottom', 'PCB bottom. ECP5 BGA, RP2350, USB-C, regulators and passives; all routed copper of apriltag_cam.kicad_pcb is in the texture. 3840x2160. For the 4-layer board layout at 8192 px with zoom see the PCB layout tab.'),
-        big('r_section', 'Section through the lens axis with the 90 degree field-of-view cone (apex at the hood entrance pupil, 45 degree half angle). The hood is a 45 degree cone so it does not vignette the field.')])
+        big('r_section', 'Section through the lens axis with the 82.2 degree horizontal field-of-view cone of the CIL023 lens (apex at the hood entrance pupil, 41.1 degree half angle; angle read from pcb/pcb_params.json). The 45 degree hood cone does not vignette the field.')])
     if 'r_turntable' in imgs_:
         renders += ('<figure class="rbig"><video src="%s" poster="%s" controls loop muted autoplay playsinline preload="metadata"></video>'
                     '<figcaption>Turntable of the assembled unit (3 s loop).</figcaption></figure>' % (imgs_['r_turntable'], imgs_.get('r_hero', '')))

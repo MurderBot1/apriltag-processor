@@ -5,7 +5,7 @@ in a world frame you define**. You send it the tags you use and where they are (
 stores them in flash and then streams the camera position and orientation over the same USB-C cable that powers it.
 
 ```
-OV9281 (MIPI, 120 fps) -> ECP5-45F FPGA running custom RTL (threshold, despeckle, labelling, frame streamer) -> 8-bit frame bus ->
+OV9281 (MIPI, 120 fps) -> ECP5 LFE5U-25F FPGA running custom RTL (threshold, despeckle, labelling, frame streamer) -> 8-bit frame bus ->
                           RP2350 MCU (tag decoder in C, pose solve, USB, stored field map) -> host
 ```
 
@@ -98,7 +98,7 @@ build/test results. Earlier releases are never overwritten. `main` does not trig
 * GitHub Actions: one check per dataset category (`N/10 detected`, reference detector) plus an all-tests workflow, see `docs/verification.md`.
 * RTL is verified bit-exact against Python golden models (threshold, despeckle, labelling), the C tag unit bit-exact against the golden model of the old FPGA processor, and the whole
   chain is exercised with real CSI-2 packets and a bit-level D-PHY model with lane skew and clock offsets.
-* Open-source place-and-route onto the real ECP5-45F pins: 12.2 k LUT4 (27 %), 56 of 108 block RAM, core clock closes 85.7 MHz on 4 of 6 seeds, D-PHY 200 MHz on 6 of 6 (`docs/fpga.md`).
+* Open-source place-and-route onto the real ECP5 CABGA-381 pins, shipping part LFE5U-25F-8BG381I: 13.4 k LUT4 (55 %), 56 of 56 block RAM (100 %, no margin), core clock closes 85.7 MHz and D-PHY 200 MHz on 7 of 7 seeds (nextpnr estimates, not signoff; `docs/fpga.md`). Earlier 45F numbers (12.2 k LUT4, 56 of 108 block RAM, 4 of 6 seeds, older RTL and tools) are kept in `docs/fpga.md`, labelled as 45F.
 
 ## Honest limits - read before building hardware
 
