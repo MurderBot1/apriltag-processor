@@ -20,7 +20,11 @@ AX = PARAMS["sensor"]["center"]  # optical axis (x, y)
 FPGA = (0.0, -8.0)  # from pcb_params keepout_note
 HO = HI + WALL
 BORE_D = 15.0
-HOLDER_H, BARREL_H, BARREL_D = 6.0, 14.0, 14.0
+LH = PARAMS["lens_holder"]
+HOLDER_H, BARREL_H, BARREL_D = LH["height_above_board"], LH["lens_total_height_above_holder"], LH["lens_barrel_diameter"]
+assert (HOLDER_H, BARREL_H) == (7.4, 14.6)   # CLA021-LCP + CIL023 allowance (pcb_params.json)
+DESIGN_HALF_ANGLE = 50.0   # deg; rectilinear half-diagonal angle of CIL023 on the OV9281 is 45.8 deg, +4 deg for its -5 % TV distortion and tolerance
+SCREW_HEAD_D, SCREW_HEAD_H = 3.4, 1.3   # holder screw head allowance (ISO 7045 M1.6: 3.2 x 1.3; Commonlands does not publish its head)
 HOOD_TOP = HOLDER_H + BARREL_H + 0.3
 FRONT_OFFSET = ZPT  # front.stl is in print pose, local z=0 is the split plane
 
@@ -166,11 +170,12 @@ def test_front_pilots_align(front):
 def test_aperture_and_fov_cone(front):
     lens = PARAMS["lens_holder"]
     f, hfov = lens["focal_length_mm"], lens["hfov_deg"]
-    assert abs(math.degrees(2 * math.atan(1.92 / f)) - hfov) < 0.5
-    # OV9281 1280x800 @3um -> diagonal half angle
+    assert abs(math.degrees(2 * math.atan(1.92 / f)) - hfov) < 0.5   # rectilinear HFOV on the 3.84 mm OV9281 width
+    # OV9281 1280x800 @3um -> diagonal half angle (rectilinear), then the design angle with margin for distortion
     half_diag = math.hypot(1.92, 1.2)
-    th = math.atan(half_diag / f)
-    tan_t = math.tan(th)
+    assert math.degrees(math.atan(half_diag / f)) < DESIGN_HALF_ANGLE - 3.0
+    tan_t = math.tan(math.radians(DESIGN_HALF_ANGLE))
+    assert 7.2 > 2 * half_diag + 2.0   # CIL023 image circle 7.2 mm covers the 4.53 mm sensor diagonal
     zlens = ZPT + lens["height_above_board"] + lens["lens_total_height_above_holder"]
     r0 = 5.0  # assumed front-element clear radius
     # sample the cone surface from the lens front plane to above the hood
@@ -194,6 +199,31 @@ def test_aperture_and_fov_cone(front):
         assert abs(lo + hi_) < 0.1 and abs((hi_ - lo) - BORE_D) < 0.1
     margin = BORE_D / 2 - (r0 + (HOOD_TOP + ZPT - zlens) * tan_t)
     assert margin > 1.5
+
+
+def test_holder_headroom_under_cone_roof(front):
+    """The 7.4 mm holder (body 17 x 17 plus assumed screw ears) must keep >= 1.0 mm to the cone roof everywhere on its outline."""
+    hw = LH["footprint"][0] / 2
+    ex, ey = LH["ear_span_x"] / 2, LH["ear_span_y"] / 2
+    corners = [(sx * hw, sy * hw) for sx in (-1, 1) for sy in (-1, 1)] + [(sx * ex, sy * ey) for sx in (-1, 1) for sy in (-1, 1)]
+    top = ZPT + HOLDER_H
+    for dx, dy in corners:
+        for k in np.linspace(0, 1, 5):
+            x, y = AX[0] + dx * k, AX[1] + dy * k
+            pts = np.array([[x, y, top + h] for h in np.linspace(0.05, 1.0, 6)])
+            assert not inside(front, pts).any(), "holder outline (%.1f, %.1f) closer than 1.0 mm to the roof" % (dx, dy)
+
+
+def test_holder_screw_heads_fit_under_pcb(back):
+    """Holder screws enter from the PCB underside (M1.6 x 5): the head (3.4 x 1.3 allowance) sits in the 4.0 mm gap above the floor, clear of the back shell."""
+    assert ZPB - FLOOR - SCREW_HEAD_H >= 2.0, "head must leave >= 2.0 mm to the floor"
+    for sx, sy in LH["screw_positions"]:
+        r = SCREW_HEAD_D / 2
+        ang = np.linspace(0, 2 * np.pi, 12, endpoint=False)
+        ring = np.array([[sx + r * math.cos(a), sy + r * math.sin(a), z] for a in ang for z in (ZPB - SCREW_HEAD_H, ZPB - 0.05)])
+        assert not inside(back, ring).any(), "holder screw head collides with the back shell"
+    # screw length: M1.6 x 5 through 1.6 mm PCB leaves >= 3.0 mm in the holder and does not reach the holder top
+    assert 5.0 - PCB_T >= 3.0 and 5.0 - PCB_T < HOLDER_H
 
 
 def test_led_light_pipe_bores_go_through_flat_roof(front):
@@ -225,8 +255,10 @@ def test_pcb_components_do_not_interfere(back, front):
         g = np.mgrid[x0:x1:step, y0:y1:step, z0:z1:step].reshape(3, -1).T
         pts.append(g + step / 2 * 0)
 
-    box(AX[0] - 10, AX[0] + 10, AX[1] - 10, AX[1] + 10, ZPT + 0.05, ZPT + 6.0)                  # lens holder
-    box(AX[0] - 7, AX[0] + 7, AX[1] - 7, AX[1] + 7, ZPT + 6.0, ZPT + 20.0, 1.0)                  # barrel envelope
+    hw = LH["footprint"][0] / 2
+    box(AX[0] - hw, AX[0] + hw, AX[1] - hw, AX[1] + hw, ZPT + 0.05, ZPT + HOLDER_H)              # lens holder body
+    box(AX[0] - LH["ear_span_x"] / 2, AX[0] + LH["ear_span_x"] / 2, AX[1] - LH["ear_span_y"] / 2, AX[1] + LH["ear_span_y"] / 2, ZPT + 0.05, ZPT + HOLDER_H)   # screw ears (assumed)
+    box(AX[0] - 7, AX[0] + 7, AX[1] - 7, AX[1] + 7, ZPT + HOLDER_H, ZPT + HOLDER_H + BARREL_H, 1.0)    # barrel envelope
     box(FPGA[0] - 8.5, FPGA[0] + 8.5, FPGA[1] - 8.5, FPGA[1] + 8.5, ZPB - 1.5, ZPB - 0.05)              # FPGA
     ucx, ucy = uc_c = PARAMS["usb_c"]["center"]
     box(ucx, ucx + 7.3, ucy - 4.47, ucy + 4.47, ZPB - 3.2, ZPB - 0.05)           # USB-C body

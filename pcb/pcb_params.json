@@ -43,12 +43,15 @@
     "optical_axis_height_above_board": 0.7
   },
   "lens_holder": {
-    "part": "M12 board-mount lens holder (20x20 footprint, 2 screws)",
+    "part": "Commonlands CLA021-LCP M12 board-mount lens holder (LCP, 20 mm hole spacing, 2 screws)",
     "footprint": [
-      20.0,
-      20.0
+      17.0,
+      17.0
     ],
-    "height_above_board": 6.0,
+    "ear_span_x": 23.0,
+    "ear_span_y": 6.0,
+    "ear_note": "ear_span_* is an ASSUMED envelope for the two screw ears (holes at x=+-10, 1.5 mm of material beyond each hole); Commonlands publishes only the 17 x 17 mm footprint and the 20 mm hole spacing. Check against the CLA021 STP.",
+    "height_above_board": 7.4,
     "screw_positions": [
       [
         -10.0,
@@ -59,10 +62,14 @@
         9.0
       ]
     ],
+    "screw_part": "Commonlands CLA904-SCR, Phillips M1.6 x 5 thread-forming (head diameter and height not published by Commonlands)",
+    "lens_part": "Commonlands CIL023-F2.2-M12B650 (EFL 2.2 mm, f/2.2, 650 nm IR-cut, -5 % TV distortion, 7.2 mm image circle)",
     "lens_barrel_diameter": 14.0,
-    "lens_total_height_above_holder": 14.0,
-    "hfov_deg": 90.0,
-    "focal_length_mm": 1.92
+    "lens_total_height_above_holder": 14.6,
+    "lens_height_note": "Lens top = holder 7.4 + 14.6 = 22.0 mm above the PCB top. This is a design ALLOWANCE: the CIL023 mechanical drawing (STP) and back focal length are not published on the product page, so the stack keeps 2 mm more than the old 20.0 mm assumption. Replace with the measured value once the STP is read.",
+    "hfov_deg": 82.2,
+    "hfov_note": "rectilinear 2*atan(1.92/2.2) on the 3.84 mm OV9281 width. Real HFOV with the lens distortion is larger (about 84 to 85 deg, model estimate); calibrate k1..k3 on the camera.",
+    "focal_length_mm": 2.2
   },
   "usb_c": {
     "part": "USB-C 16-pin receptacle (HRO TYPE-C-31-M-12)",

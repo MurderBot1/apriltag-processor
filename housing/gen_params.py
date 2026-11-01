@@ -10,6 +10,7 @@ hole_xy = {abs(P['mounting_holes']['positions'][0][0])}; hole_d = {P['mounting_h
 sensor_c = {P['sensor']['center']};
 sensor_pkg = [{P['sensor']['package'][0]}, {P['sensor']['package'][1]}, 0.7];
 holder = [{l['footprint'][0]}, {l['footprint'][1]}, {l['height_above_board']}];
+holder_ears = [{l['ear_span_x']}, {l['ear_span_y']}];
 barrel_d = {l['lens_barrel_diameter']}; barrel_h = {l['lens_total_height_above_holder']};
 bot_h = {P['bottom_side_max_component_height']};
 usb_w = {u['opening_width']}; usb_h = {u['opening_height']}; usb_c = {u['center']};

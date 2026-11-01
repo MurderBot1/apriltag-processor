@@ -21,7 +21,7 @@ About 230 tests in 18 files (run_all counts below). What each layer proves:
 | MCU firmware | `test_fw_proto.py`, `test_fw_storage.py`, `test_fw_app.py` | 101 | COBS/CRC framing incl. fuzz, flash storage with **power loss simulated at every byte of a commit**, command handling, damaged / lost frame packets, a real packet through the C tag unit, auto-exposure convergence |
 | host + end to end | `test_host_e2e.py`, `test_host_fuzz.py` | 32 | host library against the real firmware code with the tags from the RTL runs (injected through the test hook of the fake FPGA); garbage/split/dropped bytes |
 | board data | `test_pcb.py` | 13 | every net has >= 2 pins, every FPGA power ball on the right rail, pin plan legality (banks, LVDS pairs, edge-clock pad, left/right IDDR rule), regulator divider voltages, mechanical contract |
-| housing | `test_housing.py` | 9 | watertight STLs, USB-C opening, screw posts vs PCB holes, 90 deg FOV cone clearance |
+| housing | `test_housing.py` | 13 | watertight STLs, USB-C opening, screw posts vs PCB holes, FOV cone clearance, holder headroom, holder screw heads |
 
 ## The test dataset: 100 images, 10 categories x 10
 
