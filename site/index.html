@@ -55,7 +55,7 @@
 <a class="navlink" href="#/config" data-id="config">Field map &amp; calibration</a>
   </div>
   <div id="navempty" class="muted" hidden>no match</div>
-  <div class="navfoot muted">built 2026-11-01 00:15</div>
+  <div class="navfoot muted">built 2026-11-01 00:33</div>
 </nav>
 <main id="main">
 <section class="page" id="page-home" hidden><h1>AprilTag camera: project browser</h1>
@@ -73,7 +73,7 @@ Everything below is generated from the repository by <code>site/build_site.py</c
                         -> RP2350 MCU (USB, stored field map, pose solve) -> host</pre>
 <img class="hero" src="img/r_hero_s.jpg" alt="housing assembly render"></section>
 <section class="page" id="page-about" hidden><h1>About this site</h1>
-<p>Generated 2026-11-01 00:15 by <code>site/build_site.py</code> (run <code>py -3.12 site/build_site.py</code>; reads the repo, writes only under <code>site/</code>). All data is embedded or loaded with <code>&lt;script src&gt;</code>, so it works from file://.</p>
+<p>Generated 2026-11-01 00:33 by <code>site/build_site.py</code> (run <code>py -3.12 site/build_site.py</code>; reads the repo, writes only under <code>site/</code>). All data is embedded or loaded with <code>&lt;script src&gt;</code>, so it works from file://.</p>
 <ul><li>3D: three.js r147 (non-module build + OrbitControls) vendored in <code>site/vendor/</code>, MIT licence.</li>
 <li>PCB 3D: full-assembly GLB from kicad-cli (<code>render/out/apriltag_cam_full.glb</code>) converted by <code>site/glb_convert.py</code>; the STEP was <code>render/out/apriltag_cam_full.step</code>.</li>
 <li>Markdown rendered with markdown-it-py; charts are inline SVG.</li>
@@ -173,11 +173,22 @@ arm-none-eabi-gcc + Pico SDK via <code>PICO_SDK_PATH</code>), native firmware-si
 Java jar, Rust <code>.crate</code>/rlib, docs tarball and the committed PCB gerbers/BOM (copied, not regenerated; needs KiCad). A step whose toolchain is
 missing is recorded as <code>skipped</code> in the manifest (never faked); set <code>REQUIRE=&quot;fpga firmware ...&quot;</code> to make that an error. A timing miss in the FPGA
 flow is recorded as a <code>warning</code>, and the bitstream is still produced.</p>
+<p><strong>RP2350 firmware image.</strong> Build on Linux (the Windows msys <code>ld</code> 2.47 fails the Pico SDK link with &quot;pico_flash_region.ld appears multiple times&quot;, so
+Windows is not a supported firmware build host). Needs <code>gcc-arm-none-eabi</code> (CI: Ubuntu 24.04 package, 13.2.1), <code>libnewlib-arm-none-eabi</code>, <code>cmake</code>, <code>ninja</code> and
+Pico SDK <strong>2.1.1</strong> with submodules (tinyusb); the SDK builds picotool from source on first configure (network needed):</p>
+<pre><code>git clone --depth 1 --branch 2.1.1 --recurse-submodules --shallow-submodules https://github.com/raspberrypi/pico-sdk.git ~/pico-sdk
+cmake -S firmware/rp2350 -B build/rp2350 -G Ninja -DPICO_SDK_PATH=~/pico-sdk &amp;&amp; cmake --build build/rp2350
+python3 tools/fw_size.py build/rp2350/apriltag_cam.elf --bin build/rp2350/apriltag_cam.bin --uf2 build/rp2350/apriltag_cam.uf2
+</code></pre>
+<p>The workflow <code>.github/workflows/firmware.yml</code> does this on every pull request that touches <code>firmware/</code>, checks the <code>.uf2</code> structure, uploads
+<code>apriltag_cam.uf2/.elf/.bin/.elf.map</code> as the artifact <code>rp2350-firmware</code> and posts the size report (flash image vs 16 MB, static SRAM vs 520 KB) on the PR.
+It never creates a release. Flash the <code>.uf2</code> by holding BOOTSEL while plugging in USB and copying the file to the <code>RP2350</code> drive (not yet tried on hardware).</p>
 <p><strong>Releasing:</strong> pushing to the <code>deploy</code> branch (<code>git push origin main:deploy</code>, or merge <code>main</code> into <code>deploy</code>) runs <code>.github/workflows/release.yml</code>.
 It installs the toolchains, runs <code>tools/build_all.sh --strict</code>, uploads <code>products/</code> as a workflow artifact, and creates a NEW GitHub Release
 tagged <code>deploy-&lt;run_number&gt;-&lt;short sha&gt;</code> with the products and manifest attached and notes listing the commit, date, tool versions and
 build/test results. Earlier releases are never overwritten. <code>main</code> does not trigger releases. The workflow can also be started manually
-(workflow_dispatch) from any ref. It uses <code>GITHUB_TOKEN</code> with <code>contents: write</code>.</p>
+(workflow_dispatch) from any ref; the manual run has a <code>dry_run</code> input (default true) that does everything except <code>gh release create</code>
+(it still lists the assets and checks that <code>firmware_apriltag_cam.uf2/.elf</code> are present). It uses <code>GITHUB_TOKEN</code> with <code>contents: write</code>.</p>
 <h2>Headline results (details and caveats in <code>docs/verification.md</code>, <code>docs/fpga.md</code>, <code>docs/hardware.md</code>)</h2>
 <ul>
 <li><strong>120.08 fps</strong> sustained in full-chip simulation at true sensor timing (832,800 clocks per frame at 100 MHz), every frame leaves the FPGA
@@ -487,6 +498,14 @@ Freerouting 2.1.0 with fixed copper timed out). The full re-route found complete
 128 had the best KiCad DRC (11: 73 + 15, 36: 75 + 23). One router flaw is patched after the fact: the +1V1MCU stub on the 0.2 mm DVDD pad is narrowed from 0.3 to
 0.2 mm (clearance to the neighbouring QFN pads); <code>pcb/router/export_problem.py</code> now also treats In2 copper as an obstacle (needed for incremental routing).
 The 3D renders and the site PCB pages were regenerated from the new board.</p>
+<h2>Firmware image build (RP2350)</h2>
+<p>The firmware (<code>firmware/rp2350</code>: <code>atapp</code>, <code>atframe</code>, <code>attpu</code>, <code>atpose</code>, <code>frame_rx.pio</code>, TinyUSB CDC) builds into <code>apriltag_cam.uf2/.elf/.bin</code> with Pico SDK 2.1.1 and
+arm-none-eabi-gcc 13.2.1 on Linux (CI: <code>.github/workflows/firmware.yml</code>; release: <code>tools/build_all.sh</code>). The build host must be Linux: the Windows msys
+<code>ld</code> 2.47 rejects the SDK linker script (&quot;pico_flash_region.ld appears multiple times&quot;). See the README section &quot;Build and release&quot; for the commands.
+<code>tools/fw_size.py</code> reports the image against the limits: flash 16 MB (fitted W25Q128), SRAM 520 KB. Sizes are posted on every firmware PR (see the comment
+of the <code>firmware</code> workflow); they are static allocation only, with no stack-depth or runtime measurement.
+Not verified (no hardware in the project): PIO frame capture on GPIO16..25, 21 MB/s frame bus timing and margin, DMA versus CPU SRAM contention,
+USB enumeration, BOOTSEL flashing of the <code>.uf2</code>, FPGA slave-SPI configuration from the RP2350.</p>
 </section>
 <section class="page" id="page-verification-doc" hidden><h1>Verification</h1><p class="muted">rendered from <code>docs/verification.md</code></p><h1>Verification</h1>
 <p>Run everything with <code>py -3.12 tests/run_all.py</code> (about 35 minutes; <code>--quick</code> skips the long frame-level RTL runs).

@@ -75,3 +75,13 @@ Freerouting 2.1.0 with fixed copper timed out). The full re-route found complete
 128 had the best KiCad DRC (11: 73 + 15, 36: 75 + 23). One router flaw is patched after the fact: the +1V1MCU stub on the 0.2 mm DVDD pad is narrowed from 0.3 to
 0.2 mm (clearance to the neighbouring QFN pads); `pcb/router/export_problem.py` now also treats In2 copper as an obstacle (needed for incremental routing).
 The 3D renders and the site PCB pages were regenerated from the new board.
+
+## Firmware image build (RP2350)
+
+The firmware (`firmware/rp2350`: `atapp`, `atframe`, `attpu`, `atpose`, `frame_rx.pio`, TinyUSB CDC) builds into `apriltag_cam.uf2/.elf/.bin` with Pico SDK 2.1.1 and
+arm-none-eabi-gcc 13.2.1 on Linux (CI: `.github/workflows/firmware.yml`; release: `tools/build_all.sh`). The build host must be Linux: the Windows msys
+`ld` 2.47 rejects the SDK linker script ("pico_flash_region.ld appears multiple times"). See the README section "Build and release" for the commands.
+`tools/fw_size.py` reports the image against the limits: flash 16 MB (fitted W25Q128), SRAM 520 KB. Sizes are posted on every firmware PR (see the comment
+of the `firmware` workflow); they are static allocation only, with no stack-depth or runtime measurement.
+Not verified (no hardware in the project): PIO frame capture on GPIO16..25, 21 MB/s frame bus timing and margin, DMA versus CPU SRAM contention,
+USB enumeration, BOOTSEL flashing of the `.uf2`, FPGA slave-SPI configuration from the RP2350.
