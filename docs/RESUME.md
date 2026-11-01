@@ -28,7 +28,7 @@ Project rules are in `CLAUDE.md` (manager/worker flow, `gh` for all GitHub work,
 
 ## 2. Open design decisions (from the BOM audit, `docs/bom/AUDIT.md`)
 
-- **Lens and holder (resolved in PR housing-optics):** CIL023-F2.2-M12B650 (82.2 deg rectilinear, $39.00) on CLA021-LCP (7.4 mm, $4.50); CIL018 needs a 9 to 13 mm holder. Housing stack re-derived (lens top allowance 22.0 mm; lens STP not public). See `docs/bom/AUDIT.md` section 5 and `housing/README.md`.
+- **Lens and holder (resolved in PR housing-optics):** CIL023-F2.2-M12B650 (82.2 deg rectilinear, $39.00) on CLA021-LCP (7.4 mm, $4.50); CIL018 needs a 9 to 13 mm holder. Housing stack re-derived (lens top allowance 22.0 mm; lens STP not public). See `docs/bom/AUDIT.md` section 6 and `housing/README.md`.
 - **U6, U8** (TLV75525 / TLV75528): out of stock at LCSC and JLCPCB. Needs a footprint decision.
 - **Flash label:** `pcb/design.py` says W25Q128JVSIQ (SOIC-8), footprint is WSON-8, so it should be JVPIQ. `bom.csv` and the KiCad file were not regenerated.
 - **Crystal Y1:** BOM says ABM8-272-T3 (10 pF) because C15/C16 are 15 pF. Needs design-owner confirmation, or change C15/C16.

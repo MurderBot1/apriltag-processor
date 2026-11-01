@@ -108,7 +108,7 @@ Fit findings:
 * **Holder screws.** M1.6 pan head is about 3 mm (not published by Commonlands); the PCB hole is 2.6 mm, so the head bears only about 0.2 mm all round. Check against the CLA020 drawing.
 * McMaster-Carr requires a login to show prices and Bolt Depot/Fastenal/Digi-Key blocked automated access, so they were not used.
 
-## 5. Update 2026-10-31: optics and housing production readiness (branch housing-optics)
+## 6. Update 2026-10-31: optics and housing production readiness (branch housing-optics)
 
 Decisions (sources: Commonlands product pages and products.json read 2026-10-31):
 * **Lens changed to CIL023-F2.2-M12B650** (EFL 2.2 mm, 82.2 deg rectilinear HFOV, -5 % TV, 7.2 mm image circle, USD 39.00, 270 in stock). Reason: the section 3 recommendation CIL018 needs a 9 to 13 mm tall holder ("Both variants require a 9mm-13mm tall M12 holder"), and the in-stock 20 mm-spacing holder CLA021-LCP is 7.4 mm; CLA020-PC (10 mm) is out of stock. CIL023 lists "6mm-9mm Tall Holder" and fits the CLA021. A 20 mm hole spacing is fixed by the PCB; the 18 mm holders (CLA018 8.4 mm, CLA019 12 mm) and the 22 mm CLA024 (12 mm) do not match it.
