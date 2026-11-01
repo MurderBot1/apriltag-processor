@@ -1,0 +1,42 @@
+name: fpga-timing
+
+# nextpnr timing check of the FPGA design with the SAME pinned OSS CAD Suite as release.yml (yosys + nextpnr-ecp5).
+# Runs on PRs that touch the RTL / FPGA flow, and by hand with any seed list / speed grade / device.
+# nextpnr numbers are estimates, not signoff.
+on:
+  pull_request:
+    paths: ['rtl/**', 'tools/fpga_*.sh', 'tools/pins.py', 'tools/build_all.sh', '.github/workflows/fpga-timing.yml']
+  workflow_dispatch:
+    inputs:
+      seeds:   { description: "seeds", default: "1 2 3 4 5 6", type: string }
+      speed:   { description: "ECP5 speed grade (6, 7 or 8)", default: "8", type: string }
+      device:  { description: "45k or 25k", default: "45k", type: string }
+      require_close: { description: "fail if no seed closes both clocks", default: true, type: boolean }
+
+jobs:
+  timing:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned OSS CAD Suite (same as release.yml)
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/oss.tgz" https://github.com/YosysHQ/oss-cad-suite-build/releases/download/2025-09-01/oss-cad-suite-linux-x64-20250901.tgz
+          echo "fabef6776a43be47a06913916f1d14bbd4553dc2443c365e30016e350eed6cb3  $RUNNER_TEMP/oss.tgz" | sha256sum -c -
+          tar -xzf "$RUNNER_TEMP/oss.tgz" -C "$RUNNER_TEMP"; rm "$RUNNER_TEMP/oss.tgz"
+          echo "$RUNNER_TEMP/oss-cad-suite/bin" >> "$GITHUB_PATH"
+      - name: Sweep
+        env:
+          SEEDS: ${{ inputs.seeds || '1 3 5 4 7' }}
+          SPEED: ${{ inputs.speed || '8' }}
+          DEVICE: ${{ inputs.device || '45k' }}
+        run: |
+          yosys -V; nextpnr-ecp5 --version
+          set +e
+          bash tools/fpga_sweep.sh "$SEEDS" "$SPEED" "$DEVICE" 85.714 | tee sweep.md
+          rc=${PIPESTATUS[0]}
+          { echo "### FPGA timing: $DEVICE speed grade $SPEED (pinned OSS CAD Suite 2025-09-01, nextpnr estimate, not signoff)"; echo; cat sweep.md; } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$rc" != 0 ] && [ "${{ inputs.require_close }}" != false ]; then echo "no seed closes both clocks"; exit 1; fi
