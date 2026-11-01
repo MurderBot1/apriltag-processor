@@ -131,6 +131,8 @@ void Camera::set_sensor(uint16_t exposure, uint8_t gain) {
 
 void Camera::set_ae(bool enable) { ack(CMD_SET_AE, Bytes{uint8_t(enable ? 1 : 0)}); }
 
+void Camera::set_auto_ratio(bool enable) { ack(CMD_SET_AUTO_RATIO, Bytes{uint8_t(enable ? 1 : 0)}); }
+
 void Camera::set_track(uint8_t diff, uint8_t abs_black, uint8_t mindim, uint8_t maxham, uint8_t ratio) {
     if (maxham > 63) throw Error("maxham out of range");
     if (ratio > 3) throw Error("ratio out of range");

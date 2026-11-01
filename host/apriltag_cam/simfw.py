@@ -10,7 +10,7 @@ import subprocess
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 CORE = os.path.join(ROOT, 'firmware', 'core')
 DLL = os.path.join(ROOT, 'firmware', 'tests', 'libatfw.dll' if os.name == 'nt' else 'libatfw.so')
-SOURCES = [os.path.join(CORE, f) for f in ('atpose.c', 'atproto.c', 'atapp.c', 'atae.c', 'atframe.c', 'attpu.c')] + \
+SOURCES = [os.path.join(CORE, f) for f in ('atpose.c', 'atproto.c', 'atapp.c', 'atae.c', 'atratio.c', 'atframe.c', 'attpu.c')] + \
           [os.path.join(ROOT, 'firmware', 'tests', 'atfw_shim.c')]
 
 FPGA_ID = 0x41544731
@@ -225,7 +225,7 @@ class FakeFpga:
     def _now(self):
         return self.time_fn(self) if self.time_fn else self.time_us
 
-    def publish(self, tags, frame_id=None, status=0):
+    def publish(self, tags, frame_id=None, status=0, ccl_flags=0):
         """tags: iterable of (id, corners[4][2], ham=0, rot=0) or dicts {id, corners, ham}.  Queues one frame packet whose detections are `tags`."""
         recs = []
         for t in tags:
@@ -239,7 +239,7 @@ class FakeFpga:
         self.seq = (self.seq + 1) & 0xFFFF
         self.count = len(recs)
         ts = self._now()
-        self._enqueue(make_packet(fid, ts, self.frame_sum_fn(self) if self.frame_sum_fn else self.frame_sum, status, count=len(recs)), recs[:31], fid)
+        self._enqueue(make_packet(fid, ts, self.frame_sum_fn(self) if self.frame_sum_fn else self.frame_sum, status, count=len(recs), ccl_flags=ccl_flags), recs[:31], fid)
 
     def publish_packet(self, packet):
         """Queue a complete packet (bytes) built by make_packet() or taken from the RTL simulation; the real C tag unit decodes it."""

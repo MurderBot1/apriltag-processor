@@ -1,0 +1,149 @@
+{
+ "lat": 2,
+ "cats": {
+  "blur": {
+   "vis": 590,
+   "fixed0": 540,
+   "fixed1": 540,
+   "auto": 540,
+   "r1_frames": 0,
+   "first_r1": null,
+   "switches": 0,
+   "first_tag": 0
+  },
+  "bright": {
+   "vis": 810,
+   "fixed0": 800,
+   "fixed1": 810,
+   "auto": 800,
+   "r1_frames": 0,
+   "first_r1": null,
+   "switches": 0,
+   "first_tag": 0
+  },
+  "clutter": {
+   "vis": 590,
+   "fixed0": 570,
+   "fixed1": 570,
+   "auto": 570,
+   "r1_frames": 0,
+   "first_r1": null,
+   "switches": 0,
+   "first_tag": 0
+  },
+  "dark": {
+   "vis": 690,
+   "fixed0": 690,
+   "fixed1": 690,
+   "auto": 690,
+   "r1_frames": 0,
+   "first_r1": null,
+   "switches": 0,
+   "first_tag": 0
+  },
+  "grad": {
+   "vis": 750,
+   "fixed0": 750,
+   "fixed1": 750,
+   "auto": 750,
+   "r1_frames": 0,
+   "first_r1": null,
+   "switches": 0,
+   "first_tag": 0
+  },
+  "lowcon": {
+   "vis": 660,
+   "fixed0": 0,
+   "fixed1": 660,
+   "auto": 637,
+   "r1_frames": 96,
+   "first_r1": 4,
+   "switches": 1,
+   "first_tag": 4
+  },
+  "noise": {
+   "vis": 570,
+   "fixed0": 570,
+   "fixed1": 310,
+   "auto": 570,
+   "r1_frames": 0,
+   "first_r1": null,
+   "switches": 0,
+   "first_tag": 0
+  },
+  "normal": {
+   "vis": 620,
+   "fixed0": 620,
+   "fixed1": 620,
+   "auto": 620,
+   "r1_frames": 0,
+   "first_r1": null,
+   "switches": 0,
+   "first_tag": 0
+  },
+  "persp": {
+   "vis": 720,
+   "fixed0": 650,
+   "fixed1": 650,
+   "auto": 650,
+   "r1_frames": 0,
+   "first_r1": null,
+   "switches": 0,
+   "first_tag": 0
+  },
+  "shadow": {
+   "vis": 470,
+   "fixed0": 430,
+   "fixed1": 430,
+   "auto": 430,
+   "r1_frames": 0,
+   "first_r1": null,
+   "switches": 0,
+   "first_tag": 0
+  }
+ },
+ "total": {
+  "vis": 6470,
+  "f0": 5620,
+  "f1": 6030,
+  "fa": 6257
+ },
+ "orders": {
+  "file order (sorted names)": {
+   "frames": 100,
+   "vis": 647,
+   "fixed0": 562,
+   "fixed1": 603,
+   "auto": 605,
+   "r1_frames": 10,
+   "switches": 2
+  },
+  "categories reversed": {
+   "frames": 100,
+   "vis": 647,
+   "fixed0": 562,
+   "fixed1": 603,
+   "auto": 606,
+   "r1_frames": 56,
+   "switches": 1
+  },
+  "lowcon first": {
+   "frames": 100,
+   "vis": 647,
+   "fixed0": 562,
+   "fixed1": 603,
+   "auto": 606,
+   "r1_frames": 60,
+   "switches": 2
+  },
+  "noise, lowcon, clutter, noise, lowcon": {
+   "frames": 50,
+   "vis": 305,
+   "fixed0": 171,
+   "fixed1": 251,
+   "auto": 214,
+   "r1_frames": 20,
+   "switches": 2
+  }
+ }
+}

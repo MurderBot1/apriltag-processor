@@ -202,9 +202,15 @@ class Camera:
     def set_ae(self, enable: bool):
         self._request(P.CMD_SET_AE, bytes([1 if enable else 0]))
 
+    def set_auto_ratio(self, enable: bool):
+        """Automatic per-frame choice of the tile contrast ratio (on after boot). enable=False fixes the ratio at 0 (the register reset value);
+        set_tracking_params(ratio=1..3) also switches it off. See results/auto_ratio.md."""
+        self._request(P.CMD_SET_AUTO_RATIO, bytes([1 if enable else 0]))
+
     def set_tracking_params(self, diff=None, abs_black=None, mindim=None, maxham=None, ratio=None):
         """FPGA threshold register: local-contrast min, absolute black level, min tag dimension (px), max hamming distance, tile contrast-ratio test
-        (0: 2*diff>=max (reset), 1: 3*diff>=max, 2: 4*diff>=max, 3: off; use 1 or 2 for low-contrast scenes, see results/lowcon_ratio.md)."""
+        (0: 2*diff>=max (reset), 1: 3*diff>=max, 2: 4*diff>=max, 3: off; use 1 or 2 for low-contrast scenes, see results/lowcon_ratio.md).
+        A nonzero ratio disables the automatic ratio selection (set_auto_ratio); ratio 0 leaves it as it is."""
         d = DEFAULT_THRESH
         v = [d['diff'] if diff is None else diff, d['abs_black'] if abs_black is None else abs_black,
              d['mindim'] if mindim is None else mindim, d['maxham'] if maxham is None else maxham]

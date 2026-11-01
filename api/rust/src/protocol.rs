@@ -18,6 +18,7 @@ pub const CMD_GET_TAG: u8 = 0x0C;
 pub const CMD_GET_TAGS_RAW: u8 = 0x0D;
 pub const CMD_SET_AE: u8 = 0x0E;
 pub const CMD_GET_TIME: u8 = 0x0F;
+pub const CMD_SET_AUTO_RATIO: u8 = 0x10;
 
 pub const RSP_ACK: u8 = 0x80;
 pub const RSP_PONG: u8 = 0x81;

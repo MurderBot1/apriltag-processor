@@ -15,7 +15,8 @@ public final class Protocol {
 
     public static final int CMD_PING = 0x01, CMD_SET_CALIB = 0x02, CMD_CLEAR_MAP = 0x03, CMD_ADD_TAG = 0x04, CMD_COMMIT = 0x05,
             CMD_GET_CONFIG = 0x06, CMD_STREAM = 0x07, CMD_SET_SENSOR = 0x08, CMD_GET_STATUS = 0x09, CMD_SET_TRACK = 0x0A,
-            CMD_GET_POSE = 0x0B, CMD_GET_TAG = 0x0C, CMD_GET_TAGS_RAW = 0x0D, CMD_SET_AE = 0x0E, CMD_GET_TIME = 0x0F;
+            CMD_GET_POSE = 0x0B, CMD_GET_TAG = 0x0C, CMD_GET_TAGS_RAW = 0x0D, CMD_SET_AE = 0x0E, CMD_GET_TIME = 0x0F,
+            CMD_SET_AUTO_RATIO = 0x10;
     public static final int RSP_ACK = 0x80, RSP_PONG = 0x81, RSP_POSE = 0x82, RSP_TAGS = 0x83, RSP_CONFIG = 0x86, RSP_TAG = 0x87,
             RSP_STATUS = 0x89, RSP_TIME = 0x8A, RSP_NAK = 0xFF;
     public static final int ERR_BAD_LEN = 1, ERR_FULL = 2, ERR_FLASH = 3, ERR_UNKNOWN = 4, ERR_NO_POSE = 5, ERR_RANGE = 6;

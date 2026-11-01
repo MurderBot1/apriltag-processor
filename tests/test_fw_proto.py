@@ -299,6 +299,6 @@ def test_doc_tables_match_header():
     for i, (n, col) in doc_ids.items():
         if i >= 0x80 and n in sizes:
             assert int(col) == sizes[n], (n, col)
-    for n, ln in {'SET_CALIB': 36, 'ADD_TAG': 34, 'STREAM': 3, 'SET_SENSOR': 3, 'SET_TRACK': 4, 'SET_AE': 1, 'GET_TAG': 2}.items():
+    for n, ln in {'SET_CALIB': 36, 'ADD_TAG': 34, 'STREAM': 3, 'SET_SENSOR': 3, 'SET_TRACK': 4, 'SET_AE': 1, 'SET_AUTO_RATIO': 1, 'GET_TAG': 2}.items():
         row = [c for (nm, c) in doc_ids.values() if nm == n][0]
         assert str(ln) in row, (n, row)

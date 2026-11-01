@@ -135,6 +135,10 @@ class Camera:
     def set_ae(self, enable):
         self._request(P.CMD_SET_AE, bytes([1 if enable else 0]))
 
+    def set_auto_ratio(self, enable):
+        """Automatic per-frame choice of the tile contrast ratio (on after boot); False fixes the ratio at 0. set_track(ratio=1..3) switches it off."""
+        self._request(P.CMD_SET_AUTO_RATIO, bytes([1 if enable else 0]))
+
     def set_track(self, diff=24, abs_black=64, mindim=10, maxham=2, ratio=0):
         """ratio: tile contrast-ratio test, 0: 2*diff>=max (reset), 1: 3*diff>=max, 2: 4*diff>=max (low-contrast scenes), 3: off."""
         v = [diff, abs_black, mindim, maxham]

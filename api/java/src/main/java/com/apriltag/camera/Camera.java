@@ -183,6 +183,11 @@ public class Camera implements AutoCloseable {
         ack(CMD_SET_AE, new byte[] {(byte) (enable ? 1 : 0)});
     }
 
+    /** Automatic tile contrast ratio (on after boot); false fixes ratio 0; setTrack with ratio 1..3 switches it off. */
+    public void setAutoRatio(boolean enable) throws IOException {
+        ack(CMD_SET_AUTO_RATIO, new byte[] {(byte) (enable ? 1 : 0)});
+    }
+
     /** Reset values 24, 64, 10, 2. */
     public void setTrack(int diff, int absBlack, int mindim, int maxham) throws IOException {
         setTrack(diff, absBlack, mindim, maxham, 0);

@@ -90,6 +90,11 @@ static void send(at_app_t *a, uint8_t type, const uint8_t *body, size_t n)
 }
 static void ack(at_app_t *a, uint8_t cmd) { send(a, AT_RSP_ACK, &cmd, 1); }
 static void nak(at_app_t *a, uint8_t cmd, uint8_t err) { uint8_t b[2] = {cmd, err}; send(a, AT_RSP_NAK, b, 2); }
+static void set_thresh(at_app_t *a, uint32_t low30, unsigned ratio)
+{
+    a->thresh = (low30 & 0x3FFFFFFFu) | ((uint32_t)(ratio & 3u) << 30);
+    a->hal.fpga_write(a->hal.ctx, FPGA_REG_THRESH, a->thresh);
+}
 
 static void send_pose(at_app_t *a)
 {
@@ -191,7 +196,17 @@ static void on_frame(at_app_t *a, uint8_t type, const uint8_t *p, size_t n)
     case AT_CMD_SET_TRACK:
         if (n != 4) { nak(a, type, AT_ERR_BAD_LEN); break; }
         a->maxham = p[3] & 63;                              /* the tag unit runs here; the FPGA keeps the field in its register for read-back; p[3] bits 7:6 = tile contrast-ratio field (THRESH[31:30]) */
-        a->hal.fpga_write(a->hal.ctx, FPGA_REG_THRESH, (uint32_t)p[0] | ((uint32_t)p[1] << 8) | ((uint32_t)p[2] << 16) | ((uint32_t)(p[3] & 63) << 24) | ((uint32_t)(p[3] >> 6) << 30));
+        /* An explicit ratio (1..3) switches the automatic ratio off. Ratio 0 leaves the automatic mode as it is: clients that do not know the field
+         * send 0, and with automatic mode on the policy keeps the ratio it chose. SET_AUTO_RATIO(0) fixes the ratio at 0. */
+        if (p[3] >> 6) a->ar_enabled = 0;
+        set_thresh(a, (uint32_t)p[0] | ((uint32_t)p[1] << 8) | ((uint32_t)p[2] << 16) | ((uint32_t)(p[3] & 63) << 24),
+                   a->ar_enabled ? a->ar.ratio : (unsigned)(p[3] >> 6));
+        ack(a, type); break;
+    case AT_CMD_SET_AUTO_RATIO:
+        if (n != 1) { nak(a, type, AT_ERR_BAD_LEN); break; }
+        if (p[0] > 1) { nak(a, type, AT_ERR_RANGE); break; }
+        at_ar_init(&a->ar); a->ar_enabled = p[0];
+        set_thresh(a, a->thresh & 0x3FFFFFFFu, 0);          /* both modes start from ratio 0 */
         ack(a, type); break;
     case AT_CMD_GET_STATUS: {
         uint32_t st[16] = {0}; uint8_t b[64] = {0};
@@ -203,7 +218,8 @@ static void on_frame(at_app_t *a, uint8_t type, const uint8_t *p, size_t n)
         at_put_u32(b + 20, a->solved); at_put_u32(b + 24, a->solve_fail); at_put_u32(b + 28, a->torn_reads);
         at_put_u32(b + 32, a->frame_id); at_put_u16(b + 36, a->field.ntags); b[38] = (uint8_t)a->pose_valid; b[39] = a->streaming;
         at_put_u16(b + 40, a->ae.exposure); b[42] = a->ae.gain; b[43] = a->ae_enabled;
-        at_put_u16(b + 44, (uint16_t)(a->ae_mean * 256.0f)); at_put_u16(b + 46, 0);
+        at_put_u16(b + 44, (uint16_t)(a->ae_mean * 256.0f));
+        b[46] = (uint8_t)((a->thresh >> 30) | (a->ar_enabled << 2)); b[47] = 0;        /* ratio in the THRESH register, bit 2 = automatic ratio */
         send(a, AT_RSP_STATUS, b, 48); break; }
     case AT_CMD_GET_TIME: {
         if (n != 0) { nak(a, type, AT_ERR_BAD_LEN); break; }
@@ -234,10 +250,19 @@ void at_app_init(at_app_t *a, const at_hal_t *hal)
 {
     memset(a, 0, sizeof *a);
     a->hal = *hal; at_rx_init(&a->rx); a->divider = 1; a->maxham = 2;
+    a->thresh = AT_THRESH_RESET; at_ar_init(&a->ar); a->ar_enabled = 1;
     attpu_init();
     at_ae_init(&a->ae, AT_AE_INIT_EXPOSURE, AT_AE_INIT_GAIN); a->ae_enabled = 1;
     a->field.cal = (at_calib_t){640, 640, 639.5f, 399.5f, 0, 0, 0, 0, 0};
     at_store_load(a);
+}
+
+/* ----------------------------------------------------------------------------------- automatic contrast ratio */
+static void run_ar(at_app_t *a, unsigned ntags, unsigned ccl_flags)
+{
+    if (!a->ar_enabled) return;
+    unsigned r = at_ar_step(&a->ar, ntags, ccl_flags);
+    if (r != (a->thresh >> 30)) set_thresh(a, a->thresh & 0x3FFFFFFFu, r);
 }
 
 /* ----------------------------------------------------------------------------------- auto exposure */
@@ -294,6 +319,7 @@ int at_app_poll(at_app_t *a)
         a->pose_us = a->hal.micros(a->hal.ctx) - t0;
         if (a->streaming && ++a->div_cnt >= a->divider) { a->div_cnt = 0; send_pose(a); }
     } else if (a->nobs) a->solve_fail++;
+    run_ar(a, (unsigned)nt, f.ccl_flags);
     run_ae(a, f.frame_sum);
     return 1;
 }

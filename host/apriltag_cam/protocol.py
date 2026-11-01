@@ -9,6 +9,7 @@ MAX_FRAME = MAX_BODY + 8
 CMD_PING, CMD_SET_CALIB, CMD_CLEAR_MAP, CMD_ADD_TAG, CMD_COMMIT = 0x01, 0x02, 0x03, 0x04, 0x05
 CMD_GET_CONFIG, CMD_STREAM, CMD_SET_SENSOR, CMD_GET_STATUS, CMD_SET_TRACK = 0x06, 0x07, 0x08, 0x09, 0x0A
 CMD_GET_POSE, CMD_GET_TAG, CMD_GET_TAGS_RAW, CMD_SET_AE, CMD_GET_TIME = 0x0B, 0x0C, 0x0D, 0x0E, 0x0F
+CMD_SET_AUTO_RATIO = 0x10
 # device -> host
 RSP_ACK, RSP_PONG, RSP_POSE, RSP_TAGS, RSP_CONFIG, RSP_TAG, RSP_STATUS, RSP_TIME, RSP_NAK = 0x80, 0x81, 0x82, 0x83, 0x86, 0x87, 0x89, 0x8A, 0xFF
 ERR_BAD_LEN, ERR_FULL, ERR_FLASH, ERR_UNKNOWN, ERR_NO_POSE, ERR_RANGE = 1, 2, 3, 4, 5, 6
@@ -151,6 +152,8 @@ class Status:
     gain: int = 0
     ae_enabled: bool = False
     mean_brightness: float = 0.0
+    ratio: int = 0                # contrast-ratio field currently in the FPGA THRESH register
+    auto_ratio: bool = False      # automatic ratio selection active
 
     @property
     def init_done(self): return bool(self.fpga_status >> 3 & 1)
@@ -170,7 +173,8 @@ def decode_status(body: bytes) -> Status:
         raise ValueError('bad STATUS length %d' % len(body))
     w = struct.unpack_from('<9IHBB', body, 0)
     exp, gain, ae, meanq = struct.unpack_from('<HBBH', body, 40)
-    return Status(*w[:9], w[9], bool(w[10]), bool(w[11]), exp, gain, bool(ae), meanq / 256.0)
+    rflags = body[46]
+    return Status(*w[:9], w[9], bool(w[10]), bool(w[11]), exp, gain, bool(ae), meanq / 256.0, rflags & 3, bool(rflags & 4))
 
 
 def encode_calib(fx, fy, cx, cy, k1=0.0, k2=0.0, p1=0.0, p2=0.0, k3=0.0) -> bytes:
