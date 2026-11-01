@@ -38,8 +38,7 @@ def run(group):
     f = re.search(r'(\d+) failed', tail); nf = int(f.group(1)) if f else 0
     if r.returncode:                                   # show why a group failed (CI logs otherwise only keep the count)
         print(f'--- {name}: failure details', flush=True)
-        print('
-'.join(l for l in (r.stdout + r.stderr).splitlines() if l.startswith(('FAILED', 'ERROR', 'E  ')))[:4000], flush=True)
+        print(chr(10).join(l for l in (r.stdout + r.stderr).splitlines() if l.startswith(('FAILED', 'ERROR', 'E  ')))[:4000], flush=True)
     return name, n, nf, r.returncode, time.time() - t, tail
 
 
