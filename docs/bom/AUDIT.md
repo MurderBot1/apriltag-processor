@@ -4,6 +4,8 @@ Scope: `docs/bom/bom.json` (rendered to `docs/bom/index.html` by `build_bom.py`)
 `pcb/design.py`, `pcb/output/apriltag_cam.kicad_pcb`, `housing/README.md`, `pcb/pcb_params.json`, `docs/hardware.md`.
 Prices and stock were re-read on 2026-10-29. Method notes are at the end.
 
+**Status note (2026-11-01):** this is the dated audit record. Since then: U1 is LFE5U-25F-8BG381I (not the 85F or 45F named below), U6/U8 are ME6211C25M5G-N / ME6211C28M5G-N (not TLV75525/TLV75528), the flash label is W25Q128JVPIQ, the lens is CIL023 (82.2 deg HFOV) on CLA021-LCP. Current parts and prices: `docs/bom/bom.json`, `docs/bom/PRODUCTION.md`.
+
 ## 1. Cross-check of the four sources
 
 | Check | Result |

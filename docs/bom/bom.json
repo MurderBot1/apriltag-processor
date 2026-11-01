@@ -85,7 +85,7 @@
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "REPLACES TLV75525PDBVR (LCSC and JLC stock 0 on 2026-10-29 and 2026-10-31). Same SOT-23-5 pinout as the board uses: 1 VIN, 2 VSS, 3 CE, 4 NC, 5 VOUT (pinout read from the LCSC-derived library entry of the ME6211 family; the datasheet PDF itself could not be downloaded here, so re-check it against the MICRONE datasheet before ordering). 2.5 V fixed, 400 mA (LCSC attribute; TLV75525: 500 mA), the 2.5 V rail feeds only light loads (ECP5 VCCAUX). CE is tied to VIN as before, the 1u in / 2u2 out ceramics stay. LCSC C194395: stock 31,280 on 2026-11-01; JLCPCB stock not checked; price is the lowest quoted tier (10+) at $0.0562 (100+: $0.0440).",
+   "notes": "REPLACES TLV75525PDBVR (LCSC and JLC stock 0 on 2026-10-29 and 2026-10-31). Same SOT-23-5 pinout as the board uses: 1 VIN, 2 VSS, 3 CE, 4 NC, 5 VOUT (pinout checked 2026-11-01 against the MICRONE ME6211 datasheet V20, pin table for SOT23-5: 1 VIN, 2 VSS, 3 CE, 4 NC, 5 VOUT; the PDF was read from chipdip.ru and elecfans.com copies, not from the LCSC page for C194395, so compare the revision before a production order). 2.5 V fixed, 400 mA maximum output current (datasheet V20 table for ME6211C25; dropout typ 110 mV at 100 mA and 220 mV at 200 mA, VIN max 6.5 V, CE high >= 1.0 V; TLV75525: 500 mA), the 2.5 V rail feeds only light loads (ECP5 VCCAUX). CE is tied to VIN as before, the 1u in / 2u2 out ceramics stay. LCSC C194395: stock 31,280 on 2026-11-01; JLCPCB stock not checked; price is the lowest quoted tier (10+) at $0.0562 (100+: $0.0440).",
    "mpn_suggested": false,
    "price_source": "LCSC product API (wmsc.lcsc.com) 2026-11-01; 10+ tier"
   },
@@ -119,7 +119,7 @@
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "REPLACES TLV75528PDBVR (LCSC and JLC stock 0). The TLV75528PDYDR alternative has only 24 pcs at LCSC and its pinout was not checked, so it was not used; AP2125K-2.8 (C176952) has 50 pcs. Same SOT-23-5 pinout as the board uses: 1 VIN, 2 VSS, 3 CE, 4 NC, 5 VOUT (from the LCSC-derived library entry; re-check against the MICRONE datasheet before ordering). 2.8 V fixed, 450 mA (TLV75528: 500 mA); the load is the OV9281 AVDD/EVDD rail only (sensor supply current not verified here, expected tens of mA). LCSC C53099: stock 17,280 on 2026-11-01; JLCPCB stock not checked; price is the lowest quoted tier (10+) at $0.0667 (100+: $0.0535).",
+   "notes": "REPLACES TLV75528PDBVR (LCSC and JLC stock 0). The TLV75528PDYDR alternative has only 24 pcs at LCSC and its pinout was not checked, so it was not used; AP2125K-2.8 (C176952) has 50 pcs. Same SOT-23-5 pinout as the board uses: 1 VIN, 2 VSS, 3 CE, 4 NC, 5 VOUT (checked 2026-11-01 against the MICRONE ME6211 datasheet V20 SOT23-5 pin table, copies from chipdip.ru and elecfans.com). 2.8 V fixed, 450 mA maximum output current (datasheet V20 table for ME6211C28; dropout typ 110 mV at 100 mA and 220 mV at 200 mA; TLV75528: 500 mA); the load is the OV9281 AVDD/EVDD rail only (sensor supply current not verified here, expected tens of mA). LCSC C53099: stock 17,280 on 2026-11-01; JLCPCB stock not checked; price is the lowest quoted tier (10+) at $0.0667 (100+: $0.0535).",
    "mpn_suggested": false,
    "price_source": "LCSC product API (wmsc.lcsc.com) 2026-11-01; 10+ tier"
   },

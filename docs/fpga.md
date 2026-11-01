@@ -4,13 +4,13 @@
 
 Architecture A3 (`docs/costdown.md`): the FPGA keeps CSI-2/D-PHY receive, threshold, despeckle, the connected-component labeller
 and a streamer; the tag processing unit (TPU) and the two binary frame banks moved into the RP2350 (firmware C code + SRAM). That is
-what allows the smaller LFE5U-45F in the same CABGA-381 footprint (the old design needed the 85F: 196 of 208 block RAMs).
+what allows the smaller LFE5U-25F in the same CABGA-381 footprint (the old design needed the 85F: 196 of 208 block RAMs).
 
 Flow: `bash tools/fpga_flow.sh <seed> <freq>` (synth_ecp5 -> nextpnr-ecp5 `--45k --package CABGA381 --speed 8`; speed grade is `FPGA_SPEED=6|7|8`, see "Speed grades" below with `rtl/apriltag_cam.lpf` -> ecppack;
 env `FPGA_OUT=dir`, `FPGA_DEVICE=45k|85k|25k` for parallel runs / other devices). A real bitstream is produced (`sim/apriltag_cam.bit`).
 Nothing has been loaded onto a physical device. All numbers below are from nextpnr (estimates, not signoff), yosys 0.66, nextpnr 0.7.
 
-## Resource use (full chip, seed 1; the other seeds differ by a few LUTs only)
+## Resource use on the 45F (older RTL, seed 1, MSYS2 tools; the 25F shipping numbers are in the first paragraph)
 
 | resource | used | of (45F) | % | old design on the 85F |
 |---|---|---|---|---|
@@ -23,10 +23,9 @@ Nothing has been loaded onto a physical device. All numbers below are from nextp
 
 Block RAM now: threshold 17-row ring 27, labeller ~26 (label tables, run RAM), candidate RAM 2 (1024 x 32, the streamer reads it back), sensor init 1.
 The streamer itself (`rtl/mask_stream.v`) is a 16-word FIFO in LUT RAM plus the byte transmitter: a few hundred LUTs. Logic and block RAM have large
-headroom (the 45F has about 2x the block RAM needed). An ECP5-25F has 56 block RAMs: the design needs all 56 (100 %), so no margin; see
-`results/fpga_45f_seeds.md` for the one-seed nextpnr trial of the 25F (it fits: core 93.1 MHz, D-PHY 216.3 MHz).
+headroom on the 45F (about 2x the block RAM needed). The shipping ECP5-25F has 56 block RAMs: the design needs all 56 (100 %), so no margin, and 13,389 LUT4 (55 %) with the THRESH ratio field; see the top of this file and `results/fpga_speed_grades.md`.
 
-## Timing (post place-and-route, target 85.714 MHz core clock, 200 MHz D-PHY `sclk`)
+## Timing on the 45F (older RTL and tools, post place-and-route, target 85.714 MHz core clock, 200 MHz D-PHY `sclk`)
 
 | seed | core clock fmax | D-PHY `sclk` fmax | both pass |
 |---|---|---|---|

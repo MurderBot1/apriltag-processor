@@ -7,7 +7,7 @@ PCB: 48 x 48 mm, 4 layers (F.Cu signal / In1 GND plane / In2 3V3 plane / B.Cu si
 | side | parts |
 |---|---|
 | top (lens side) | OV9281 (bare CSP) at (0,+9), M12 lens holder footprint (CLA021-LCP, 17x17 body, 20 mm screw spacing, two holes at (+-10, 9); the 2.6 mm holes are too large for the M1.6 screw heads, see `housing/README.md`), PWR + STAT LEDs (at (-21.5, -6.5) / (-21.5, -9.5) with their 1k resistors, under the flat part of the housing roof; the front cover has an engraved power symbol above the PWR light pipe and an engraved heartbeat/pulse symbol below the STAT light pipe) , 4 M2 mounting holes |
-| bottom | ECP5-45F BG381 (LFE5U-25F-8BG381I since 2026-11-01, same footprint as the 45F and 85F) at (0,-8), RP2350A, 16 MB QSPI flash, USB-C (left edge), all regulators, decoupling, JTAG header, test points, BOOTSEL button |
+| bottom | ECP5 BG381 = LFE5U-25F-8BG381I (since 2026-11-01; same footprint as the 45F and 85F) at (0,-8), RP2350A, 16 MB QSPI flash, USB-C (left edge), all regulators, decoupling, JTAG header, test points, BOOTSEL button |
 
 ## Block / power tree
 
