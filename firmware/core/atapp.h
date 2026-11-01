@@ -33,6 +33,7 @@ typedef struct {
     const void *data;       /* oldest complete packet that has not been released yet (valid until frame_put) */
     size_t bytes;           /* length actually received */
     uint32_t lost;          /* running total of packets the receiver could not deliver (no free buffer, resync, short packet) */
+    uint32_t max_depth;     /* most packets ever waiting or in processing at once (at_bufpool_t.max_depth) */
 } at_frame_buf_t;
 
 typedef struct {
@@ -60,7 +61,7 @@ typedef struct {
     at_rx_t rx;
     uint8_t streaming; uint16_t divider, div_cnt;
     uint32_t frame_id, solved, solve_fail, torn_reads, tx_msgs;       /* torn_reads (legacy name, wire field unchanged): damaged / rejected packets */
-    uint32_t frames_done, rx_lost; uint8_t maxham;
+    uint32_t frames_done, rx_lost, rx_max_depth; uint8_t maxham;
     at_pose_t pose; int pose_valid; uint32_t pose_frame; uint32_t pose_us; uint64_t pose_ts, frame_ts;
     at_tag_obs_t obs[AT_MAX_MEAS]; int nobs;
     uint32_t store_seq;

@@ -90,7 +90,9 @@ Tag-unit time on the MCU (**estimates**: `tools/m33_cycles.py`, Unicorn runs the
 (`tools/m33_pose_cycles.py`, estimate, bracketed because the emulator has no RP2350 double-precision coprocessor): median 1.8 ms / worst 3.6 ms with single-precision
 maths on the FPU, median 3.0 / worst 8.8 ms with software doubles; the real firmware (doubles through the SDK, DCP) lies in between.
 
-Frame drops (`tools/frame_budget.py`, `results/frame_budget.md`; model of 2 frame buffers, the 10 frames of a category repeated; ESTIMATE): the old design lost
+Frame drops, current firmware (3 frame buffers, buffer released after the tag unit; ESTIMATE from the emulated M33 and the model in `tools/frame_budget.py`, not measured on hardware): 0 of 2000 frames lost in the nominal cycle model, 20 of 2000 (1.0 %, the slowest frame of one category recurring every 10th frame) in the pessimistic model; first build (2 buffers, release at the end) 3.0 %. Tests: `tests/test_fw_sched.py` (the C buffer pool, the order of release in `at_app_poll`, drop counting, and the C pool driven with the model's timing loses exactly the packets the model predicts, 24 cases). Details and the unverified items (late claim at the rising edge of `mcu_fs`, bus arbitration) in `results/frame_budget.md`. The text below describes the first 2-buffer build and is kept for comparison.
+
+Frame drops of the first build (`tools/frame_budget.py`, `results/frame_budget.md`; model of 2 frame buffers, the 10 frames of a category repeated; ESTIMATE): the old design lost
 20 of 100 frames (clutter 7, noise 6, dark 3, grad 2, shadow 2) if the stream looked like them. New, tag unit only, nominal model: 1.0 % overall (noise 9.9 %,
 every other category 0), pessimistic model 2.0 %; with the pose solve on the same core (float): 3.0 % (dark and noise 10 % / 20 %), software doubles 4.0 %;
 two cores alternating frames: 2.0 % (float pose). A third 132 KB frame buffer brings the nominal model to 0 % except software-double pose on one core (1 %) (pessimistic: 0 % for the tag unit alone and for two cores, 1 % / 2 % for one core with float / software-double pose) -
