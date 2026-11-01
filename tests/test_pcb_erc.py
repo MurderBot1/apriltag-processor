@@ -166,9 +166,7 @@ def test_gerber_zip_has_all_layers_and_drill_and_matches_the_folder():
     for n in names:
         data = z.read(n)
         assert len(data) > 200, n
-        norm = lambda b: b.replace(b'
-', b'
-')        # git may normalise line endings of the text files on checkout
+        norm = lambda b: b.replace(bytes([13, 10]), bytes([10]))        # git may normalise line endings of the text files on checkout
         assert norm(data) == norm(open(os.path.join(OUT, 'gerbers', n), 'rb').read()), f'{n}: zip differs from gerbers/'
     for n in names:
         if n.endswith(('.gtl', '.gbl', '.g1', '.g2', '.gm1')):
