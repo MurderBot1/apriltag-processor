@@ -47,16 +47,23 @@ jobs:
           set -eu
           test -s build/rp2350/apriltag_cam.uf2
           test -s build/rp2350/apriltag_cam.elf
-          # UF2 sanity: magic words in the first block, family id RP2350 ARM-S (0xe48bff59)
+          # UF2 sanity: magic words in every block; payload blocks use family RP2350 ARM-S (0xe48bff59) starting at XIP flash
+          # 0x10000000. The SDK also emits an "absolute" family (0xe48bff57) block (RP2350-E10 workaround), which is allowed.
           python3 - <<'PY'
           import struct
           d = open('build/rp2350/apriltag_cam.uf2', 'rb').read()
           assert len(d) % 512 == 0, 'uf2 size not a multiple of 512'
-          m0, m1, flags, addr, n, blk, nblk, fam = struct.unpack('<8I', d[:32])
-          assert (m0, m1) == (0x0A324655, 0x9E5D5157), 'bad uf2 magic'
-          assert flags & 0x2000 and fam == 0xE48BFF59, f'family id {fam:#x} is not RP2350 ARM-S'
-          assert addr == 0x10000000, f'first block at {addr:#x}, expected XIP flash 0x10000000'
-          print(f'uf2 ok: {len(d)//512} blocks, family {fam:#x}, first address {addr:#x}')
+          fams, arm = {}, []
+          for i in range(0, len(d), 512):
+              m0, m1, flags, addr, n, blk, nblk, fam = struct.unpack('<8I', d[i:i+32])
+              m_end = struct.unpack('<I', d[i+508:i+512])[0]
+              assert (m0, m1, m_end) == (0x0A324655, 0x9E5D5157, 0x0AB16F30), f'bad uf2 magic in block {i//512}'
+              assert flags & 0x2000, 'family id flag missing'
+              fams[fam] = fams.get(fam, 0) + 1
+              if fam == 0xE48BFF59: arm.append(addr)
+          assert set(fams) <= {0xE48BFF59, 0xE48BFF57}, f'unexpected family ids {[hex(f) for f in fams]}'
+          assert arm and min(arm) == 0x10000000, 'no RP2350 ARM-S payload starting at 0x10000000'
+          print('uf2 ok: blocks per family', {hex(k): v for k, v in fams.items()}, f'ARM-S range {min(arm):#x}..{max(arm):#x}')
           PY
           python3 tools/fw_size.py build/rp2350/apriltag_cam.elf --bin build/rp2350/apriltag_cam.bin \
             --uf2 build/rp2350/apriltag_cam.uf2 --out build/rp2350/size.md
