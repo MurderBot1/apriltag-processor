@@ -135,10 +135,12 @@ class Camera:
     def set_ae(self, enable):
         self._request(P.CMD_SET_AE, bytes([1 if enable else 0]))
 
-    def set_track(self, diff=24, abs_black=64, mindim=10, maxham=2):
+    def set_track(self, diff=24, abs_black=64, mindim=10, maxham=2, ratio=0):
+        """ratio: tile contrast-ratio test, 0: 2*diff>=max (reset), 1: 3*diff>=max, 2: 4*diff>=max (low-contrast scenes), 3: off."""
         v = [diff, abs_black, mindim, maxham]
-        if not all(0 <= x <= 255 for x in v) or maxham > 63:
+        if not all(0 <= x <= 255 for x in v) or maxham > 63 or not 0 <= ratio <= 3:
             raise ValueError('tracking parameter out of range')
+        v[3] |= ratio << 6
         self._request(P.CMD_SET_TRACK, bytes(v))
 
     def get_status(self):

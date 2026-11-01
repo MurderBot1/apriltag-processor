@@ -371,7 +371,11 @@ def test_i2c_busy_polling_is_bounded(dev):
 
 def test_set_tracking_params_register(dev):
     dev.ok(P.CMD_SET_TRACK, bytes([20, 70, 12, 0xFF]))
-    assert dev.fpga.regs[simfw.REG_THRESH] == 20 | 70 << 8 | 12 << 16 | 63 << 24   # maxham masked to 6 bits
+    assert dev.fpga.regs[simfw.REG_THRESH] == 20 | 70 << 8 | 12 << 16 | 63 << 24 | 3 << 30   # byte 3: maxham in bits 5:0, contrast-ratio field in 7:6
+    dev.ok(P.CMD_SET_TRACK, bytes([24, 64, 10, 2 | 2 << 6]))
+    assert dev.fpga.regs[simfw.REG_THRESH] == 24 | 64 << 8 | 10 << 16 | 2 << 24 | 2 << 30
+    dev.ok(P.CMD_SET_TRACK, bytes([24, 64, 10, 2]))                                      # default: ratio 0
+    assert dev.fpga.regs[simfw.REG_THRESH] >> 30 == 0
 
 
 # --------------------------------------------------------------------------------------------- pose accuracy, whole stack

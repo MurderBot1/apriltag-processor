@@ -131,9 +131,10 @@ void Camera::set_sensor(uint16_t exposure, uint8_t gain) {
 
 void Camera::set_ae(bool enable) { ack(CMD_SET_AE, Bytes{uint8_t(enable ? 1 : 0)}); }
 
-void Camera::set_track(uint8_t diff, uint8_t abs_black, uint8_t mindim, uint8_t maxham) {
+void Camera::set_track(uint8_t diff, uint8_t abs_black, uint8_t mindim, uint8_t maxham, uint8_t ratio) {
     if (maxham > 63) throw Error("maxham out of range");
-    ack(CMD_SET_TRACK, Bytes{diff, abs_black, mindim, maxham});
+    if (ratio > 3) throw Error("ratio out of range");
+    ack(CMD_SET_TRACK, Bytes{diff, abs_black, mindim, uint8_t(maxham | (ratio << 6))});
 }
 
 Status Camera::get_status() {

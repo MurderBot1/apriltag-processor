@@ -22,7 +22,7 @@ class NakError(CameraError):
         super().__init__('device NAK for command 0x%02X: error %d (%s)' % (cmd, code, P.ERR_NAMES.get(code, '?')))
 
 
-DEFAULT_THRESH = dict(diff=24, abs_black=64, mindim=10, maxham=2)       # reset values of the FPGA threshold register
+DEFAULT_THRESH = dict(diff=24, abs_black=64, mindim=10, maxham=2, ratio=0)       # reset values of the FPGA threshold register
 
 
 class Camera:
@@ -202,13 +202,16 @@ class Camera:
     def set_ae(self, enable: bool):
         self._request(P.CMD_SET_AE, bytes([1 if enable else 0]))
 
-    def set_tracking_params(self, diff=None, abs_black=None, mindim=None, maxham=None):
-        """FPGA threshold register: local-contrast min, absolute black level, min tag dimension (px), max hamming distance."""
+    def set_tracking_params(self, diff=None, abs_black=None, mindim=None, maxham=None, ratio=None):
+        """FPGA threshold register: local-contrast min, absolute black level, min tag dimension (px), max hamming distance, tile contrast-ratio test
+        (0: 2*diff>=max (reset), 1: 3*diff>=max, 2: 4*diff>=max, 3: off; use 1 or 2 for low-contrast scenes, see results/lowcon_ratio.md)."""
         d = DEFAULT_THRESH
         v = [d['diff'] if diff is None else diff, d['abs_black'] if abs_black is None else abs_black,
              d['mindim'] if mindim is None else mindim, d['maxham'] if maxham is None else maxham]
-        if not all(0 <= x <= 255 for x in v) or v[3] > 63:
+        r = d['ratio'] if ratio is None else ratio
+        if not all(0 <= x <= 255 for x in v) or v[3] > 63 or not 0 <= r <= 3:
             raise ValueError('tracking parameter out of range')
+        v[3] |= r << 6
         self._request(P.CMD_SET_TRACK, bytes(v))
 
     # ----------------------------------------------------------------------------- streaming
