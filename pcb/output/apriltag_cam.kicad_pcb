@@ -15358,7 +15358,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "LFE5U-45F-8BG381C"
+		(property "Value" "LFE5U-25F-8BG381I"
 			(at 0 -9.5 90)
 			(layer "B.Fab")
 			(hide yes)
