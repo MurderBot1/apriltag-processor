@@ -97,7 +97,7 @@ build/test results. Earlier releases are never overwritten. `main` does not trig
 3. **Timing closure**: see `docs/fpga.md` for the measured fmax of each clock domain against the 100 MHz / 200 MHz
    targets. Anything reported as failing there must be fixed (more pipelining) before relying on 120 fps in hardware.
 4. Detection is weaker than the reference library at long range (> ~3.5 m for 16.5 cm tags), for low-contrast scenes (0 % on the
-   `lowcon` category) and for small / grazing / shadowed tags. The labeller no longer rejects busy frames (256 runs/row, label recycling,
+   `lowcon` category with the reset THRESH ratio; 100 % with ratio 2, see `results/lowcon_ratio.md`) and for small / grazing / shadowed tags. The labeller no longer rejects busy frames (256 runs/row, label recycling,
    the 64 largest candidates kept), but a cluttered or noisy frame costs the MCU up to about 9 ms (estimate, Cortex-M33 emulation, median 1.6 ms; the old FPGA processor
    needed up to 30 ms): in a stream at 120 fps a heavy frame can make the MCU miss a packet (`frames_dropped`); the model predicts 1 - 4 % of frames
    if every 10th frame were the slowest of its category (`results/frame_budget.md`; the old design: 20 %). The MCU timing, the PIO/DMA frame

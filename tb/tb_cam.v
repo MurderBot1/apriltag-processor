@@ -17,6 +17,7 @@ module tb_cam;
     reg [15:0] beats [0:3000000];
     reg [31:0] plen [0:4000];
     integer npk, nframes, nres = 0;
+    reg [31:0] thr_w;
     reg [1023:0] f;
     integer fd, k, i, b, maxcyc;
     integer fs_count = 0, last_fs = 0, cyc = 0, min_period = 999999999, max_period = 0;
@@ -134,6 +135,7 @@ module tb_cam;
         fd = $fopen(f, "w"); $fclose(fd);
         repeat (10) @(posedge clk); rst <= 0; repeat (5) @(posedge clk);
         // register write/read check
+        if ($value$plusargs("thr=%h", thr_w)) spi_write(24'h00000C, thr_w);         // optional THRESH register value (diff, abs_black, mindim, maxham, ratio)
         spi_write(24'h000058, 32'hCAFEF00D); spi_read(24'h000000, 1);
         spi_read(24'h000058, 1);
         $display("REGTEST id_ok=%0d scratch=%h", 1, rd_words[0]);

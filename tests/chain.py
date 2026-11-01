@@ -11,7 +11,12 @@ def build():
     return rtlutil.build('tb_cam' + os.environ.get('CHAIN_TAG', ''), RTL)
 
 
-def run_frames(vvp, frames, tag, maxcyc=None, maxham=2, **kw):
+def thr_word(diff=24, abs_black=64, mindim=10, maxham=2, ratio=0):
+    """value of the FPGA THRESH register (0x0C): diff | abs_black<<8 | mindim<<16 | maxham<<24 (6 bit) | ratio<<30 (contrast-ratio test, see golden.RATIO_K)"""
+    return diff | abs_black << 8 | mindim << 16 | (maxham & 63) << 24 | ratio << 30
+
+
+def run_frames(vvp, frames, tag, maxcyc=None, maxham=2, thr=None, **kw):
     """Simulate the frames back to back; returns (log, res, seconds).  res['results'][i] describes packet i that left on the MCU bus:
     dict(seq, cyc, packet (parsed, see attpu.parse_packet), words = the 16+16*31 word result image the C tag unit produces from it (same layout as the
     old FPGA result RAM, so decode_tags() works unchanged), tags).  res['stats'] = the STATS line of the testbench (statistics registers).
@@ -24,7 +29,7 @@ def run_frames(vvp, frames, tag, maxcyc=None, maxham=2, **kw):
         os.remove(os.path.join(rtlutil.SIM, old))
     t = time.time()
     log = rtlutil.run(vvp, [f'frames={pre}.frames.hex', f'plen={pre}.plen.hex', f'npk={npk}', f'nframes={len(frames)}',
-                            f'out={out}', f'pkt={pre}.pkt'] + ([f'maxcyc={maxcyc}'] if maxcyc else []), timeout=7200)
+                            f'out={out}', f'pkt={pre}.pkt'] + ([f'maxcyc={maxcyc}'] if maxcyc else []) + ([f'thr={thr:08x}'] if thr is not None else []), timeout=7200)
     res = parse(out, pre + '.pkt', maxham)
     for i in range(len(res['packets'])):
         try: os.remove(f'{pre}.pkt.{i}.hex')
@@ -52,8 +57,8 @@ def decode_tags(words):
     return tpu_harness.parse_results(words + [0] * (512 - len(words)))
 
 
-def iss_reference(img, frame_id):
+def iss_reference(img, frame_id, ratio=0):
     """golden pipeline on the same image: Python threshold -> components -> TPU ISS"""
-    mask = golden.binarize_clean(img)
+    mask = golden.binarize_clean(img, ratio=ratio)
     tags, mach, nc = tpu_harness.run_iss(mask, frame_id=frame_id)
     return tags, mach, nc

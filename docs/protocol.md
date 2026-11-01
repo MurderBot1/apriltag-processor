@@ -142,6 +142,12 @@ local contrast threshold, absolute black level, minimum tag dimension in pixels,
 the FPGA; `maxham` is kept by the MCU (the tag unit runs there) and stored in the FPGA register for read-back only.
 Reset values 24, 64, 10, 2.
 
+The FPGA THRESH register also has a field that SET_TRACK does not set: bits 31:30 `ratio` (reset 0). A tile only gets the adaptive threshold
+("contrasty") if `diff >= diff_min` and `k * diff >= max` with k = 2 / 3 / 4 for ratio 0 / 1 / 2 (ratio 3: no ratio test). The reset value k = 2 means
+`min <= max / 2`; a frame whose contrast is compressed so that black stays above half of white (the `lowcon` dataset category: black ~69, white ~167) has
+no contrasty tile and the chip then sees nothing. Writing ratio 2 (`THRESH |= 2 << 30`) fixes that. The default stays 0 because it is the more robust
+setting for very noisy frames (see `docs/verification.md`). No SET_TRACK parameter carries it yet: the firmware writes the register with bits 31:30 = 0, so a SET_TRACK resets ratio to 0 (firmware change pending, not part of this change).
+
 ### 0x0B GET_POSE -> POSE
 Latest solved pose. NAK NO_POSE if none yet.
 

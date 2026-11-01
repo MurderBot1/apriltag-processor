@@ -40,7 +40,7 @@ Project rules are in `CLAUDE.md` (manager/worker flow, `gh` for all GitHub work,
 ## 3. Other open items
 
 - **Simulation pages:** `site/simout/` and the text in `site/sim/pages.py` still describe the old dataset. Needs Icarus Verilog (`iverilog`, not installed on this machine) and new frame names in `gen_pipeline.py`, `gen_sim.py`, `pages.py`.
-- **`lowcon` category:** chip detects 0 of 66 tags. Guess: fixed 24-level tile-threshold margin. Not investigated.
+- **`lowcon` category:** cause found: tile ratio test `2*diff >= max`. New THRESH bits 31:30 `ratio` (RTL + golden, `results/lowcon_ratio.md`): ratio 2 gives 66 / 66, but noise drops to 24 / 57, so the reset value stays 0 (562 / 647 unchanged). Open: firmware SET_TRACK writes bits 31:30 = 0; an adaptive per-frame choice would fix both.
 - **Frame drops:** 20 of 100 dataset frames exceed one frame period on the all-FPGA design (stale "0.2 ms" in `docs/architecture.md`).
 - **Release workflow** (`.github/workflows/release.yml`) has never run. Pushing to `deploy` triggers it. 45F timing and seed choice matter there (default seed in `tools/build_all.sh` is 1).
 - **`todo.md`** in the manager repo is still untracked.
