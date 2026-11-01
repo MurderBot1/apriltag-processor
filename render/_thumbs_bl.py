@@ -180,17 +180,17 @@ def build_ov9281():    # bare CSP image sensor die (placeholder look: silicon di
             bpy.ops.mesh.primitive_uv_sphere_add(segments=10, ring_count=6, radius=0.11, location=(-1.5 + i * 0.5, -1.25 + j * 0.5, 0.0))
             bpy.context.object.data.materials.append(M('silver'))
 
-def build_holder():    # CLA020 M12 lens holder 20x20, two M2.6 holes
-    box('plate', (20, 20, 2.6), (0, 0, 1.3), M('black'), 0.5)
+def build_holder():    # CLA021-LCP M12 lens holder 17x17 body, 7.4 mm tall, screw ears at 20 mm spacing
+    box('plate', (17, 17, 2.6), (0, 0, 1.3), M('black'), 0.5)
+    box('ears', (23, 6, 2.6), (0, 0, 1.3), M('black'), 0.5)
     ring = [(0, 2.6), (6.6, 2.6), (6.6, 6.4), (6.2, 6.8), (5.4, 6.8)]
-    revolve('barrel', [(5.0, 0), (6.9, 0), (6.9, 9.5), (6.5, 10.0), (5.6, 10.0), (5.6, 10.0)], M('black'), 72, (0, 0, 2.5))
-    revolve('bore', [(5.6, 10.0), (5.2, 9.8), (5.2, 0)], M('dgrey'), 72, (0, 0, 2.5))
+    revolve('barrel', [(5.0, 0), (6.9, 0), (6.9, 4.4), (6.5, 4.9), (5.6, 4.9), (5.6, 4.9)], M('black'), 72, (0, 0, 2.5))
+    revolve('bore', [(5.6, 4.9), (5.2, 4.7), (5.2, 0)], M('dgrey'), 72, (0, 0, 2.5))
     for sx in (-1, 1):
-        for sy in (-1, 1):
-            revolve('hole', [(1.3, 2.62), (1.3, 0.0)], M('dgrey'), 24, (sx * 8.0, sy * 8.0, 0))
-            revolve('holering', [(1.3, 2.62), (1.9, 2.62)], M('dgrey'), 24, (sx * 8.0, sy * 8.0, 0))
+        revolve('hole', [(0.85, 2.62), (0.85, 0.0)], M('dgrey'), 24, (sx * 10.0, 0, 0))
+        revolve('holering', [(0.85, 2.62), (1.5, 2.62)], M('dgrey'), 24, (sx * 10.0, 0, 0))
 
-def build_lens():      # M12 lens f=1.92 mm (barrel + glass front element + lock ring)
+def build_lens():      # M12 lens (representative, CIL023 f=2.2 mm class) (barrel + glass front element + lock ring)
     revolve('thread', [(5.7, 0), (6.0, 0.0), (6.0, 9.0), (5.7, 9.0)], M('steel'), 72, (0, 0, 0))
     prof = []
     for i in range(18): prof += [(5.85, 0.4 + i * 0.5), (6.0, 0.4 + i * 0.5 + 0.25)]

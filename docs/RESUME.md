@@ -28,13 +28,12 @@ Project rules are in `CLAUDE.md` (manager/worker flow, `gh` for all GitHub work,
 
 ## 2. Open design decisions (from the BOM audit, `docs/bom/AUDIT.md`)
 
-- **Lens:** recommended Commonlands CIL018-F2.8-M12B650 ($39.00, f=1.8 mm, 93.7 deg HFOV). The design assumed 1.92 mm / 90 deg. Cheaper: Arducam 2.1 mm at $10.09 RobotShop (about 85 deg, so it fails a hard 90 deg need; distortion not published).
-- **Lens holder:** CLA020-PC is out of stock, 10.0 mm tall, M1.6 screws. Housing assumes 6 mm and 2.6 mm holes. In-stock alternative: CLA021-LCP (7.4 mm, $4.50). The housing stack must be re-derived.
+- **Lens and holder (resolved in PR housing-optics):** CIL023-F2.2-M12B650 (82.2 deg rectilinear, $39.00) on CLA021-LCP (7.4 mm, $4.50); CIL018 needs a 9 to 13 mm holder. Housing stack re-derived (lens top allowance 22.0 mm; lens STP not public). See `docs/bom/AUDIT.md` section 6 and `housing/README.md`.
 - **U6, U8** (TLV75525 / TLV75528): out of stock at LCSC and JLCPCB. Needs a footprint decision.
 - **Flash label:** `pcb/design.py` says W25Q128JVSIQ (SOIC-8), footprint is WSON-8, so it should be JVPIQ. `bom.csv` and the KiCad file were not regenerated.
 - **Crystal Y1:** BOM says ABM8-272-T3 (10 pF) because C15/C16 are 15 pF. Needs design-owner confirmation, or change C15/C16.
 - **Check the 85F price** at Mouser/DigiKey if the 85F is kept (LCSC live price $100.13, an earlier snippet showed about $35).
-- **M1.6 holder screws:** head diameter not published; may not clear the 2.6 mm PCB hole.
+- **M1.6 holder screws (open, PCB):** head diameter not published (ISO 7045 M1.6 is 3.2 mm; second-hand McMaster listing 2.6 mm). The 2.6 mm PCB holes at (+-10, 9) are too large: change them to about 1.9 mm in `pcb/build_pcb.py`.
 - **Unverified BOM lines (3 of 50):** OV9281 sensor U10 (quote only), PCB fab fee, JLCPCB assembly fees.
 
 ## 3. Other open items

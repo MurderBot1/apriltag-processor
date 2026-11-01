@@ -28,6 +28,8 @@ head_cb_d = 4.4; head_cb_h = 1.4;
 pilot_d = 1.8;                // self-tapping pilot (use 3.2 for M2 heat-set insert)
 pilot_depth = 4.0;
 post_d = 6;
+holder_screw_hd_d = 3.4;      // holder screw head diameter allowance (Commonlands does not publish it; ISO 7045 M1.6 pan head is 3.2 max)
+holder_screw_hd   = 1.3;      // head height allowance (ISO 7045 M1.6: 1.3 max); it sits under the PCB in the 4.0 mm gap above the floor
 
 tongue_t = 1.0; tongue_h = 1.5; groove_extra = 0.2;   // lap joint, ring just outside cavity
 
@@ -37,7 +39,7 @@ roof_t   = 2.4;               // vertical roof thickness
 cone_r0  = 18.5;              // cone starts here (45 deg, printable w/o supports)
 bore_d   = 15.0;              // lens aperture (14 mm barrel + 0.5 per side)
 hood_wall = 2.0;
-hood_top = holder[2] + barrel_h + 0.3;   // rim 0.3 above lens front
+hood_top = holder[2] + barrel_h + 0.3;   // rim 0.3 above lens front (holder 7.4 CLA021-LCP + lens allowance 14.6 = lens top 22.0 above the PCB)
 cone_in_top = roof_in + (cone_r0 - bore_d/2);   // inner cone height at bore
 led_bore = 2.0;               // for 1.75 mm clear filament light pipe; LEDs sit on the FLAT roof (> cone_r0 from the lens axis), bores are perpendicular to it
 
@@ -172,9 +174,12 @@ module pcb_model() {
   color("green") translate([0, 0, zpb]) rrect(pcb_w, 2, pcb_t);
   translate([sensor_c[0], sensor_c[1], 0]) {
     color("gray") translate([-holder[0]/2, -holder[1]/2, zpt]) cube(holder);
+    color("gray") translate([-holder_ears[0]/2, -holder_ears[1]/2, zpt]) cube([holder_ears[0], holder_ears[1], holder[2]]);   // assumed screw-ear envelope
     color("black") translate([0, 0, zpt + holder[2]]) cylinder(d = barrel_d, h = barrel_h);
     color("white") translate([-sensor_pkg[0]/2, -sensor_pkg[1]/2, zpt - 0.01]) cube([sensor_pkg[0], sensor_pkg[1], 0.5]);
   }
+  // holder screws: M1.6 x 5 from the PCB underside, head under the board (head 3.4 x 1.3 allowance, hole in PCB 2.6)
+  for (sx = [-1, 1]) color("silver") translate([sx*10, sensor_c[1], zpb - holder_screw_hd]) cylinder(d = holder_screw_hd_d, h = holder_screw_hd);
   for (p = led_pos) color("red") translate([p[0] - 0.8, p[1] - 0.4, zpt]) cube([1.6, 0.8, 0.8]);
   color("darkgray") translate([fpga_c[0] - 8.5, fpga_c[1] - 8.5, zpb - 1.5]) cube([17, 17, 1.5]);
   color("silver") translate([usb_c[0], usb_c[1] - usb_w/2, zpb - bot_h]) cube([7.3, usb_w, bot_h]);

@@ -14,7 +14,7 @@ import numpy as np
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 W, H = 1280, 800
-HFOV_DEG = 90.0
+HFOV_DEG = 90.0   # nominal pinhole of the SIMULATED test set. The product lens (CIL023, 2.2 mm) is 82.2 deg rectilinear, fx 733 px; the dataset is not re-rendered for it
 FX = FY = (W / 2.0) / math.tan(math.radians(HFOV_DEG / 2))   # 640 px
 CX, CY = W / 2.0 - 0.5, H / 2.0 - 0.5                           # 639.5, 399.5
 TAG_SIZE = 0.1651                                               # 6.5in (FRC)
