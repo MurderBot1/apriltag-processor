@@ -55,7 +55,7 @@
 <a class="navlink" href="#/config" data-id="config">Field map &amp; calibration</a>
   </div>
   <div id="navempty" class="muted" hidden>no match</div>
-  <div class="navfoot muted">built 2026-10-31 23:57</div>
+  <div class="navfoot muted">built 2026-11-01 00:12</div>
 </nav>
 <main id="main">
 <section class="page" id="page-home" hidden><h1>AprilTag camera: project browser</h1>
@@ -73,7 +73,7 @@ Everything below is generated from the repository by <code>site/build_site.py</c
                         -> RP2350 MCU (USB, stored field map, pose solve) -> host</pre>
 <img class="hero" src="img/r_hero_s.jpg" alt="housing assembly render"></section>
 <section class="page" id="page-about" hidden><h1>About this site</h1>
-<p>Generated 2026-10-31 23:57 by <code>site/build_site.py</code> (run <code>py -3.12 site/build_site.py</code>; reads the repo, writes only under <code>site/</code>). All data is embedded or loaded with <code>&lt;script src&gt;</code>, so it works from file://.</p>
+<p>Generated 2026-11-01 00:12 by <code>site/build_site.py</code> (run <code>py -3.12 site/build_site.py</code>; reads the repo, writes only under <code>site/</code>). All data is embedded or loaded with <code>&lt;script src&gt;</code>, so it works from file://.</p>
 <ul><li>3D: three.js r147 (non-module build + OrbitControls) vendored in <code>site/vendor/</code>, MIT licence.</li>
 <li>PCB 3D: full-assembly GLB from kicad-cli (<code>render/out/apriltag_cam_full.glb</code>) converted by <code>site/glb_convert.py</code>; the STEP was <code>render/out/apriltag_cam_full.step</code>.</li>
 <li>Markdown rendered with markdown-it-py; charts are inline SVG.</li>
@@ -308,9 +308,12 @@ in flight, so even a 100-140 runs-per-row noise frame (113,759 runs, slowest row
 real 85.714 MHz core. Unions of several components, new labels and finished components cost more (10-20 clocks each); a
 row that still cannot be labelled in time is dropped with a flag (<code>max_row_cycles</code> is exported in the status registers) -
 never a hang. 7 of 500 frames of an earlier (historical) evaluation set lose 1-5 rows that way, none of the current 100, see <code>docs/verification.md</code></li>
-<li>two frame buffers in the MCU's SRAM (2 x 132 KB): frame N is processed by the tag unit (median 1.6 ms, worst 9.3 ms, estimated) while frame N+1
-streams into the other buffer, so capture never stalls; a packet is lost (and counted) only if both buffers are busy when it starts, which needs the
-processing of a frame to take more than ~10 ms (<code>results/frame_budget.md</code>)</li>
+<li>three frame buffers in the MCU's SRAM (3 x 132,128 B = 396,384 B, <code>AT_NBUF</code> in <code>firmware/core/atframe.h</code>): frame N is processed by the tag unit
+(median 1.6 ms, worst 9.3 ms, estimated) while frames N+1 and N+2 can stream in, so capture never stalls; the buffer is handed back as soon as the tag
+unit has copied its tags out (before the 1.8 - 3.6 ms pose solve), and a buffer released between two packets is still used by the next one
+(<code>late_claim</code>, rising edge of <code>mcu_fs</code>). A packet is lost (and counted, <code>frames dropped</code> in STATUS) only if all three buffers are busy when it starts.
+Estimated drops (emulated M33, not measured): 0 % nominal, 1 % pessimistic (the slowest frame of one category) with the first-build 2 buffers at 3 %;
+SRAM about 480 - 488 KB of 512 KiB (computed, not linked here). Decision, SRAM budget and the dual-core alternative: <code>results/frame_budget.md</code></li>
 <li>end-to-end latency (last pixel -&gt; tag list on the MCU) = 17-row threshold delay + 1 row despeckle + ~2-3 rows CCL + the candidate list
 (~0.2 ms) + tag unit time</li>
 </ul>
@@ -773,7 +776,8 @@ all-FPGA run for every one of the 100 frames (max corner difference 0 px, 0 fram
 1.89 / 11.0). The old FPGA processor needed a median 427k clocks = 5.0 ms and a worst 2.55 M clocks = 29.8 ms at 85.714 MHz. Pose solver
 (<code>tools/m33_pose_cycles.py</code>, estimate, bracketed because the emulator has no RP2350 double-precision coprocessor): median 1.8 ms / worst 3.6 ms with single-precision
 maths on the FPU, median 3.0 / worst 8.8 ms with software doubles; the real firmware (doubles through the SDK, DCP) lies in between.</p>
-<p>Frame drops (<code>tools/frame_budget.py</code>, <code>results/frame_budget.md</code>; model of 2 frame buffers, the 10 frames of a category repeated; ESTIMATE): the old design lost
+<p>Frame drops, current firmware (3 frame buffers, buffer released after the tag unit; ESTIMATE from the emulated M33 and the model in <code>tools/frame_budget.py</code>, not measured on hardware): 0 of 2000 frames lost in the nominal cycle model, 20 of 2000 (1.0 %, the slowest frame of one category recurring every 10th frame) in the pessimistic model; first build (2 buffers, release at the end) 3.0 %. Tests: <code>tests/test_fw_sched.py</code> (the C buffer pool, the order of release in <code>at_app_poll</code>, drop counting, and the C pool driven with the model's timing loses exactly the packets the model predicts, 24 cases). Details and the unverified items (late claim at the rising edge of <code>mcu_fs</code>, bus arbitration) in <code>results/frame_budget.md</code>. The text below describes the first 2-buffer build and is kept for comparison.</p>
+<p>Frame drops of the first build (<code>tools/frame_budget.py</code>, <code>results/frame_budget.md</code>; model of 2 frame buffers, the 10 frames of a category repeated; ESTIMATE): the old design lost
 20 of 100 frames (clutter 7, noise 6, dark 3, grad 2, shadow 2) if the stream looked like them. New, tag unit only, nominal model: 1.0 % overall (noise 9.9 %,
 every other category 0), pessimistic model 2.0 %; with the pose solve on the same core (float): 3.0 % (dark and noise 10 % / 20 %), software doubles 4.0 %;
 two cores alternating frames: 2.0 % (float pose). A third 132 KB frame buffer brings the nominal model to 0 % except software-double pose on one core (1 %) (pessimistic: 0 % for the tag unit alone and for two cores, 1 % / 2 % for one core with float / software-double pose) -
@@ -970,9 +974,9 @@ start), 32,000 mask words (800 rows x 40 words, bit x%32 of word y*40+x/32 = pix
 <code>run_ccl</code>. A frame with a sensor CRC/line-count error still leaves as a complete packet with the <code>CSI bad</code> status bit (the FPGA has no store to
 retract it; a frame with missing lines is zero padded); the MCU discards flagged packets. Format: <code>rtl/mask_stream.v</code>, <code>firmware/core/atframe.h</code>.</p>
 <p>RP2350 side (<code>firmware/rp2350/frame_rx.pio</code>, <code>hal_frame_rx.c</code>): a PIO state machine samples D on the rising edge of the strobe (3 PIO cycles per byte,
-7 available at 150 MHz), autopush every 4 bytes, a DMA channel moves each packet (33,032 words) into one of two 132 KB frame buffers in SRAM; the channel
-is re-armed from its completion interrupt (to a dummy word when both buffers are busy, so the stream never loses alignment); a packet that ends early is
-detected 100 us after <code>mcu_fs</code> falls and repaired by restarting the state machine. Firmware RAM use (bss, linked locally): 348 KB of 520 KB.</p>
+7 available at 150 MHz), autopush every 4 bytes, a DMA channel moves each packet (33,032 words) into one of three 132 KB frame buffers in SRAM (<code>AT_NBUF</code>); the channel
+is re-armed from its completion interrupt (to a dummy word when all buffers are busy, so the stream never loses alignment) and switched to a buffer that became free in the gap when <code>mcu_fs</code> rises (<code>late_claim</code>); a packet that ends early is
+detected 100 us after <code>mcu_fs</code> falls and repaired by restarting the state machine. Firmware RAM use: 348 KB bss of 520 KB with two buffers (linked locally); with three buffers about 480 - 488 KB of the 512 KiB main SRAM (computed, see <code>results/frame_budget.md</code>, not linked).</p>
 <p><strong>Not verified on hardware:</strong> the input timing margin (the PIO input synchroniser adds about 13 ns; the data window around the strobe edge is 11.7 ns
 before / 35 ns after), DMA/CPU SRAM arbitration at 21 MB/s while the tag unit runs, the PIO program itself (no PIO simulator was available; it compiles
 with the Pico SDK's <code>pioasm</code>). Testbenches: <code>tb/tb_mstream.v</code> (byte timing, stability around the strobe, FIFO, late labeller, short frame, abort),
@@ -2972,7 +2976,7 @@ These are checked in <code>tests/test_housing.py</code> by sampling the cone aga
 </div>
 <div class="tabpane" data-pane="m-p" hidden>
  <div class="v3host" id="v-pcb"><div class="vmsg">loading 3D...</div></div>
- <p class="muted">Full-assembly model <code>render/out/apriltag_cam_full.step</code> / <code>.glb</code> (exported 2026-10-31 23:46 with kicad-cli; every footprint carries a real 3D model: KiCad 10 official library for passives, SOT, WSON, header, switch, crystal; dimensionally accurate parametric models from <code>render/models/gen_models.py</code> for the ECP5 caBGA-381, RP2350 QFN-60, USB-C, oscillator, OV9281 CSP, M12 lens holder + lens and test pads): 340 model colour groups (149), 132868 triangles. Colours are the colours stored in the models. The copper traces on the 3D board are a texture from the routed .kicad_pcb (toggle &quot;traces&quot;) and are in the PCB layout tab and the renders.</p>
+ <p class="muted">Full-assembly model <code>render/out/apriltag_cam_full.step</code> / <code>.glb</code> (exported 2026-10-31 23:44 with kicad-cli; every footprint carries a real 3D model: KiCad 10 official library for passives, SOT, WSON, header, switch, crystal; dimensionally accurate parametric models from <code>render/models/gen_models.py</code> for the ECP5 caBGA-381, RP2350 QFN-60, USB-C, oscillator, OV9281 CSP, M12 lens holder + lens and test pads): 340 model colour groups (149), 132868 triangles. Colours are the colours stored in the models. The copper traces on the 3D board are a texture from the routed .kicad_pcb (toggle &quot;traces&quot;) and are in the PCB layout tab and the renders.</p>
  <div class="gridimgs"><figure><img src="img/board_top.png" alt="PCB top (board_top.png)" loading="lazy"><figcaption>PCB top (board_top.png)</figcaption></figure><figure><img src="img/board_bottom.png" alt="PCB bottom (board_bottom.png)" loading="lazy"><figcaption>PCB bottom (board_bottom.png)</figcaption></figure><figure><img src="img/board_iso.png" alt="PCB iso (board_iso.png)" loading="lazy"><figcaption>PCB iso (board_iso.png)</figcaption></figure></div>
 </div>
 <div class="tabpane" data-pane="m-r" hidden>
