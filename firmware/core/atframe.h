@@ -33,5 +33,35 @@ typedef struct {
     uint32_t max_row_cycles;
 } at_frame_t;
 
+/* ------------------------------------------------------------------------------------------ frame buffer pool
+ * Bookkeeping of the frame buffers of the receiver (plain C, no hardware: the RP2350 HAL uses it from its DMA / GPIO interrupts and from the main
+ * loop, the PC tests drive it directly).  AT_NBUF buffers of AT_PKT_BYTES each; a buffer is FREE -> FILLING (the receiver claims it when a
+ * packet starts) -> READY (packet complete) -> BUSY (held by the application; only one at a time) -> FREE.  Packets are handed out oldest first.
+ * If no buffer is free when a packet starts the receiver sinks that packet and it is counted as lost (`lost_nobuf`); a packet that ends early
+ * and is repaired by a resynchronisation is counted in `lost_abort`.  The caller must serialise calls (RP2350: interrupts disabled). */
+#define AT_NBUF 3                       /* frame buffers in SRAM: 3 x 132,128 B = 396,384 B (see docs/architecture.md, results/frame_budget.md) */
+#define AT_BUF_MAX 4
+
+enum { AT_BUF_FREE = 0, AT_BUF_FILLING, AT_BUF_READY, AT_BUF_BUSY };
+
+typedef struct {
+    uint8_t n;                          /* buffers in use (<= AT_BUF_MAX) */
+    uint8_t state[AT_BUF_MAX];
+    int8_t held;                        /* buffer given to the application, -1 = none */
+    uint32_t order[AT_BUF_MAX];         /* arrival number of a READY buffer */
+    uint32_t arrivals;
+    uint32_t lost_nobuf, lost_abort;    /* packets lost: no free buffer at the packet start / receiver resynchronisation */
+    uint32_t received;                  /* packets stored completely */
+    uint32_t max_depth;                 /* most packets ever waiting or in processing at once (READY + BUSY), a measure of the scheduling margin */
+} at_bufpool_t;
+
+void at_buf_init(at_bufpool_t *p, unsigned n);
+int  at_buf_claim(at_bufpool_t *p);                    /* buffer for a packet that starts now (FREE -> FILLING), -1 if none is free */
+void at_buf_complete(at_bufpool_t *p, int idx);        /* packet complete: idx = claimed buffer (-> READY) or -1 = it went to the sink (lost) */
+void at_buf_abort(at_bufpool_t *p, int idx);           /* packet repaired by resync: idx (or -1) is freed again, counted as lost */
+int  at_buf_acquire(at_bufpool_t *p);                  /* oldest READY buffer -> BUSY, -1 if none or one is already held */
+void at_buf_release(at_bufpool_t *p);                  /* held buffer -> FREE */
+uint32_t at_buf_lost(const at_bufpool_t *p);           /* lost_nobuf + lost_abort */
+
 /* Validate (size, magic, trailer check word) and unpack.  Returns 0 if the packet is usable, -1 if it is malformed. */
 int at_frame_parse(const void *packet, size_t bytes, at_frame_t *f);

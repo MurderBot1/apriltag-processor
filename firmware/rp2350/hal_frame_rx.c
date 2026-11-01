@@ -6,6 +6,9 @@
  * stall is repaired by aborting the transfer, flushing the PIO and starting over; that packet is counted as lost.
  * The gap between packets is >= 1.5 ms (vertical blanking), the interrupt work takes microseconds.
  *
+ * Frame buffers: AT_NBUF (3) in atframe.h, bookkeeping in at_bufpool_t (atframe.c).  A buffer that the application releases between two packets is
+ * still used by the next one (late_claim at the rising edge of FS).
+ *
  * Pins (pcb_pins.h): D0..D7 = PIN_FB_D0.., CLK = PIN_FB_CLK (must be PIN_FB_D0 + 8), FS = PIN_FB_FS.
  * NOT verified on hardware (see docs/fpga.md "MCU frame bus"): input timing margin, DMA/CPU SRAM arbitration at 21 Mbyte/s with the tag unit running. */
 #include <string.h>
@@ -20,32 +23,23 @@
 #include "pcb_pins.h"
 #include "frame_rx.pio.h"
 
-#define NBUF 2
-
-static uint32_t g_buf[NBUF][AT_PKT_WORDS] __attribute__((aligned(4)));
+static uint32_t g_buf[AT_NBUF][AT_PKT_WORDS] __attribute__((aligned(4)));
 static uint32_t g_trash;
-enum { S_FREE = 0, S_FILLING, S_READY, S_BUSY };
-static volatile uint8_t g_state[NBUF];
-static volatile uint32_t g_order[NBUF];          /* arrival number of a READY buffer */
-static volatile uint32_t g_arrivals;
+static at_bufpool_t g_pool;                      /* buffer bookkeeping (atframe.c), only touched with interrupts disabled / from the ISRs */
 static volatile int g_cur = -1;                  /* buffer being filled, -1 = dummy sink */
-static volatile uint32_t g_lost;
-static volatile int g_held = -1;                 /* buffer handed to the application */
 static PIO g_pio = pio0;
 static uint g_sm, g_dma;
 static uint g_offset;
 
 static void arm_dma(void)
 {
-    int pick = -1;
-    for (int i = 0; i < NBUF; i++) if (g_state[i] == S_FREE) { pick = i; break; }
+    int pick = at_buf_claim(&g_pool);
     g_cur = pick;
     dma_channel_config c = dma_channel_get_default_config(g_dma);
     channel_config_set_transfer_data_size(&c, DMA_SIZE_32);
     channel_config_set_read_increment(&c, false);
     channel_config_set_dreq(&c, pio_get_dreq(g_pio, g_sm, false));
     if (pick >= 0) {
-        g_state[pick] = S_FILLING;
         channel_config_set_write_increment(&c, true);
         dma_channel_configure(g_dma, &c, g_buf[pick], &g_pio->rxf[g_sm], AT_PKT_WORDS, true);
     } else {
@@ -57,9 +51,30 @@ static void arm_dma(void)
 static void dma_done_isr(void)
 {
     dma_hw->ints0 = 1u << g_dma;
-    if (g_cur >= 0) { g_order[g_cur] = ++g_arrivals; g_state[g_cur] = S_READY; }
-    else g_lost++;
+    at_buf_complete(&g_pool, g_cur);             /* g_cur < 0: the packet went to the sink and is counted as lost */
     arm_dma();
+}
+
+/* Late claim.  The DMA is re-armed when a packet ends, which is up to 1.7 ms before the next one starts; a buffer that the application releases
+ * in between would be missed and the next packet lost although a buffer is free when it starts (the model in tools/frame_budget.py claims at the
+ * packet start).  So when `mcu_fs` rises and the channel was armed to the sink, switch it to a buffer if one is free now AND nothing of the new
+ * packet has arrived yet (no transfer done, RX FIFO empty).  If a word slipped through, keep the sink: the packet is lost as before, the
+ * stream stays aligned.  Runs in the GPIO interrupt (priority below the DMA interrupt, so dma_done_isr cannot interleave). */
+static void late_claim(void)
+{
+    if (g_cur >= 0 || !dma_channel_is_busy(g_dma)) return;
+    if (dma_hw->ch[g_dma].transfer_count != AT_PKT_WORDS || !pio_sm_is_rx_fifo_empty(g_pio, g_sm)) return;
+    int pick = at_buf_claim(&g_pool);
+    if (pick < 0) return;
+    dma_channel_abort(g_dma);
+    g_cur = pick;
+    dma_channel_config c = dma_channel_get_default_config(g_dma);
+    channel_config_set_transfer_data_size(&c, DMA_SIZE_32);
+    channel_config_set_read_increment(&c, false);
+    channel_config_set_write_increment(&c, true);
+    channel_config_set_dreq(&c, pio_get_dreq(g_pio, g_sm, false));
+    dma_channel_configure(g_dma, &c, g_buf[pick], &g_pio->rxf[g_sm], AT_PKT_WORDS, true);
+    /* if a word was moved between the check and the abort the packet is one word short: fs_check() notices it when FS falls and resyncs */
 }
 
 /* restart reception from scratch: stop the transfer, empty the PIO, drop the partial packet */
@@ -71,8 +86,7 @@ static void resync(void)
     pio_sm_clear_fifos(g_pio, g_sm);
     pio_sm_restart(g_pio, g_sm);
     pio_sm_exec(g_pio, g_sm, pio_encode_jmp(g_offset));
-    if (g_cur >= 0) g_state[g_cur] = S_FREE;
-    g_lost++;
+    at_buf_abort(&g_pool, g_cur);
     dma_hw->ints0 = 1u << g_dma;
     arm_dma();
     pio_sm_set_enabled(g_pio, g_sm, true);
@@ -91,6 +105,11 @@ static int64_t fs_check(alarm_id_t id, void *user)
 static void fs_irq(uint gpio, uint32_t events)
 {
     (void)gpio;
+    if (events & GPIO_IRQ_EDGE_RISE) {
+        uint32_t irq = save_and_disable_interrupts();
+        late_claim();
+        restore_interrupts(irq);
+    }
     if (events & GPIO_IRQ_EDGE_FALL) add_alarm_in_us(100, fs_check, NULL, true);
 }
 
@@ -109,8 +128,8 @@ void hal_frame_init(void)
     irq_set_exclusive_handler(DMA_IRQ_0, dma_done_isr);
     irq_set_priority(DMA_IRQ_0, 0);
     irq_set_enabled(DMA_IRQ_0, true);
-    gpio_set_irq_enabled_with_callback(PIN_FB_FS, GPIO_IRQ_EDGE_FALL, true, fs_irq);
-    memset((void *)g_state, 0, sizeof g_state);
+    gpio_set_irq_enabled_with_callback(PIN_FB_FS, GPIO_IRQ_EDGE_FALL | GPIO_IRQ_EDGE_RISE, true, fs_irq);
+    at_buf_init(&g_pool, AT_NBUF);
     arm_dma();
     pio_sm_set_enabled(g_pio, g_sm, true);
 }
@@ -119,11 +138,10 @@ int hal_frame_get(void *ctx, at_frame_buf_t *b)
 {
     (void)ctx;
     uint32_t irq = save_and_disable_interrupts();
-    int pick = -1;
-    for (int i = 0; i < NBUF; i++) if (g_state[i] == S_READY && (pick < 0 || g_order[i] < g_order[pick])) pick = i;
-    b->lost = g_lost;
-    if (pick >= 0 && g_held < 0) { g_state[pick] = S_BUSY; g_held = pick; b->data = g_buf[pick]; b->bytes = AT_PKT_BYTES; }
-    else pick = -1;
+    int pick = at_buf_acquire(&g_pool);
+    b->lost = at_buf_lost(&g_pool);
+    b->max_depth = g_pool.max_depth;
+    if (pick >= 0) { b->data = g_buf[pick]; b->bytes = AT_PKT_BYTES; }
     restore_interrupts(irq);
     return pick >= 0;
 }
@@ -132,6 +150,6 @@ void hal_frame_put(void *ctx)
 {
     (void)ctx;
     uint32_t irq = save_and_disable_interrupts();
-    if (g_held >= 0) { g_state[g_held] = S_FREE; g_held = -1; }
+    at_buf_release(&g_pool);
     restore_interrupts(irq);
 }

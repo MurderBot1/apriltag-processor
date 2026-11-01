@@ -254,12 +254,15 @@ static void run_ae(at_app_t *a, uint32_t sum)
     }
 }
 
-/* ----------------------------------------------------------------------------------- frames from the FPGA */
+/* ----------------------------------------------------------------------------------- frames from the FPGA
+ * Scheduling: one packet per call, oldest first.  With AT_NBUF = 3 frame buffers a frame may wait up to two frame periods (16.7 ms) behind a
+ * slow one (tag unit worst 9.3 ms, pose up to 3.6 ms, estimated) before the receiver runs out of buffers; the buffer is released as soon as the
+ * tag unit has finished, see the model in tools/frame_budget.py (design `single_early`). */
 int at_app_poll(at_app_t *a)
 {
-    at_frame_buf_t b = {0, 0, 0};
-    if (!a->hal.frame_get || !a->hal.frame_get(a->hal.ctx, &b)) { a->rx_lost = b.lost; return 0; }
-    a->rx_lost = b.lost;
+    at_frame_buf_t b = {0, 0, 0, 0};
+    if (!a->hal.frame_get || !a->hal.frame_get(a->hal.ctx, &b)) { a->rx_lost = b.lost; a->rx_max_depth = b.max_depth; return 0; }
+    a->rx_lost = b.lost; a->rx_max_depth = b.max_depth;
     at_frame_t f;
     if (at_frame_parse(b.data, b.bytes, &f) || (f.status & AT_PKT_ST_DAMAGED)) {   /* malformed or flagged by the FPGA: no result */
         a->torn_reads++;
@@ -270,6 +273,9 @@ int at_app_poll(at_app_t *a)
     attpu_tag_t tags[ATTPU_MAX_TAGS];
     int nt = a->hal.detect ? a->hal.detect(a->hal.ctx, &f, tags, ATTPU_MAX_TAGS) : -1;        /* test hook; < 0 = run the real tag unit */
     if (nt < 0) nt = attpu_run(f.mask, f.cand, f.cand_count, f.seq, a->maxham, tags);
+    /* The tags are copied out of the packet: give the frame buffer back NOW, before the pose solve (1.8 - 3.6 ms) and the other work, so the
+     * receiver can store the next packet in it.  Nothing below may touch f.mask / f.cand (f.seq, f.ts, f.frame_sum are copies). */
+    a->hal.frame_put(a->hal.ctx);
     a->nobs = 0;
     at_meas_t meas[AT_MAX_MEAS];
     for (int i = 0; i < nt && a->nobs < AT_MAX_MEAS; i++) {
@@ -289,6 +295,5 @@ int at_app_poll(at_app_t *a)
         if (a->streaming && ++a->div_cnt >= a->divider) { a->div_cnt = 0; send_pose(a); }
     } else if (a->nobs) a->solve_fail++;
     run_ae(a, f.frame_sum);
-    a->hal.frame_put(a->hal.ctx);
     return 1;
 }
