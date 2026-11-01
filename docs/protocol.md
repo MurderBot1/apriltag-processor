@@ -137,10 +137,16 @@ lines then gain up to 0xFF, at most 4x change per step, one frame skipped after 
 | 46 | u16 | reserved (0) |
 
 ### 0x0A SET_TRACK
-`diff u8 | abs_black u8 | mindim u8 | maxham u8 (low 6 bits)`, written to the FPGA THRESH register (0x0C):
+`diff u8 | abs_black u8 | mindim u8 | maxham u8 (bits 5:0) + ratio (bits 7:6)`, written to the FPGA THRESH register (0x0C):
 local contrast threshold, absolute black level, minimum tag dimension in pixels, maximum accepted Hamming distance. The first three are used by
 the FPGA; `maxham` is kept by the MCU (the tag unit runs there) and stored in the FPGA register for read-back only.
-Reset values 24, 64, 10, 2.
+Reset values 24, 64, 10, 2, ratio 0.
+
+The fifth parameter is the tile contrast-ratio field `ratio` (bits 7:6 of the fourth byte; the message stays 4 bytes, clients that send maxham <= 63 get ratio 0), written to THRESH bits 31:30 (reset 0). A tile only gets the adaptive threshold
+("contrasty") if `diff >= diff_min` and `k * diff >= max` with k = 2 / 3 / 4 for ratio 0 / 1 / 2 (ratio 3: no ratio test). The reset value k = 2 means
+`min <= max / 2`; a frame whose contrast is compressed so that black stays above half of white (the `lowcon` dataset category: black ~69, white ~167) has
+no contrasty tile and the chip then sees nothing. SET_TRACK with ratio 1 or 2 fixes that (`set_track(..., ratio=2)` in the Python API, `set_tracking_params(ratio=2)` in the host module; C++ / Java / Rust likewise). The default stays 0 because it is the more robust
+setting for very noisy frames (see `docs/verification.md`). Every SET_TRACK sets all fields, so one that omits ratio resets it to 0.
 
 ### 0x0B GET_POSE -> POSE
 Latest solved pose. NAK NO_POSE if none yet.

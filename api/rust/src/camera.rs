@@ -256,12 +256,17 @@ impl<T: Transport> Camera<T> {
         self.ack(CMD_SET_AE, &[enable as u8])
     }
 
-    /// diff, abs_black, mindim, maxham (<= 63). Reset values 24, 64, 10, 2.
+    /// diff, abs_black, mindim, maxham (<= 63). Reset values 24, 64, 10, 2 (ratio 0).
     pub fn set_track(&mut self, diff: u8, abs_black: u8, mindim: u8, maxham: u8) -> Result<()> {
-        if maxham > 63 {
-            return Err(Error::Protocol("maxham out of range".into()));
+        self.set_track_ratio(diff, abs_black, mindim, maxham, 0)
+    }
+
+    /// As `set_track` plus the tile contrast-ratio test `ratio` (0: 2*diff>=max (reset), 1: 3x, 2: 4x (low-contrast scenes), 3: off).
+    pub fn set_track_ratio(&mut self, diff: u8, abs_black: u8, mindim: u8, maxham: u8, ratio: u8) -> Result<()> {
+        if maxham > 63 || ratio > 3 {
+            return Err(Error::Protocol("maxham or ratio out of range".into()));
         }
-        self.ack(CMD_SET_TRACK, &[diff, abs_black, mindim, maxham])
+        self.ack(CMD_SET_TRACK, &[diff, abs_black, mindim, maxham | (ratio << 6)])
     }
 
     pub fn get_status(&mut self) -> Result<Status> {

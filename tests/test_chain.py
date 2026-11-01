@@ -56,6 +56,21 @@ def test_result_matches_golden_pipeline_bit_exact_corners(vvp):
         assert np.abs(got[i]['corners'] - ref[i]['corners']).max() < 0.05, i
 
 
+def test_lowcon_frame_with_ratio_register_bit_exact(vvp):
+    """lowcon regression (0/66 on the chip with the reset value).  The tile 'contrasty' test 2*diff >= max rejects every tile of a frame whose
+    contrast is compressed to 24 % (black ~69, white ~167: diff 62..98 < max/2).  THRESH bits 31:30 select 3*diff, 4*diff or no ratio test.
+    The lowest-contrast frame must give the golden tag set with ratio=2 (and none with the reset value)."""
+    f = img('lowcon_009')
+    ref = {t['id']: t for t in chain.iss_reference(f, 1, ratio=2)[0]}
+    assert len(ref) >= 4
+    assert not chain.iss_reference(f, 1)[0]                    # reset value: golden finds nothing either
+    log, res, el = chain.run_frames(vvp, [f], 'sys_lowcon', thr=chain.thr_word(ratio=2))
+    got = {t['id']: t for t in decode_tags(res['results'][0]['words'])}
+    assert set(got) == set(ref), (set(got), set(ref))
+    for i in got:
+        assert np.abs(got[i]['corners'] - ref[i]['corners']).max() < 0.05, i
+
+
 def test_bad_crc_frame_is_flagged_and_next_frame_recovers(vvp):
     """the FPGA has no frame store to retract a frame: the packet leaves with the CSI-bad flag set, the MCU discards it; the next frame is clean"""
     frames = [img('normal_004'), img('noise_003')]

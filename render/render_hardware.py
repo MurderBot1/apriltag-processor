@@ -430,8 +430,9 @@ def shot_section(path, w, h, spp):
             md = o.modifiers.new('cut', 'BOOLEAN'); md.operation = 'DIFFERENCE'; md.solver = 'EXACT'; md.object = gcut
     for o in lens:                      # sensor stays, half only
         if o.name.startswith('sensor'): o.modifiers.new('cut', 'BOOLEAN'); o.modifiers[-1].object = gcut; o.modifiers[-1].solver = 'EXACT'; o.modifiers[-1].operation = 'DIFFERENCE'
-    # ---- 90 deg FOV cone: apex at the entrance pupil of the hood (z = 21.1 above the split plane, from housing.scad cone)
-    az = ZS + 21.1; L = 38.0; r = L          # 45 deg half angle
+    # ---- HFOV cone: apex at the entrance pupil of the hood (lens top 22.0 above the split plane + 1.1, from housing.scad), half angle = rectilinear HFOV/2 from pcb_params.json
+    _lp = json.load(open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'pcb', 'pcb_params.json')))['lens_holder']
+    az = ZS + _lp['height_above_board'] + _lp['lens_total_height_above_holder'] + 1.1; L = 38.0; r = L * math.tan(math.radians(_lp['hfov_deg'] / 2))
     cm = emit_mat('fov', (1.0, 0.78, 0.25), 1.2, 0.16)
     cone = lathe('fov_cone', [(0.0, az), (r, az + L)], cm, a0=math.pi / 2, a1=3 * math.pi / 2, seg=64, closed=False, smooth=True)
     tri = add_obj('fov_plane', [(0, AXIS[1], az), (0, AXIS[1] - r, az + L), (0, AXIS[1] + r, az + L)], [(0, 1, 2)], emit_mat('fov2', (1.0, 0.8, 0.3), 1.0, 0.22))
@@ -448,7 +449,7 @@ def shot_section(path, w, h, spp):
     for sy in (-1, 1):
         line((0, AXIS[1] + sy * 1.8, ZS + 0.75), (0, AXIS[1], az), 0.1, emit_mat('ray', (1, 0.9, 0.5), 3.0))
     # label (built-in font)
-    cu = bpy.data.curves.new('lbl', 'FONT'); cu.body = '90° FOV'; cu.size = 7.0 * MM * 1000 / 1000; cu.extrude = 0.0
+    cu = bpy.data.curves.new('lbl', 'FONT'); cu.body = '%.1f° HFOV' % _lp['hfov_deg']; cu.size = 7.0 * MM * 1000 / 1000; cu.extrude = 0.0
     lo = bpy.data.objects.new('lbl', cu); COLL.objects.link(lo)
     cu.size = 0.0075
     lo.location = (0.0, (AXIS[1] + 0.0) * MM - 0.0, (az + L * 0.55) * MM); lo.rotation_euler = (math.pi / 2, 0, math.pi / 2)

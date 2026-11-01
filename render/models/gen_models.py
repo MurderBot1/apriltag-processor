@@ -113,34 +113,38 @@ add('OV9281_CSP', [
 add('TestPoint_Pad_D1.0mm', [(GOLD, cyl(0, 0, 0.5, 0, 0.05))])
 
 # ---------------------------------------------------------------- LH1  M12 (S-mount) board-mount lens holder + M12x0.5 lens, optical axis at footprint origin
-# holder: 20 mm (y) flanged body, screw holes at x=+-10 (footprint NPTH 2.6), 6 mm tall; lens: thread d12 P0.5, hex lock nut, focus body d14, ends 14 mm above holder
-body = box(-8.0, 8.0, -10.0, 10.0, 0, 6.0)
+# holder: Commonlands CLA021-LCP, 17 x 17 mm body, 7.4 mm tall, screw ears at x=+-10 (20 mm spacing, 1.7 mm holes; footprint NPTH is a separate matter);
+# lens: representative M12x0.5 model (thread d12 P0.5, hex lock nut, focus body d14). Its top is 22.0 mm above the PCB (design allowance, the CIL023 STP is not public),
+# i.e. LZ = 1.95 mm higher than the old 20.05 mm model. This is NOT the CIL023 optical prescription.
+HH = 7.4; LZ = 1.95
+body = box(-8.5, 8.5, -8.5, 8.5, 0, HH)
 extra = []
 for sx in (-1, 1):
     extra.append(Part.makeCylinder(2.0, 3.0, V(sx * 10.0, 0, 0)))
     extra.append(box(sx * 8.0 if sx > 0 else -10.0, 10.0 if sx > 0 else -8.0, -2.0, 2.0, 0, 3.0))
 holder = body.multiFuse(extra)
-holder = holder.cut(Part.makeCylinder(6.4, 7, V(0, 0, 0)))
-for sx in (-1, 1): holder = holder.cut(Part.makeCylinder(1.3, 4, V(sx * 10.0, 0, -0.5)))
+holder = holder.cut(Part.makeCylinder(6.4, HH + 1, V(0, 0, 0)))
+for sx in (-1, 1): holder = holder.cut(Part.makeCylinder(0.85, 4, V(sx * 10.0, 0, -0.5)))
 holder = holder.cut(box(-5, 5, -8.5, 8.5, -0.1, 1.2))
 holder = holder.removeSplitter()
-prof = [(5.0, 1.6)]; z = 1.6
-while z < 13.9:
+prof = [(5.0, 1.6 + LZ)]; z = 1.6 + LZ
+while z < 13.9 + LZ:
     prof += [(5.75, z), (6.0, z + 0.125), (6.0, z + 0.25), (5.75, z + 0.375)]; z += 0.5
 prof += [(5.75, z), (5.0, z)]
 thread = revolve(prof)
-focus = revolve([(5.0, 14.0), (7.0, 14.0), (7.0, 19.4), (6.2, 20.0), (5.0, 20.0)])
-grip = [revolve([(7.0, 14.5 + 1.0 * i), (7.25, 14.6 + 1.0 * i), (7.25, 15.1 + 1.0 * i), (7.0, 15.2 + 1.0 * i)]) for i in range(5)]
-bezel = revolve([(3.4, 19.7), (6.0, 19.7), (6.0, 20.05), (3.4, 20.05)])
-hexw = Part.Face(Part.makePolygon([V(7.5 * math.cos(math.radians(60 * i)), 7.5 * math.sin(math.radians(60 * i)), 6.0) for i in range(7)]))
-nut = hexw.extrude(V(0, 0, 2.0)).cut(Part.makeCylinder(5.9, 2.0, V(0, 0, 6.0)))
+focus = revolve([(5.0, 14.0 + LZ), (7.0, 14.0 + LZ), (7.0, 19.4 + LZ), (6.2, 20.0 + LZ), (5.0, 20.0 + LZ)])
+grip = [revolve([(7.0, 14.5 + LZ + 1.0 * i), (7.25, 14.6 + LZ + 1.0 * i), (7.25, 15.1 + LZ + 1.0 * i), (7.0, 15.2 + LZ + 1.0 * i)]) for i in range(5)]
+bezel = revolve([(3.4, 19.7 + LZ), (6.0, 19.7 + LZ), (6.0, 20.05 + LZ), (3.4, 20.05 + LZ)])
+hexw = Part.Face(Part.makePolygon([V(7.5 * math.cos(math.radians(60 * i)), 7.5 * math.sin(math.radians(60 * i)), HH) for i in range(7)]))
+nut = hexw.extrude(V(0, 0, 2.0)).cut(Part.makeCylinder(5.9, 2.0, V(0, 0, HH)))
 def element(zc, t, a, s1, s2):
+    zc += LZ
     R1 = (a * a + s1 * s1) / (2 * s1); R2 = (a * a + s2 * s2) / (2 * s2)
     top = Part.makeSphere(R1, V(0, 0, zc + t / 2 + s1 - R1)); bot = Part.makeSphere(R2, V(0, 0, zc - t / 2 - s2 + R2))
     return top.common(bot).common(Part.makeCylinder(a, t + s1 + s2 + 0.1, V(0, 0, zc - t / 2 - s1 - 0.05)))
 els = [element(19.0, 0.9, 3.3, 0.9, 0.5), element(17.4, 0.8, 3.9, 0.5, 0.7), element(15.4, 1.0, 4.3, 0.7, 0.7),
        element(12.6, 0.9, 4.3, 0.5, 0.4), element(9.5, 0.9, 4.5, 0.4, 0.7), element(5.5, 0.6, 4.3, 0.2, 0.2)]
-spacers = [revolve([(4.4, z0), (5.0, z0), (5.0, z0 + 0.4), (4.4, z0 + 0.4)]) for z0 in (10.5, 14.0)]
+spacers = [revolve([(4.4, z0 + LZ), (5.0, z0 + LZ), (5.0, z0 + LZ + 0.4), (4.4, z0 + LZ + 0.4)]) for z0 in (10.5, 14.0)]
 add('M12_LENS_MOUNT', [
     ((0.07, 0.07, 0.08), holder),
     ((0.55, 0.56, 0.58), nut),

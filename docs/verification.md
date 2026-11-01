@@ -21,7 +21,7 @@ About 230 tests in 18 files (run_all counts below). What each layer proves:
 | MCU firmware | `test_fw_proto.py`, `test_fw_storage.py`, `test_fw_app.py` | 101 | COBS/CRC framing incl. fuzz, flash storage with **power loss simulated at every byte of a commit**, command handling, damaged / lost frame packets, a real packet through the C tag unit, auto-exposure convergence |
 | host + end to end | `test_host_e2e.py`, `test_host_fuzz.py` | 32 | host library against the real firmware code with the tags from the RTL runs (injected through the test hook of the fake FPGA); garbage/split/dropped bytes |
 | board data | `test_pcb.py` | 13 | every net has >= 2 pins, every FPGA power ball on the right rail, pin plan legality (banks, LVDS pairs, edge-clock pad, left/right IDDR rule), regulator divider voltages, mechanical contract |
-| housing | `test_housing.py` | 9 | watertight STLs, USB-C opening, screw posts vs PCB holes, 90 deg FOV cone clearance |
+| housing | `test_housing.py` | 13 | watertight STLs, USB-C opening, screw posts vs PCB holes, FOV cone clearance, holder headroom, holder screw heads |
 
 ## The test dataset: 100 images, 10 categories x 10
 
@@ -64,7 +64,7 @@ measured 474 s for the 100 frames with 12 workers):
 | normal | 62 | 62 (100 %) | 2.0 / 7.2 | 0.6 |
 | bright | 81 | 80 (99 %) | 1.1 / 5.7 | 1.5 |
 | dark | 69 | 69 (100 %) | 1.9 / 2.9 | 0.6 |
-| lowcon | 66 | **0 (0 %)** | no pose | 1.0 |
+| lowcon | 66 | **0 (0 %)** with reset values, **66 (100 %)** with THRESH ratio 2 | no pose / 2.2 / 8.9 | 1.0 |
 | grad | 75 | 75 (100 %) | 1.3 / 2.0 | 0.5 |
 | shadow | 47 | 43 (91 %) | 3.0 / 13.6 | 1.9 |
 | noise | 57 | 57 (100 %) | 2.2 / 8.0 | 0.7 |
@@ -76,7 +76,8 @@ measured 474 s for the 100 frames with 12 workers):
 0 false-id detections, no dropped frames (single-frame runs). These numbers are with the noise-robust labeller (`rtl/run_ccl.v`: 256 runs
 per row, ~3 clocks per run on the common path, label recycling, the 64 largest candidates by area; CCL flags are diagnostics of a degraded
 frame, never a rejection). Before that rework the same harness gave **450 / 647 (70 %)**: dark 72 %, noise 70 %, shadow 68 %, clutter 14 %.
-The remaining clear weakness is **low-contrast frames (0 %)**, probably the fixed 24-level tile-threshold margin; not investigated.
+The `lowcon` weakness (0 % with the reset values) was traced to the tile ratio test `2*diff >= max`, not to the 24-level margin: with the new THRESH `ratio`
+field set to 2 or 1 the chip detects 66 / 66 (see `results/lowcon_ratio.md`). The reset value stays 0 because the ratio tests 3x / 4x cost `noise` frames (57 -> 31 / 24 of 57) through labeller row drops.
 The chip now misses only a few tags in `blur`, `persp` and `shadow` (small / grazing / shadowed tags).
 CCL status flag set on 6 of the 100 frames (candidate table full, i.e. more than 64 candidates, only the 64 largest kept), no dropped rows.
 

@@ -4,7 +4,7 @@ Architecture A3 (`docs/costdown.md`): the FPGA keeps CSI-2/D-PHY receive, thresh
 and a streamer; the tag processing unit (TPU) and the two binary frame banks moved into the RP2350 (firmware C code + SRAM). That is
 what allows the smaller LFE5U-45F in the same CABGA-381 footprint (the old design needed the 85F: 196 of 208 block RAMs).
 
-Flow: `bash tools/fpga_flow.sh <seed> <freq>` (synth_ecp5 -> nextpnr-ecp5 `--45k --package CABGA381 --speed 8` with `rtl/apriltag_cam.lpf` -> ecppack;
+Flow: `bash tools/fpga_flow.sh <seed> <freq>` (synth_ecp5 -> nextpnr-ecp5 `--45k --package CABGA381 --speed 8`; speed grade is `FPGA_SPEED=6|7|8`, see "Speed grades" below with `rtl/apriltag_cam.lpf` -> ecppack;
 env `FPGA_OUT=dir`, `FPGA_DEVICE=45k|85k|25k` for parallel runs / other devices). A real bitstream is produced (`sim/apriltag_cam.bit`).
 Nothing has been loaded onto a physical device. All numbers below are from nextpnr (estimates, not signoff), yosys 0.66, nextpnr 0.7.
 
@@ -41,6 +41,19 @@ Reproduce: `FPGA_OUT=sim/fpga_s<N> bash tools/fpga_flow.sh <N> 85.714`; summary 
 **Decision unchanged: the core runs at 85.714 MHz** (`rtl/sys_pll.v`, `LINE_CYC_DEFAULT=686` clocks per 8 us sensor line). The 120 fps requirement is a property of
 the sensor rate (frame 1041 lines = 8.328 ms). Removing the TPU (whose multiplier/divider operand routing was a critical path of some seeds) is the likely
 reason the core clock now closes on most seeds; that causal link was not isolated.
+
+## Speed grades and tool versions
+
+`FPGA_SPEED=6|7|8` (default 8) and `FPGA_DEVICE=45k|25k` select the part; `tools/fpga_sweep.sh "<seeds>" <speed> <device>` runs several seeds in parallel and prints the table.
+Full study with per-seed numbers: `results/fpga_speed_grades.md`. Result (nextpnr estimate, not signoff, OSS CAD Suite 2025-09-01 as pinned in `release.yml`, 6 seeds):
+LFE5U-45F speed 8: 6 of 6 seeds close both clocks; speed 7: 0 of 6 (core 72 - 78 MHz, D-PHY 181 - 191 MHz); speed 6: 0 of 6 (core 62 - 70 MHz, D-PHY 155 - 172 MHz).
+LFE5U-25F speed 8: 5 of 6 close (56/56 block RAM); speeds 7 and 6: 0 of 6. A -6 or -7 FPGA therefore cannot be used with this design: the labeller carry chains limit the core clock, and the 800 Mb/s lanes need a faster
+grade anyway (`docs/costdown.md` section 4).
+
+The release workflow measures with the same pinned tools (`.github/workflows/fpga-timing.yml` also runs the sweep on PRs that touch `rtl/`). nextpnr prints a post-placement estimate before routing, which is
+lower than the final number (seed 1: 78.09 MHz vs 89.11 MHz core); `tools/build_all.sh` previously read both and reported "timing NOT met" for a seed that closes. It now uses the final report only, tries `FPGA_SEEDS`
+(default `1 3 5 4 7`) and keeps the first seed that closes both clocks.
+Tool versions differ in the absolute numbers (MSYS2 yosys 0.66 / nextpnr 0.7 gave seed 1 core 90.99 / D-PHY 206.02 MHz; pinned Yosys 0.56 / nextpnr 0.8: 89.11 / 229.20 MHz), so quote the version with every number.
 
 ## MCU frame bus (FPGA -> RP2350)
 

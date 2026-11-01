@@ -6,7 +6,7 @@ PCB: 48 x 48 mm, 4 layers (F.Cu signal / In1 GND plane / In2 3V3 plane / B.Cu si
 
 | side | parts |
 |---|---|
-| top (lens side) | OV9281 (bare CSP) at (0,+9), M12 lens holder footprint (20x20, two M2.6 holes), PWR + STAT LEDs (at (-21.5, -6.5) / (-21.5, -9.5) with their 1k resistors, under the flat part of the housing roof; the front cover has an engraved power symbol above the PWR light pipe and an engraved heartbeat/pulse symbol below the STAT light pipe) , 4 M2 mounting holes |
+| top (lens side) | OV9281 (bare CSP) at (0,+9), M12 lens holder footprint (CLA021-LCP, 17x17 body, 20 mm screw spacing, two holes at (+-10, 9); the 2.6 mm holes are too large for the M1.6 screw heads, see `housing/README.md`), PWR + STAT LEDs (at (-21.5, -6.5) / (-21.5, -9.5) with their 1k resistors, under the flat part of the housing roof; the front cover has an engraved power symbol above the PWR light pipe and an engraved heartbeat/pulse symbol below the STAT light pipe) , 4 M2 mounting holes |
 | bottom | ECP5-45F BG381 (LFE5U-45F-8BG381C, same footprint as the 85F) at (0,-8), RP2350A, 16 MB QSPI flash, USB-C (left edge), all regulators, decoupling, JTAG header, test points, BOOTSEL button |
 
 ## Block / power tree
@@ -50,7 +50,7 @@ rather than hidden:
 1. **OV9281 CSP footprint** (`OV9281_CSP` in `build_pcb.py`): the ball *map* comes from the open-hardware reference
    design above, but the ball *pitch* (0.5 mm) and pad size (0.25 mm) are assumptions. Replace with the dimensions from
    OmniVision's package drawing. Bare-CSP sensor assembly with a lens holder also needs a specialist assembler
-   (active alignment/focus); the optical stack (M12, f = 1.92 mm, 90 deg HFOV) is in `housing/README.md`.
+   (active alignment/focus); the optical stack (M12, CIL023 f = 2.2 mm, 82 deg rectilinear HFOV, CLA021 holder) is in `housing/README.md`.
 2. **ECP5 IDDRX2F bit order and the D-PHY SoT hunt** are verified against a behavioural model only. The receiver tries
    both nibble orders so it does not depend on the convention, but it has not been run on silicon; bring-up should start
    with the `status`/lock bits of `dphy_rx` (LED) and the CSI-2 ECC/CRC counters in the registers.

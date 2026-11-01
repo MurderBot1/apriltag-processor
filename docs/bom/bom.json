@@ -2,7 +2,7 @@
  "project": "AprilTag camera PCB (48x48 mm, 4-layer)",
  "sources": "pcb/output/bom.csv, pcb/design.py, pcb/output/apriltag_cam.kicad_pcb, housing/README.md, docs/bom/AUDIT.md",
  "price_checked": "2026-11-01",
- "notes": "Prices re-checked 2026-10-29. LCSC rows come from LCSC's product API (price tier used is noted per row; tier = the largest quantity break not above the quantity needed, or the minimum order quantity). Commonlands rows come from commonlands.com products.json / product pages. DigiKey, Mouser, Zoro, GoPhotonics and Edmund pages block automated fetches, so anything sourced only from them stays 'unverified'. 'verified' = exact MPN, a link, and an explicitly stated unit price read from the vendor on the check date. fixed = one-time per order (not multiplied by board count). See AUDIT.md for every discrepancy.",
+ "notes": "Prices re-checked 2026-10-31 (LCSC/JLC API, Commonlands, Amazon, MatterHackers, JLCPCB fee page; Mouser/DigiKey/Arrow read for U1 and OV9281). LCSC rows come from LCSC's product API (price tier used is noted per row; tier = the largest quantity break not above the quantity needed, or the minimum order quantity). Commonlands rows come from commonlands.com products.json / product pages. DigiKey, Mouser, Zoro, GoPhotonics and Edmund pages block automated fetches, so anything sourced only from them stays 'unverified'. 'verified' = exact MPN, a link, and an explicitly stated unit price read from the vendor on the check date. fixed = one-time per order (not multiplied by board count). See AUDIT.md for every discrepancy.",
  "items": [
   {
    "category": "ICs",
@@ -13,13 +13,13 @@
    "mfr": "Lattice",
    "link": "https://www.lcsc.com/product-detail/C1551314.html",
    "unit_price": 11.2791,
-   "checked": "2026-10-30",
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
-   "hard": "LCSC C1551314 lists 11.2791 (1+) / 10.9093 (10+) but STOCK IS 0 on 2026-10-30, so the price is a list price that cannot be bought there today. The only in-stock 45F in CABGA-381 at LCSC is the SERDES variant LFE5UM-45F-8BG381C (C1550814, 6 pcs, 35.28 / 34.12 @10+): same package and same I/O pads (tools/pin_compat.py), but its extra SERDES balls are not in this repo's pin table, so it is NOT verified as a drop-in; using it would add 24.00 per board. Speed -6/-7 45F in CABGA-381 (C1551300, C1551441) are also 0 stock. Mouser / DigiKey could not be read. Needs BGA-capable assembly. Other channels, 2026-10-30: Mouser (page timed out) and DigiKey (blocked) could not be read directly; undated aggregator pages (electronicsdatasheets, edinventory, ichome, Octopart) list LFE5U-45F-8BG381C at about 20-57 USD with stock claims at DigiKey/Mouser/Arrow/Win Source/Quarktwin - UNVERIFIED snapshots, not used for the price. In-stock fallback: the SERDES variant LFE5UM-45F-8BG381C (+24.00 per board at LCSC, pin compatibility of its extra SERDES balls unverified).",
+   "hard": "OUT OF STOCK at every channel read on 2026-10-31. LCSC C1551314 stock 0 (list 11.2791 @1 / 10.9093 @10, not buyable); JLC stock 0; Mouser stock 0, 46 weeks lead time, 90 on order expected 2027-06-15, USD 67.15 @1 / 58.45 @25; DigiKey 220-1992-ND stock 0, 90 expected 2026-11-30, 43 weeks, USD 56.76 @1 / 49.39 @25 / 45.76 @100; Arrow 'out of stock'; Avnet search 'Part Not Found'. In stock on 2026-10-31: LFE5U-45F-6BG381C (speed grade 6, same package) at DigiKey 46 pcs USD 46.64 @1 / 40.70 @25 / 37.62 @100 and Mouser 5 pcs USD 55.20 @1 / 48.15 @25 (LCSC -6: stock 0). Speed grade 6 timing closure for this design is NOT checked (docs/fpga.md reports 81.7-91.0 MHz core clock). LFE5UM-45F-8BG381C is NOT a drop-in: see docs/bom/PRODUCTION.md section 1 (16 SERDES supply balls are tied to GND on this PCB but are VCCA/VCCHTX/VCCHRX/VCCAUXA on the UM part). Needs BGA-capable assembly.",
    "notes": "Architecture A3: the TPU and both frame banks moved into the RP2350 firmware, so the 85k part (LFE5U-85F-8BG381C, LCSC C1551826, 100.13 on 2026-10-29) is replaced by the 45k part; same footprint and balls. Synthesis: 12,227 LUT4 (27 %), 56 of 108 block RAM, core clock 81.7-91.0 MHz over 6 seeds (docs/fpga.md).",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-30; 1+ tier; stock 0"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-31; 1+ tier; stock 0 (list price, not buyable). Mouser, DigiKey, Arrow pages read in browser 2026-10-31."
   },
   {
    "category": "ICs",
@@ -30,13 +30,13 @@
    "mfr": "Raspberry Pi",
    "link": "https://lcsc.com/product-detail/Microcontrollers-MCU-MPU-SOC_Raspberry-Pi-RP2350A_C42411118.html",
    "unit_price": 1.299,
-   "checked": "2026-10-29",
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
    "hard": "Newer part; LCSC stock 5,466 on check. Also sold by DigiKey, Mouser and Raspberry Pi approved resellers.",
-   "notes": "LCSC C42411118: stock 5,466, JLC stock 5,466, JLC Extended; price is the 1+ tier at $1.299. Price is lower than the 2026-10-28 snapshot (was 1.68).",
+   "notes": "LCSC C42411118: stock 4,993, JLC stock 4,993, JLC Extended; price is the 1+ tier at $1.299. Price is lower than the 2026-10-28 snapshot (was 1.68).",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 1+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-31; 1+ tier"
   },
   {
    "category": "ICs",
@@ -51,7 +51,7 @@
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "Value label in design.py/bom.csv is W25Q128JVPIQ, which matches the WSON-8 6x5 footprint (the earlier JVSIQ label was the SOIC-8 208mil part: mismatch, fixed). LCSC C190862: stock 9,404 on 2026-11-01 (11,700 on 2026-10-29); price is the 1+ tier at $3.4222.",
+   "notes": "Value label in design.py/bom.csv is now W25Q128JVPIQ, which matches the WSON-8 6x5 footprint (the earlier JVSIQ label was the SOIC-8 208mil part: mismatch, fixed). LCSC C190862: stock 9,404 on 2026-11-01; price is the 1+ tier at $3.4222.",
    "mpn_suggested": false,
    "price_source": "LCSC product API (wmsc.lcsc.com) 2026-11-01; 1+ tier"
   },
@@ -63,14 +63,14 @@
    "mpn": "TLV62569DBVR",
    "mfr": "Texas Instruments",
    "link": "https://www.lcsc.com/product-detail/C141836.html",
-   "unit_price": 0.0698,
-   "checked": "2026-10-29",
+   "unit_price": 0.0692,
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "LCSC C141836: stock 14,020, JLC stock 15,269, JLC Extended; price is the 5+ tier at $0.0698.",
+   "notes": "LCSC C141836: stock 295,740, JLC stock 303,036, JLC Extended; price is the 5+ tier at $0.0692.",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 5+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-31; 5+ tier"
   },
   {
    "category": "ICs",
@@ -85,7 +85,7 @@
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "REPLACES TLV75525PDBVR (LCSC stock 0 on 2026-10-29 and 2026-10-31). Same SOT-23-5 pinout as the board uses: 1 VIN, 2 VSS, 3 CE, 4 NC, 5 VOUT (pinout read from the LCSC-derived library entry of the ME6211 family; the datasheet PDF itself could not be downloaded here, so re-check against the MICRONE datasheet before ordering). 2.5 V fixed, 400 mA (LCSC attribute; TLV75525: 500 mA); the 2.5 V rail feeds only light loads. CE is tied to VIN as before, 1u in / 2u2 out ceramics stay. LCSC C194395: stock 31,280 on 2026-11-01; price is the lowest quoted tier (10+) at $0.0562 (100+: $0.0440).",
+   "notes": "REPLACES TLV75525PDBVR (LCSC and JLC stock 0 on 2026-10-29 and 2026-10-31). Same SOT-23-5 pinout as the board uses: 1 VIN, 2 VSS, 3 CE, 4 NC, 5 VOUT (pinout read from the LCSC-derived library entry of the ME6211 family; the datasheet PDF itself could not be downloaded here, so re-check it against the MICRONE datasheet before ordering). 2.5 V fixed, 400 mA (LCSC attribute; TLV75525: 500 mA), the 2.5 V rail feeds only light loads (ECP5 VCCAUX). CE is tied to VIN as before, the 1u in / 2u2 out ceramics stay. LCSC C194395: stock 31,280 on 2026-11-01; JLCPCB stock not checked; price is the lowest quoted tier (10+) at $0.0562 (100+: $0.0440).",
    "mpn_suggested": false,
    "price_source": "LCSC product API (wmsc.lcsc.com) 2026-11-01; 10+ tier"
   },
@@ -98,13 +98,13 @@
    "mfr": "Texas Instruments",
    "link": "https://www.lcsc.com/product-detail/C2877863.html",
    "unit_price": 0.2063,
-   "checked": "2026-10-29",
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "LCSC C2877863: stock 5,445, JLC stock 5,446, JLC Extended; price is the 5+ tier at $0.2063.",
+   "notes": "LCSC C2877863: stock 5,400, JLC stock 5,401, JLC Extended; price is the 5+ tier at $0.2063.",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 5+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-31; 5+ tier"
   },
   {
    "category": "ICs",
@@ -119,7 +119,7 @@
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "REPLACES TLV75528PDBVR (LCSC stock 0). The TLV75528PDYDR alternative has only 24 pcs and its pinout was not checked, so it was not used; AP2125K-2.8 (C176952) has 50 pcs. Same SOT-23-5 pinout as the board uses: 1 VIN, 2 VSS, 3 CE, 4 NC, 5 VOUT (from the LCSC-derived library entry; re-check against the MICRONE datasheet before ordering). 2.8 V fixed, 450 mA (TLV75528: 500 mA); load is the OV9281 AVDD/EVDD rail only (sensor supply current not verified here, expected tens of mA). LCSC C53099: stock 17,280 on 2026-11-01; price is the lowest quoted tier (10+) at $0.0667 (100+: $0.0535).",
+   "notes": "REPLACES TLV75528PDBVR (LCSC and JLC stock 0). The TLV75528PDYDR alternative has only 24 pcs at LCSC and its pinout was not checked, so it was not used; AP2125K-2.8 (C176952) has 50 pcs. Same SOT-23-5 pinout as the board uses: 1 VIN, 2 VSS, 3 CE, 4 NC, 5 VOUT (from the LCSC-derived library entry; re-check against the MICRONE datasheet before ordering). 2.8 V fixed, 450 mA (TLV75528: 500 mA); the load is the OV9281 AVDD/EVDD rail only (sensor supply current not verified here, expected tens of mA). LCSC C53099: stock 17,280 on 2026-11-01; JLCPCB stock not checked; price is the lowest quoted tier (10+) at $0.0667 (100+: $0.0535).",
    "mpn_suggested": false,
    "price_source": "LCSC product API (wmsc.lcsc.com) 2026-11-01; 10+ tier"
   },
@@ -132,13 +132,13 @@
    "mfr": "Texas Instruments",
    "link": "https://www.lcsc.com/product-detail/C2877864.html",
    "unit_price": 0.2365,
-   "checked": "2026-10-29",
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "LCSC C2877864: stock 2,155, JLC stock 2,157, JLC Extended; price is the 5+ tier at $0.2365.",
+   "notes": "LCSC C2877864: stock 2,125, JLC stock 2,126, JLC Extended; price is the 5+ tier at $0.2365.",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 5+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-31; 5+ tier"
   },
   {
    "category": "ICs",
@@ -148,14 +148,14 @@
    "mpn": "USBLC6-2SC6",
    "mfr": "STMicroelectronics",
    "link": "https://www.lcsc.com/product-detail/C7519.html",
-   "unit_price": 0.1815,
-   "checked": "2026-10-29",
+   "unit_price": 0.1816,
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "Genuine ST part (LCSC package SOT-23-6L, 17 V clamp). LCSC C7519: stock 34,615, JLC stock 37,110, JLC Extended; price is the 5+ tier at $0.1815.",
+   "notes": "Genuine ST part (LCSC package SOT-23-6L, 17 V clamp). LCSC C7519: stock 42,695, JLC stock 46,025, JLC Extended; price is the 5+ tier at $0.1816.",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 5+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-31; 5+ tier"
   },
   {
    "category": "Sensor / Optics",
@@ -166,10 +166,10 @@
    "mfr": "OmniVision",
    "link": "https://www.gophotonics.com/products/cmos-image-sensors/omnivision-technologies/21-118-ov9281",
    "unit_price": null,
-   "checked": "2026-10-29",
+   "checked": "2026-10-31",
    "status": "unverified",
    "fixed": false,
-   "hard": "Bare CSP is not sold at catalog distributors; needs an OmniVision distributor quote (GoPhotonics RFQ, Arrow/Avnet quoted channel, or Chinese agents). Assembly needs a CSP-capable specialist; ball pitch/pad in design.py is ASSUMED 0.5/0.25 mm - verify. Fallback: buy a ready OV9281 module (e.g. Camemake CM-MIPI-OV9281-Universal on DigiKey https://www.digikey.co.uk/en/products/detail/camemake/CM-MIPI-OV9281-Universal/27525168 ) and re-spin around a connector.",
+   "hard": "Bare CSP is not sold at catalog distributors. 2026-10-31: Arrow OV09281-H64A (64-pin CSP-5, 4.46x5.24 mm) page says 'We don't have prices now'; LCSC OV09281-H64A C5182169 0 stock, price shown 0.0007 (placeholder); JLC OV9281 / OV9281_CSP5 stock 0, price 0.0399 (placeholder); LCSC C5354447 not readable. No seller with a stated usable price found. Fallback (a finished module, NOT the bare sensor, needs a re-spin around a connector): Camemake CM-MIPI-OV9281-Universal on DigiKey Marketplace, stock 1,000, ships in about 25 days, USD 77.84 @10 / 14.01 @500 / 12.01 @1,000 / 9.01 @5,000 (https://www.digikey.com/en/products/detail/camemake/CM-MIPI-OV9281-Universal/27525168). Assembly of a bare CSP needs a specialist; ball pitch/pad in design.py is ASSUMED 0.5/0.25 mm - verify.",
    "notes": "QUOTE-ONLY: no price found for the bare CSP (link is a quote-request listing). RFQ route: GoPhotonics quote form (link), or OmniVision authorised distributors (Arrow/Avnet/WPG) for a CSP/reel quote; expect MOQ and possibly NRE. Re-check 2026-10-29: GoPhotonics link returns HTTP 403 to automated fetch (not verified). LCSC lists OV9281 C5354447 (CSP-64) at a placeholder-looking USD 0.0398 with 0 stock; JLC C9900004612 / C9900138349 are assembly-service placeholders. None is a usable price.",
    "mpn_suggested": false,
    "price_source": ""
@@ -178,52 +178,52 @@
    "category": "Sensor / Optics",
    "designators": "LH1",
    "qty": 1,
-   "value": "M12 lens holder, 20 mm hole spacing, 20x20 mm footprint, 10.0 mm tall, black polycarbonate (M1.6 screws)",
-   "mpn": "CLA020-PC",
+   "value": "M12 lens holder, 20 mm hole spacing, 17x17 mm footprint, 7.4 mm tall, black LCP (M1.7 screw holes; the Commonlands M1.6 x 5 thread-forming screw fits 1.6 and 1.7 mm holes)",
+   "mpn": "CLA021-LCP",
    "mfr": "Commonlands",
-   "link": "https://commonlands.com/products/m12-lens-mount-20mm-spacing",
+   "link": "https://commonlands.com/products/m12-lens-mount-20mm-spacing-cla021",
    "unit_price": 4.5,
-   "checked": "2026-10-29",
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
-   "hard": "OUT OF STOCK at Commonlands on 2026-10-29 (\"Sold Out\"; restock on request). In-stock alternative with the same 20 mm hole spacing: CLA021-LCP (7.4 mm tall, 17x17 mm, LCP, M1.7 screws, 1,074 pcs, USD 4.50, https://commonlands.com/products/m12-lens-mount-20mm-spacing-cla021).",
-   "notes": "Commonlands page (fetched 2026-10-29): CLA020-PC, M12x0.5, 10.0 mm height, 20 mm hole spacing, takes M1.6 self-tapping screws, USD 4.50, lens not included. MISMATCH with the repo: pcb_params.json/housing assume a 6.0 mm tall holder and the PCB footprint has 2.6 mm holes (\"M2.6\"); the real part is 10.0 mm tall with M1.6 screws, so the lens-top height (20.0 mm above PCB) and the hood fit must be re-derived. See docs/bom/AUDIT.md.",
+   "hard": "",
+   "notes": "Replaces CLA020-PC (10.0 mm tall, OUT OF STOCK at Commonlands on 2026-10-29). Commonlands page read 2026-10-31: CLA021-LCP, M12x0.5, 7.4 mm height, 20 mm hole spacing, 17 x 17 mm footprint, 'compatible with M1.7 screws', LCP, USD 4.50, '1074pcs in stock in the US'. products.json variant price 4.50. Page title says '7mm Height' and one browser title says '22mm Hole Spacing' while the body text says 7.4 mm / 20 mm (the body text and the FAQ agree: 20 mm). The mechanical drawing/STP is behind a DocSend gate and was not read, so the screw-ear outline is an assumed envelope in pcb/pcb_params.json (ear_span_x/y). Pairs with CIL023 (e-con S-mount row of the CIL023 compatibility table: 6-9 mm tall holder). Housing stack re-derived in housing/README.md.",
    "mpn_suggested": false,
-   "price_source": "commonlands.com product page and products.json, 2026-10-29"
+   "price_source": "commonlands.com product page and products.json, 2026-10-31"
   },
   {
    "category": "Sensor / Optics",
    "designators": "-",
    "qty": 1,
-   "value": "M12x0.5 lens, EFL 1.8 mm, f/2.8, 650 nm IR-cut, IP67 body (M12B): nearest in-stock match to 1.92 mm / 90 deg HFOV (rectilinear HFOV 93.7 deg on the 3.84 mm OV9281 width; -14% distortion; 6.8 mm image circle)",
-   "mpn": "CIL018-F2.8-M12B650",
+   "value": "M12x0.5 lens, EFL 2.2 mm, f/2.2, 650 nm IR-cut (M12B), -5 % TV distortion, 7.2 mm image circle; 82.2 deg rectilinear HFOV on the 3.84 mm OV9281 width",
+   "mpn": "CIL023-F2.2-M12B650",
    "mfr": "Commonlands",
-   "link": "https://commonlands.com/products/low-distortion-m12-lens",
+   "link": "https://commonlands.com/products/wide-angle-no-distortion-m12lens",
    "unit_price": 39.0,
-   "checked": "2026-10-29",
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "Not an exact 1.92 mm part: no catalog M12 lens with EFL 1.92 mm was found. CIL018 gives HFOV = 2 atan(1.92/1.8) = 93.7 deg / VFOV 67.4 deg / DFOV 103.1 deg (rectilinear; Commonlands table), image circle 6.8 mm covers the 4.53 mm OV9281 diagonal, barrel distortion -14% per datasheet (calibrate it). Variant CIL018-F2.8-M12BNIR (no IR-cut filter, same price, in stock) is the NIR option. Commonlands lists CIL018 as needing a 9-13 mm holder (fits CLA020, not the 6 mm assumed by the housing). Fallback with a 7 mm-class holder: CIL023-F2.2-M12B650 (82.2 deg HFOV, -5% TV, USD 39.00, in stock) + CLA021-LCP. Cheap alternative: Arducam LN014 / M40210M09S 2.1 mm (84.8 deg, <1% distortion, USD 12.62 at RobotShop, image circle not published). Full comparison: docs/bom/AUDIT.md. Housing cone clearance holds for the 51.5 deg half-diagonal (margin ~2.1 mm at the 15 mm bore).",
+   "notes": "Replaces CIL018-F2.8-M12B650: Commonlands says CIL018 needs a 9 to 13 mm tall holder (page, 2026-10-31), and the only 20 mm-spacing holders are CLA020-PC (10 mm, out of stock) and CLA021-LCP (7.4 mm), so CIL018 cannot be mounted on the 20 mm hole pattern in stock. CIL023 page read 2026-10-31: EFL 2.2 mm, F/2.2, '121 deg @ 7.2 mm image circle', '-5% TV (4:3)', e-con S-mount compatibility '6mm-9mm Tall Holder', USD 39.00, '270pcs CIL023-F2.2-M12B650 in stock in the US' (products.json variant price 39.00). The BNIR (no IR-cut) variant is out of stock; B650 is the default. HFOV on the OV9281 (3.84 x 2.40 mm active area): rectilinear 2 atan(1.92/2.2) = 82.2 deg, VFOV 57.2 deg, DFOV 91.7 deg; with the lens distortion the real HFOV is about 84 to 85 deg (estimate from one published data point, calibrate it). 7.2 mm image circle covers the 4.53 mm sensor diagonal with 2.7 mm to spare. Lens length and back focal length are not on the product page (STP behind a DocSend gate): the housing keeps a 22.0 mm lens-top allowance. Alternatives checked: CIL018-F2.8-M12B650 (93.7 deg rectilinear, -14 %, $39.00, 196 pcs; needs a 9-13 mm holder, i.e. CLA020-PC when it is restocked); Arducam 2.1 mm ($10.09 RobotShop, about 84.6 deg rectilinear, distortion and image circle unpublished, cheaper but not verified here). Full comparison: docs/bom/AUDIT.md.",
    "mpn_suggested": false,
-   "price_source": "commonlands.com products.json (variant price and availability), 2026-10-29"
+   "price_source": "commonlands.com products.json and product page, 2026-10-31"
   },
   {
    "category": "Mechanical",
    "designators": "-",
    "qty": 2,
-   "value": "M1.6 x 5 mm Phillips thread-forming screws for the CLA020 lens holder (pack of 25 is USD 12.00)",
+   "value": "M1.6 x 5 mm Phillips thread-forming screws for the CLA021 lens holder (pack of 25 is USD 12.00)",
    "mpn": "CLA904-SCR",
    "mfr": "Commonlands",
    "link": "https://commonlands.com/products/phillips-m1-6x5-thread-forming-screws-for-plastic-25",
    "unit_price": 0.48,
-   "checked": "2026-10-29",
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "Price per screw = USD 12.00 / 25 (must buy the pack). Added by the 2026-10-29 audit: the lens holder needs 2 screws and none was listed. Re-read 2026-10-29: Commonlands page lists USD 12.00, 'in stock in the US' (page also shows '10pcs' next to the price, ambiguous; title says pack of 25 and the price is per listing). Product text does not give head diameter (McMaster 99461A911 is referenced but needs a login). Hole check open: the PCB footprint has 2.6 mm holes, an M1.6 pan head (~3 mm) may not bear on them; confirm head size and hole dia with the holder drawing (CLA020 .STP).",
+   "notes": "Price per screw = USD 12.00 / 25 (must buy the pack). Commonlands page 2026-10-31: 'compatible with lens holders with diameter 1.6 mm and 1.7 mm' (so it fits the CLA021 M1.7 holes), USD 12.00, 'in stock in the US' ('10pcs' shown next to the price is a stock count of listings, the title says pack of 25). HEAD SIZE IS NOT PUBLISHED by Commonlands. The linked McMaster 99461A911 (second-hand listing, not read on McMaster): head 2.6 mm dia x 1.1 mm high. ISO 7045 M1.6 pan head is 3.2 x 1.3 mm. Housing design uses a 3.4 x 1.3 mm allowance under the PCB (4.0 mm gap to the floor). PCB ISSUE: the PCB holder holes are 2.6 mm; a 2.6 mm head would pass through them. The screws go in from the PCB underside, so the hole must be about 1.9 mm (head bears on FR4, shank passes) - pcb/build_pcb.py change needed, not made in this PR.",
    "mpn_suggested": false,
-   "price_source": "commonlands.com products.json, 2026-10-29"
+   "price_source": "commonlands.com product page, 2026-10-31"
   },
   {
    "category": "Timing",
@@ -237,8 +237,8 @@
    "checked": "2026-11-01",
    "status": "verified",
    "fixed": false,
-   "hard": "",
-   "notes": "ABM8-272-T3: 12 MHz, CL = 10 pF, +-30 ppm, ESR 50 ohm max, 3225 4-pad. Load check: CL = C15*C16/(C15+C16) + Cstray = 15*15/30 + 3 = 7.5 + 3 = 10.5 pF (Cstray about 3 pF: pads, trace, RP2350 XIN/XOUT pin), 0.5 pF above the 10 pF rating, about 6 ppm of pulling at a typical 12 ppm/pF trim sensitivity (assumed C1 = 4 fF, C0 = 3 pF, not from the datasheet), far inside the +-30 ppm tolerance. C15/C16 stay 15 pF (nearest standard value to the ideal 2*(10-3) = 14 pF). Stock: the LCSC API returned 0 on one query and 10,155 on a later query on 2026-11-01 (845 on 2026-10-29), so stock is volatile; re-check before ordering. Price is the lowest quoted tier (5+) at $0.6617. LCSC C20625731.",
+   "hard": "LCSC stock was 0 on 2026-10-31 and is 10,155 on 2026-11-01 (845 on 2026-10-29): volatile, re-check before ordering. JLC stock (5 on 2026-10-31) not re-checked.",
+   "notes": "ABM8-272-T3: 12 MHz, CL = 10 pF, +-30 ppm, ESR 50 ohm max, 3225 4-pad. Load check: CL = C15*C16/(C15+C16) + Cstray = 15*15/30 + 3 = 7.5 + 3 = 10.5 pF (Cstray about 3 pF: pads, trace, RP2350 XIN/XOUT pin), 0.5 pF above the 10 pF rating, about 6 ppm of pulling at an assumed 12 ppm/pF trim sensitivity (C1 = 4 fF, C0 = 3 pF assumed, not from the datasheet), far inside the +-30 ppm tolerance. C15/C16 stay 15 pF (nearest standard value to the ideal 2*(10-3) = 14 pF). The earlier 18 pF crystal ABM8-12.000MHZ-D2Y-T would have needed about 2 x 30 pF. Price is the lowest quoted tier (5+) at $0.6617. LCSC C20625731.",
    "mpn_suggested": false,
    "price_source": "LCSC product API (wmsc.lcsc.com) 2026-11-01; 5+ tier"
   },
@@ -251,13 +251,13 @@
    "mfr": "YXC",
    "link": "https://lcsc.com/datasheet/lcsc_datasheet_2408141011_YXC-Crystal-Oscillators-O9322524MADA4SI_C496679.pdf",
    "unit_price": 0.593,
-   "checked": "2026-10-29",
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
-   "hard": "",
+   "hard": "Low stock on 2026-10-31: LCSC 114, JLC 114. Enough for 100 boards, no margin for a larger run.",
    "notes": "LCSC description: 24 MHz +-20 ppm CMOS 1.8 V, SMD3225-4P (link is the LCSC datasheet PDF, HTTP 200; PDF contents not read). design.py footprint is Abracon ASE; 3225 4-pin pad-compatible by size only. Low stock. LCSC C496679: stock 114, JLC stock 114, JLC Extended; price is the 1+ tier at $0.593.",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 1+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-31; 1+ tier"
   },
   {
    "category": "Connectors / Switch",
@@ -267,14 +267,14 @@
    "mpn": "TYPE-C-31-M-12",
    "mfr": "HRO (Korean Hroparts)",
    "link": "https://www.lcsc.com/product-detail/C165948.html",
-   "unit_price": 0.1886,
-   "checked": "2026-10-29",
+   "unit_price": 0.189,
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "LCSC C165948: stock 274,470, JLC stock 288,643, JLC Extended; price is the 5+ tier at $0.1886.",
+   "notes": "LCSC C165948: stock 361,005, JLC stock 379,318, JLC Extended; price is the 5+ tier at $0.189.",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 5+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-31; 5+ tier"
   },
   {
    "category": "Connectors / Switch",
@@ -285,13 +285,13 @@
    "mfr": "Hanxia",
    "link": "https://www.lcsc.com/product-detail/C41376037.html",
    "unit_price": 0.0983,
-   "checked": "2026-10-29",
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "2x05, 1.27 mm pitch SMD pin header; matches PinHeader_2x05_P1.27mm_Vertical_SMD by pitch/rows, pad geometry not checked against the datasheet. Not a keyed box header. LCSC C41376037: stock 37,000, JLC stock 38,952, JLC Extended; price is the 5+ tier at $0.0983.",
+   "notes": "2x05, 1.27 mm pitch SMD pin header; matches PinHeader_2x05_P1.27mm_Vertical_SMD by pitch/rows, pad geometry not checked against the datasheet. Not a keyed box header. LCSC C41376037: stock 37,370, JLC stock 39,190, JLC Extended; price is the 5+ tier at $0.0983.",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 5+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-31; 5+ tier"
   },
   {
    "category": "Connectors / Switch",
@@ -302,13 +302,13 @@
    "mfr": "C&K",
    "link": "https://www.lcsc.com/product-detail/C116501.html",
    "unit_price": 0.6595,
-   "checked": "2026-10-29",
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "C&K PTS810 SJM 250 SMTR LFS (LCSC lists PTS810SJM250SMTRLFS). Cheaper same-footprint variant: PTS810SJG250SMTRLFS C221895 (4 N force, stock 23,995). LCSC C116501: stock 329, JLC stock 970, JLC Extended; price is the 1+ tier at $0.6595.",
+   "notes": "C&K PTS810 SJM 250 SMTR LFS (LCSC lists PTS810SJM250SMTRLFS). Cheaper same-footprint variant: PTS810SJG250SMTRLFS C221895 (4 N force, stock 23,995). LCSC C116501: stock 327, JLC stock 852, JLC Extended; price is the 1+ tier at $0.6595.",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 1+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-31; 1+ tier"
   },
   {
    "category": "LEDs",
@@ -319,13 +319,13 @@
    "mfr": "Hubei KENTO",
    "link": "https://www.lcsc.com/product-detail/C2286.html",
    "unit_price": 0.0077,
-   "checked": "2026-10-29",
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "LCSC C2286: stock 4,810,200, JLC stock 7,353,771, JLC Basic; price is the 100+ tier at $0.0077.",
+   "notes": "LCSC C2286: stock 4,605,400, JLC stock 7,177,689, JLC Basic; price is the 100+ tier at $0.0077.",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 100+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-31; 100+ tier"
   },
   {
    "category": "LEDs",
@@ -336,13 +336,13 @@
    "mfr": "Hubei KENTO",
    "link": "https://www.lcsc.com/product-detail/C2286.html",
    "unit_price": 0.0077,
-   "checked": "2026-10-29",
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "LCSC C2286: stock 4,810,200, JLC stock 7,353,771, JLC Basic; price is the 100+ tier at $0.0077.",
+   "notes": "LCSC C2286: stock 4,605,400, JLC stock 7,177,689, JLC Basic; price is the 100+ tier at $0.0077.",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 100+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-31; 100+ tier"
   },
   {
    "category": "Ferrites / Inductors",
@@ -353,13 +353,13 @@
    "mfr": "Murata",
    "link": "https://www.lcsc.com/product-detail/C19330.html",
    "unit_price": 0.0122,
-   "checked": "2026-10-29",
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "MPN corrected earlier from BLM18PG601SN1D (no such listing) to BLM18AG601SN1D (600 ohm, 500 mA, 380 mOhm). 500 mA rating vs ~0.22 A board draw (docs/hardware.md: ~1.1 W from 5 V) leaves ~2x margin; check USB inrush. Update the design.py label. LCSC C19330: stock 567,850, JLC stock 570,933, JLC Extended; price is the 50+ tier at $0.0122.",
+   "notes": "MPN corrected earlier from BLM18PG601SN1D (no such listing) to BLM18AG601SN1D (600 ohm, 500 mA, 380 mOhm). 500 mA rating vs ~0.22 A board draw (docs/hardware.md: ~1.1 W from 5 V) leaves ~2x margin; check USB inrush. Update the design.py label. LCSC C19330: stock 511,500, JLC stock 531,101, JLC Extended; price is the 50+ tier at $0.0122.",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 50+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-31; 50+ tier"
   },
   {
    "category": "Ferrites / Inductors",
@@ -369,14 +369,14 @@
    "mpn": "BLM18PG121SN1D",
    "mfr": "Murata",
    "link": "https://www.lcsc.com/product-detail/C14709.html",
-   "unit_price": 0.0149,
-   "checked": "2026-10-29",
+   "unit_price": 0.0138,
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "120 ohm, 2 A, 50 mOhm. LCSC C14709: stock 1,903,400, JLC stock 2,522,265, JLC Basic; price is the 50+ tier at $0.0149.",
+   "notes": "120 ohm, 2 A, 50 mOhm. LCSC C14709: stock 1,737,150, JLC stock 2,367,507, JLC Basic; price is the 50+ tier at $0.0138.",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 50+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-31; 50+ tier"
   },
   {
    "category": "Ferrites / Inductors",
@@ -387,13 +387,13 @@
    "mfr": "Murata",
    "link": "https://www.lcsc.com/product-detail/C2041573.html",
    "unit_price": 0.197,
-   "checked": "2026-10-29",
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "MPN now verified on LCSC: Murata DFE252012F-3R3M=P2, 3.3 uH +-20%, Irated 1.8 A, Isat 2.8 A, 110 mOhm, 1008. Replaces the unverified DigiKey-only listing (DigiKey page still blocked, 403). LCSC C2041573: stock 3,210, JLC stock 3,211, JLC Extended; price is the 5+ tier at $0.197.",
+   "notes": "MPN now verified on LCSC: Murata DFE252012F-3R3M=P2, 3.3 uH +-20%, Irated 1.8 A, Isat 2.8 A, 110 mOhm, 1008. Replaces the unverified DigiKey-only listing (DigiKey page still blocked, 403). LCSC C2041573: stock 2,950, JLC stock 2,951, JLC Extended; price is the 5+ tier at $0.197.",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 5+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-31; 5+ tier"
   },
   {
    "category": "Ferrites / Inductors",
@@ -404,13 +404,13 @@
    "mfr": "Murata",
    "link": "https://www.lcsc.com/product-detail/C576403.html",
    "unit_price": 0.1495,
-   "checked": "2026-10-29",
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "2.2 uH, Irated 2.3 A, Isat 3.6 A, 82 mOhm, 1008. Meets Isat >= 2.5 A for TLV62569. LCSC C576403: stock 14,560, JLC stock 14,562, JLC Extended; price is the 5+ tier at $0.1495.",
+   "notes": "2.2 uH, Irated 2.3 A, Isat 3.6 A, 82 mOhm, 1008. Meets Isat >= 2.5 A for TLV62569. LCSC C576403: stock 14,310, JLC stock 14,313, JLC Extended; price is the 5+ tier at $0.1495.",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 5+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-31; 5+ tier"
   },
   {
    "category": "Capacitors",
@@ -421,13 +421,13 @@
    "mfr": "Samsung Electro-Mechanics",
    "link": "https://www.lcsc.com/product-detail/C1525.html",
    "unit_price": 0.0032,
-   "checked": "2026-10-29",
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "LCSC C1525: stock 2,034,400, JLC stock 32,001,004, JLC Basic; price is the 100+ tier at $0.0032.",
+   "notes": "LCSC C1525: stock 5,097,800, JLC stock 35,646,666, JLC Basic; price is the 100+ tier at $0.0032.",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 100+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-31; 100+ tier"
   },
   {
    "category": "Capacitors",
@@ -438,13 +438,13 @@
    "mfr": "Samsung Electro-Mechanics",
    "link": "https://www.lcsc.com/product-detail/C19666.html",
    "unit_price": 0.0171,
-   "checked": "2026-10-29",
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "LCSC C19666: stock 440,090, JLC stock 3,001,931, JLC Basic; price is the 10+ tier at $0.0171.",
+   "notes": "LCSC C19666: stock 1,229,720, JLC stock 4,201,007, JLC Basic; price is the 10+ tier at $0.0171.",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 10+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-31; 10+ tier"
   },
   {
    "category": "Capacitors",
@@ -455,13 +455,13 @@
    "mfr": "Samsung Electro-Mechanics",
    "link": "https://www.lcsc.com/product-detail/C86285.html",
    "unit_price": 0.0062,
-   "checked": "2026-10-29",
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "LCSC C86285: stock 223,200, JLC stock 236,686, JLC Extended; price is the 100+ tier at $0.0062.",
+   "notes": "LCSC C86285: stock 224,100, JLC stock 235,188, JLC Extended; price is the 100+ tier at $0.0062.",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 100+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-31; 100+ tier"
   },
   {
    "category": "Capacitors",
@@ -472,13 +472,13 @@
    "mfr": "Samsung Electro-Mechanics",
    "link": "https://www.lcsc.com/product-detail/C15850.html",
    "unit_price": 0.0441,
-   "checked": "2026-10-29",
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "LCSC C15850: stock 1,642,400, JLC stock 8,531,375, JLC Basic; price is the 20+ tier at $0.0441.",
+   "notes": "LCSC C15850: stock 1,414,940, JLC stock 8,327,587, JLC Basic; price is the 20+ tier at $0.0441.",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 20+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-31; 20+ tier"
   },
   {
    "category": "Capacitors",
@@ -488,14 +488,14 @@
    "mpn": "CL10A105KB8NNNC",
    "mfr": "Samsung Electro-Mechanics",
    "link": "https://www.lcsc.com/product-detail/C15849.html",
-   "unit_price": 0.0141,
-   "checked": "2026-10-29",
+   "unit_price": 0.0144,
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
-   "hard": "",
-   "notes": "LCSC C15849: stock 171,100, JLC stock 12,692,616, JLC Basic; price is the 50+ tier at $0.0141.",
+   "hard": "LCSC stock 0 on 2026-10-31 but JLC stock 12,244,708, so JLC assembly can still source it.",
+   "notes": "LCSC C15849: stock 0, JLC stock 12,244,708, JLC Basic; price is the 50+ tier at $0.0144.",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 50+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-31; 50+ tier"
   },
   {
    "category": "Capacitors",
@@ -505,14 +505,14 @@
    "mpn": "CL21A226MAQNNNE",
    "mfr": "Samsung Electro-Mechanics",
    "link": "https://www.lcsc.com/product-detail/C45783.html",
-   "unit_price": 0.1936,
-   "checked": "2026-10-29",
+   "unit_price": 0.1915,
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "LCSC C45783: stock 271,980, JLC stock 3,826,195, JLC Basic; price is the 20+ tier at $0.1936.",
+   "notes": "LCSC C45783: stock 96,020, JLC stock 3,749,603, JLC Basic; price is the 20+ tier at $0.1915.",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 20+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-31; 20+ tier"
   },
   {
    "category": "Capacitors",
@@ -522,14 +522,14 @@
    "mpn": "CL10A225KO8NNNC",
    "mfr": "Samsung Electro-Mechanics",
    "link": "https://www.lcsc.com/product-detail/C23630.html",
-   "unit_price": 0.0123,
-   "checked": "2026-10-29",
+   "unit_price": 0.012,
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "LCSC C23630: stock 724,150, JLC stock 2,900,495, JLC Basic; price is the 50+ tier at $0.0123.",
+   "notes": "LCSC C23630: stock 603,250, JLC stock 2,831,026, JLC Basic; price is the 50+ tier at $0.012.",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 50+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-31; 50+ tier"
   },
   {
    "category": "Resistors",
@@ -539,14 +539,14 @@
    "mpn": "RC0402FR-0733RL",
    "mfr": "Yageo",
    "link": "https://www.lcsc.com/product-detail/C138002.html",
-   "unit_price": 0.0028,
-   "checked": "2026-10-29",
+   "unit_price": 0.0027,
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "LCSC C138002: stock 5,727,100, JLC stock 6,076,421, JLC Extended; price is the 100+ tier at $0.0028.",
+   "notes": "LCSC C138002: stock 5,481,300, JLC stock 5,861,223, JLC Extended; price is the 100+ tier at $0.0027.",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 100+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-31; 100+ tier"
   },
   {
    "category": "Resistors",
@@ -557,13 +557,13 @@
    "mfr": "UNI-ROYAL",
    "link": "https://www.lcsc.com/product-detail/C27009.html",
    "unit_price": 0.0016,
-   "checked": "2026-10-29",
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "MPN CHANGED from RC0402FR-07453KL (LCSC stock 0, JLC stock 1) to UNI-ROYAL 0402WGF4533TCE: 453k, 1%, 62.5 mW, +-100 ppm, 0402, same electrical spec. LCSC C27009: stock 636,600, JLC stock 674,631, JLC Extended; price is the 100+ tier at $0.0016.",
+   "notes": "MPN CHANGED from RC0402FR-07453KL (LCSC stock 0, JLC stock 1) to UNI-ROYAL 0402WGF4533TCE: 453k, 1%, 62.5 mW, +-100 ppm, 0402, same electrical spec. LCSC C27009: stock 623,400, JLC stock 662,039, JLC Extended; price is the 100+ tier at $0.0016.",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 100+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-31; 100+ tier"
   },
   {
    "category": "Resistors",
@@ -574,13 +574,13 @@
    "mfr": "Yageo",
    "link": "https://www.lcsc.com/product-detail/C60491.html",
    "unit_price": 0.0022,
-   "checked": "2026-10-29",
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "LCSC C60491: stock 8,244,200, JLC stock 9,252,630, JLC Extended; price is the 100+ tier at $0.0022.",
+   "notes": "LCSC C60491: stock 8,313,700, JLC stock 9,289,385, JLC Extended; price is the 100+ tier at $0.0022.",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 100+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-31; 100+ tier"
   },
   {
    "category": "Resistors",
@@ -591,13 +591,13 @@
    "mfr": "Yageo",
    "link": "https://www.lcsc.com/product-detail/C185391.html",
    "unit_price": 0.0032,
-   "checked": "2026-10-29",
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "LCSC C185391: stock 28,900, JLC stock 29,150, JLC Extended; price is the 100+ tier at $0.0032.",
+   "notes": "LCSC C185391: stock 28,700, JLC stock 29,020, JLC Extended; price is the 100+ tier at $0.0032.",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 100+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-31; 100+ tier"
   },
   {
    "category": "Resistors",
@@ -608,13 +608,13 @@
    "mfr": "Yageo",
    "link": "https://www.lcsc.com/product-detail/C105871.html",
    "unit_price": 0.0024,
-   "checked": "2026-10-29",
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "LCSC C105871: stock 7,996,200, JLC stock 9,092,371, JLC Extended; price is the 100+ tier at $0.0024.",
+   "notes": "LCSC C105871: stock 8,013,000, JLC stock 8,587,109, JLC Extended; price is the 100+ tier at $0.0024.",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 100+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-31; 100+ tier"
   },
   {
    "category": "Resistors",
@@ -625,13 +625,13 @@
    "mfr": "Yageo",
    "link": "https://www.lcsc.com/product-detail/C106232.html",
    "unit_price": 0.0017,
-   "checked": "2026-10-29",
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "LCSC C106232: stock 8,303,100, JLC stock 9,151,835, JLC Extended; price is the 100+ tier at $0.0017.",
+   "notes": "LCSC C106232: stock 8,389,300, JLC stock 9,094,171, JLC Extended; price is the 100+ tier at $0.0017.",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 100+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-31; 100+ tier"
   },
   {
    "category": "Resistors",
@@ -642,13 +642,13 @@
    "mfr": "Yageo",
    "link": "https://www.lcsc.com/product-detail/C114762.html",
    "unit_price": 0.0028,
-   "checked": "2026-10-29",
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "LCSC C114762: stock 600,100, JLC stock 673,579, JLC Extended; price is the 100+ tier at $0.0028.",
+   "notes": "LCSC C114762: stock 597,500, JLC stock 667,055, JLC Extended; price is the 100+ tier at $0.0028.",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 100+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-31; 100+ tier"
   },
   {
    "category": "Resistors",
@@ -658,14 +658,14 @@
    "mpn": "RC0402FR-0710KL",
    "mfr": "Yageo",
    "link": "https://www.lcsc.com/product-detail/C60490.html",
-   "unit_price": 0.0028,
-   "checked": "2026-10-29",
+   "unit_price": 0.0019,
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "LCSC C60490: stock 1,784,200, JLC stock 6,831,006, JLC Extended; price is the 100+ tier at $0.0028.",
+   "notes": "LCSC C60490: stock 1,862,700, JLC stock 6,850,876, JLC Extended; price is the 100+ tier at $0.0019.",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 100+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-31; 100+ tier"
   },
   {
    "category": "Resistors",
@@ -676,13 +676,13 @@
    "mfr": "Yageo",
    "link": "https://www.lcsc.com/product-detail/C106235.html",
    "unit_price": 0.0026,
-   "checked": "2026-10-29",
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "LCSC C106235: stock 1,245,100, JLC stock 2,276,055, JLC Extended; price is the 100+ tier at $0.0026.",
+   "notes": "LCSC C106235: stock 1,134,000, JLC stock 2,101,317, JLC Extended; price is the 100+ tier at $0.0026.",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 100+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-31; 100+ tier"
   },
   {
    "category": "Resistors",
@@ -692,14 +692,14 @@
    "mpn": "RC0402FR-075K1L",
    "mfr": "Yageo",
    "link": "https://www.lcsc.com/product-detail/C105872.html",
-   "unit_price": 0.0025,
-   "checked": "2026-10-29",
+   "unit_price": 0.0028,
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
    "hard": "",
-   "notes": "LCSC C105872: stock 2,128,300, JLC stock 2,375,319, JLC Extended; price is the 100+ tier at $0.0025.",
+   "notes": "LCSC C105872: stock 2,157,400, JLC stock 2,393,506, JLC Extended; price is the 100+ tier at $0.0028.",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 100+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-31; 100+ tier"
   },
   {
    "category": "Resistors",
@@ -710,13 +710,13 @@
    "mfr": "Yageo",
    "link": "https://www.lcsc.com/product-detail/C138021.html",
    "unit_price": 0.004,
-   "checked": "2026-10-29",
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
-   "hard": "",
-   "notes": "LCSC stock is 0 but JLC stock is 48,785, so JLC assembly can still source it. LCSC C138021: stock 0, JLC stock 48,785, JLC Extended; price is the 100+ tier at $0.004.",
+   "hard": "LCSC stock 0 on 2026-10-31 but JLC stock 48,286, so JLC assembly can still source it.",
+   "notes": "LCSC stock is 0 but JLC stock is 48,785, so JLC assembly can still source it. LCSC C138021: stock 0, JLC stock 48,286, JLC Extended; price is the 100+ tier at $0.004.",
    "mpn_suggested": false,
-   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-29; 100+ tier"
+   "price_source": "LCSC product API (wmsc.lcsc.com) 2026-10-31; 100+ tier"
   },
   {
    "category": "Mechanical",
@@ -727,7 +727,7 @@
    "mfr": "uxcell (Amazon ASIN)",
    "link": "https://www.amazon.com/dp/B011BNTAAU",
    "unit_price": 0.0999,
-   "checked": "2026-10-29",
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
    "hard": "",
@@ -744,7 +744,7 @@
    "mfr": "uxcell (Amazon ASIN)",
    "link": "https://www.amazon.com/dp/B0CTCQ6MHK",
    "unit_price": 0.0769,
-   "checked": "2026-10-29",
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
    "hard": "",
@@ -761,7 +761,7 @@
    "mfr": "Polymaker",
    "link": "https://www.matterhackers.com/store/l/polymaker-polylite-pla-black-175mm-1kg/sk/M3RRH23H",
    "unit_price": 0.3598,
-   "checked": "2026-10-29",
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": false,
    "hard": "",
@@ -778,7 +778,7 @@
    "mfr": "JLCPCB",
    "link": "https://jlcpcb.com/ads/pcb-manufacturer-comparison",
    "unit_price": null,
-   "checked": "2026-10-29",
+   "checked": "2026-10-31",
    "status": "unverified",
    "fixed": true,
    "hard": "",
@@ -795,7 +795,7 @@
    "mfr": "JLCPCB",
    "link": "https://jlcpcb.com/help/article/pcb-assembly-price",
    "unit_price": 51.12,
-   "checked": "2026-10-29",
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": true,
    "hard": "",
@@ -812,7 +812,7 @@
    "mfr": "JLCPCB",
    "link": "https://jlcpcb.com/help/article/pcb-assembly-price",
    "unit_price": 16.42,
-   "checked": "2026-10-29",
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": true,
    "hard": "",
@@ -829,7 +829,7 @@
    "mfr": "JLCPCB",
    "link": "https://jlcpcb.com/help/article/pcb-assembly-price",
    "unit_price": 1.53,
-   "checked": "2026-10-29",
+   "checked": "2026-10-31",
    "status": "verified",
    "fixed": true,
    "hard": "",
@@ -846,7 +846,7 @@
    "mfr": "JLCPCB",
    "link": "https://jlcpcb.com/help/article/pcb-assembly-price",
    "unit_price": 0.0016,
-   "checked": "2026-10-29",
+   "checked": "2026-10-31",
    "status": "unverified",
    "fixed": false,
    "hard": "",

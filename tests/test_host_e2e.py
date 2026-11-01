@@ -136,8 +136,14 @@ def test_sensor_ae_and_tracking_commands():
     assert st.fpga.regs[simfw.REG_THRESH] == 30 | 50 << 8 | 8 << 16 | 1 << 24
     cam.set_tracking_params(maxham=3)
     assert st.fpga.regs[simfw.REG_THRESH] == 24 | 64 << 8 | 10 << 16 | 3 << 24
+    cam.set_tracking_params(ratio=2)
+    assert st.fpga.regs[simfw.REG_THRESH] == 24 | 64 << 8 | 10 << 16 | 2 << 24 | 2 << 30     # lowcon setting
+    cam.set_tracking_params(ratio=0)
+    assert st.fpga.regs[simfw.REG_THRESH] >> 30 == 0
     with pytest.raises(ValueError):
         cam.set_tracking_params(maxham=64)
+    with pytest.raises(ValueError):
+        cam.set_tracking_params(ratio=4)
 
 
 def test_status_fields():

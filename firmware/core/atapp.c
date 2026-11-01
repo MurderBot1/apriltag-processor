@@ -190,8 +190,8 @@ static void on_frame(at_app_t *a, uint8_t type, const uint8_t *p, size_t n)
         a->ae_enabled = p[0] != 0; ack(a, type); break;
     case AT_CMD_SET_TRACK:
         if (n != 4) { nak(a, type, AT_ERR_BAD_LEN); break; }
-        a->maxham = p[3] & 63;                              /* the tag unit runs here; the FPGA keeps the field in its register for read-back */
-        a->hal.fpga_write(a->hal.ctx, FPGA_REG_THRESH, (uint32_t)p[0] | ((uint32_t)p[1] << 8) | ((uint32_t)p[2] << 16) | ((uint32_t)(p[3] & 63) << 24));
+        a->maxham = p[3] & 63;                              /* the tag unit runs here; the FPGA keeps the field in its register for read-back; p[3] bits 7:6 = tile contrast-ratio field (THRESH[31:30]) */
+        a->hal.fpga_write(a->hal.ctx, FPGA_REG_THRESH, (uint32_t)p[0] | ((uint32_t)p[1] << 8) | ((uint32_t)p[2] << 16) | ((uint32_t)(p[3] & 63) << 24) | ((uint32_t)(p[3] >> 6) << 30));
         ack(a, type); break;
     case AT_CMD_GET_STATUS: {
         uint32_t st[16] = {0}; uint8_t b[64] = {0};

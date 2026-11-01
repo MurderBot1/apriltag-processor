@@ -1,6 +1,7 @@
 // Adaptive threshold + binarizer, 2 pixels / clock, bit-exact with tools/golden.py:binarize().
 //   2x2 binning -> 8x8-pixel tiles (min,max) -> 3x3 tile neighbourhood -> thr=(min+max)/2
-//   tile is "contrasty" if diff>=diff_min and 2*diff>=max ; contrasty: black = p<=thr, else black = p<abs_black
+//   tile is "contrasty" if diff>=diff_min and k*diff>=max (k = 2,3,4 or no test, cfg_ratio = 0..3, reset 0) ; contrasty: black = p<=thr, else black = p<abs_black
+//   (k=2 means min <= max/2: a frame whose contrast is compressed so that min > max/2, e.g. black 69 / white 167, has no contrasty tile at all; k=4 admits it)
 // Pixels are delayed by D=17 rows in a 32-row ring so the tile row below is known when a row is emitted.
 // Output rows are launched when input row (y+17) starts, or by an internal timer during the post-frame flush.
 `timescale 1ns/1ps
@@ -13,6 +14,7 @@ module thresh_binarize #(
     input  wire        rst,
     input  wire [7:0]  cfg_diff_min,
     input  wire [7:0]  cfg_abs_black,
+    input  wire [1:0]  cfg_ratio,      // contrast-ratio test: 0 = 2*diff>=max, 1 = 3*diff>=max, 2 = 4*diff>=max, 3 = off (diff_min only)
     input  wire [15:0] cfg_line_cyc,   // clocks per sensor line (flush pacing)
     // video in (from csi2_rx)
     input  wire        vin_valid,
@@ -183,7 +185,8 @@ module thresh_binarize #(
         if (cval[2]) begin if (cmin2 < nmin) nmin = cmin2; if (cmax2 > nmax) nmax = cmax2; end
     end
     wire [8:0] ndiff = {1'b0, n_max} - {1'b0, n_min};
-    wire       hi    = (ndiff >= {1'b0, cfg_diff_min}) && ({ndiff, 1'b0} >= {2'b0, n_max});
+    wire [10:0] ndiff_k = (cfg_ratio == 2'd0) ? {1'b0, ndiff, 1'b0} : (cfg_ratio == 2'd1) ? ({1'b0, ndiff, 1'b0} + {2'b0, ndiff}) : {ndiff, 2'b00};
+    wire       hi    = (ndiff >= {1'b0, cfg_diff_min}) && ((cfg_ratio == 2'd3) || (ndiff_k >= {3'b0, n_max}));
     wire [8:0] nsum  = {1'b0, n_min} + {1'b0, n_max};
     wire [7:0] thr_v = nsum[8:1];
 

@@ -8,7 +8,7 @@ Pipeline
   3. Pillow: PNG -> WebP, and writes site/data/partthumbs.js (BOM line / footprint -> thumbnail rules)
 Models: KiCad 3dmodels where the library has one (passives, SOT-23, WSON, QFN-56 as the RP2350 QFN-60 stand-in, USB-C (GCT 16P
 as stand-in for the HRO TYPE-C-31-M-12), tact switch, 1.27 mm SMD header, 3225 crystal); parametric models otherwise (ECP5 BGA,
-3225 oscillator, OV9281 CSP, CLA020 lens holder, M12 lens, M2 screw, M2 heat-set insert, filament spool, bare PCB with the real routed top
+3225 oscillator, OV9281 CSP, CLA021 lens holder, M12 lens, M2 screw, M2 heat-set insert, filament spool, bare PCB with the real routed top
 copper as texture).  A real model dropped in render/models/<key>.glb|obj|stl (keys: ov9281, holder, lens, ...) replaces the parametric one.
 Fee rows (assembly setup / stencil / feeder / placement) use inline SVG icons drawn by assets/partthumbs.js."""
 import os, sys, json, subprocess
@@ -43,7 +43,7 @@ RULES = [
     ['mpn', '^LFE5U', 'ecp5'], ['mpn', '^RP2350', 'rp2350'], ['mpn', '^W25Q', 'flash'],
     ['mpn', '^TLV62569', 'tlv62569'], ['mpn', '^TLV75525', 'tlv75525'], ['mpn', '^TLV75518', 'tlv75518'],
     ['mpn', '^TLV75528', 'tlv75528'], ['mpn', '^ME6211C25', 'tlv75525'], ['mpn', '^ME6211C28', 'tlv75528'], ['mpn', '^TLV75512', 'tlv75512'], ['mpn', '^USBLC6', 'usblc6'],
-    ['mpn', '^OV9281', 'ov9281'], ['mpn', '^CLA020', 'holder'], ['value', '^M12 lens(?! holder)', 'lens'],
+    ['mpn', '^OV9281', 'ov9281'], ['mpn', '^CLA02', 'holder'], ['value', '^M12 lens(?! holder)', 'lens'],
     ['mpn', '^ABM8', 'xtal'], ['mpn', '^O9322', 'osc'], ['mpn', '^TYPE-C', 'usbc'], ['mpn', '^HX PZ1', 'hdr'],
     ['mpn', '^PTS810', 'sw'], ['mpn', '^KT-0603', 'led'], ['mpn', '^BLM18', 'l0603'], ['mpn', '^DFE252012', 'l1008'],
     ['mpn', '^CL05', 'c0402'], ['mpn', '^CL10', 'c0603'], ['mpn', '^CL21', 'c0805'], ['mpn', '^RC0402', 'r0402'],

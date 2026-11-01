@@ -16,7 +16,7 @@ module fe_top (
     csi2_rx rx(.clk(clk100), .rst(rst), .hs_valid(hs_valid), .lane0(lane0), .lane1(lane1), .pix_valid(pv), .pix0(p0), .pix1(p1), .line_first(lf), .line_last(ll),
         .fs(fs), .fe(fe), .pkt_end(pkt_end), .frame_ok(fok), .ecc_corrected(a), .ecc_dropped(b), .crc_errors(c), .frames_bad(d));
     wire bv, b0, b1, bf, bl, bfs, bfe, be; wire [9:0] by;
-    thresh_binarize #(.LINE_CYC(800)) th(.clk(clk100), .rst(rst), .cfg_diff_min(8'd24), .cfg_abs_black(8'd64), .cfg_line_cyc(16'd686), .vin_valid(pv), .vin_p0(p0), .vin_p1(p1),
+    thresh_binarize #(.LINE_CYC(800)) th(.clk(clk100), .rst(rst), .cfg_diff_min(8'd24), .cfg_abs_black(8'd64), .cfg_ratio(2'd0), .cfg_line_cyc(16'd686), .vin_valid(pv), .vin_p0(p0), .vin_p1(p1),
         .vin_fs(fs), .vin_fe(fe), .o_valid(bv), .o_b0(b0), .o_b1(b1), .o_first(bf), .o_last(bl), .o_y(by), .o_frame_start(bfs), .o_frame_end(bfe), .o_busy_err(be));
     wire dv, d0, d1, df, dl, dfs, dfe; wire [9:0] dy;
     despeckle dsp(.clk(clk100), .rst(rst), .bypass(1'b0), .i_valid(bv), .i_b0(b0), .i_b1(b1), .i_fs(bfs), .o_valid(dv), .o_b0(d0), .o_b1(d1), .o_first(df), .o_last(dl), .o_y(dy), .o_fs(dfs), .o_fe(dfe));
