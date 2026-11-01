@@ -14,6 +14,7 @@ GROUPS = [
     ('dataset (Blender/GT)',    ['tests/test_dataset.py'],                                     False),
     ('housing',                 ['tests/test_housing.py'],                                     False),
     ('pcb netlist/pin plan',    ['tests/test_pcb.py'],                                         False),
+    ('pcb ERC + fab package',   ['tests/test_pcb_erc.py'],                                     False),
     ('pose solver (C)',         ['tests/test_pose_solver.py'],                                 False),
     ('firmware proto/storage/app', ['tests/test_fw_proto.py', 'tests/test_fw_storage.py', 'tests/test_fw_app.py', 'tests/test_fw_sched.py'], False),
     ('host library',            ['tests/test_host_e2e.py', 'tests/test_host_fuzz.py'],        False),
@@ -35,6 +36,9 @@ def run(group):
     tail = [l for l in r.stdout.strip().splitlines() if l.strip()][-1] if r.stdout.strip() else r.stderr[-200:]
     m = re.search(r'(\d+) passed', tail); n = int(m.group(1)) if m else 0
     f = re.search(r'(\d+) failed', tail); nf = int(f.group(1)) if f else 0
+    if r.returncode:                                   # show why a group failed (CI logs otherwise only keep the count)
+        print(f'--- {name}: failure details', flush=True)
+        print(chr(10).join(l for l in (r.stdout + r.stderr).splitlines() if l.startswith(('FAILED', 'ERROR', 'E  ')))[:4000], flush=True)
     return name, n, nf, r.returncode, time.time() - t, tail
 
 

@@ -42,7 +42,7 @@ STEPS = {  # json key -> KiCad step (relative to 3dmodels)
 RULES = [
     ['mpn', '^LFE5U', 'ecp5'], ['mpn', '^RP2350', 'rp2350'], ['mpn', '^W25Q', 'flash'],
     ['mpn', '^TLV62569', 'tlv62569'], ['mpn', '^TLV75525', 'tlv75525'], ['mpn', '^TLV75518', 'tlv75518'],
-    ['mpn', '^TLV75528', 'tlv75528'], ['mpn', '^TLV75512', 'tlv75512'], ['mpn', '^USBLC6', 'usblc6'],
+    ['mpn', '^TLV75528', 'tlv75528'], ['mpn', '^ME6211C25', 'tlv75525'], ['mpn', '^ME6211C28', 'tlv75528'], ['mpn', '^TLV75512', 'tlv75512'], ['mpn', '^USBLC6', 'usblc6'],
     ['mpn', '^OV9281', 'ov9281'], ['mpn', '^CLA02', 'holder'], ['value', '^M12 lens(?! holder)', 'lens'],
     ['mpn', '^ABM8', 'xtal'], ['mpn', '^O9322', 'osc'], ['mpn', '^TYPE-C', 'usbc'], ['mpn', '^HX PZ1', 'hdr'],
     ['mpn', '^PTS810', 'sw'], ['mpn', '^KT-0603', 'led'], ['mpn', '^BLM18', 'l0603'], ['mpn', '^DFE252012', 'l1008'],

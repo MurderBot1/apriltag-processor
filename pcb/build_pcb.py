@@ -37,13 +37,16 @@ def make_sensor_fp(b):
     return fp
 
 
+LENS_SCREW_HOLE = 1.9      # mm; M1.6 self-tapping holder screws, so the screw head bears on the FR4 (was 2.6, a head would pass through)
+
+
 def make_lens_mount_fp(b):
     fp = pcbnew.FOOTPRINT(b)
     fp.SetFPID(pcbnew.LIB_ID('apriltag_cam', 'M12_LENS_MOUNT'))
     for x in (-10.0, 10.0):
         pad = pcbnew.PAD(fp)
         pad.SetNumber(''); pad.SetShape(pcbnew.PAD_SHAPE_CIRCLE); pad.SetAttribute(pcbnew.PAD_ATTRIB_NPTH)
-        pad.SetSize(pcbnew.VECTOR2I(mm(2.6), mm(2.6))); pad.SetDrillSize(pcbnew.VECTOR2I(mm(2.6), mm(2.6)))
+        pad.SetSize(pcbnew.VECTOR2I(mm(LENS_SCREW_HOLE), mm(LENS_SCREW_HOLE))); pad.SetDrillSize(pcbnew.VECTOR2I(mm(LENS_SCREW_HOLE), mm(LENS_SCREW_HOLE)))
         pad.SetLayerSet(pad.UnplatedHoleMask()); pad.SetPosition(pcbnew.VECTOR2I(mm(x), 0)); fp.Add(pad)
     for (a, bb) in (((-10, -10), (10, -10)), ((10, -10), (10, 10)), ((10, 10), (-10, 10)), ((-10, 10), (-10, -10))):
         s = pcbnew.PCB_SHAPE(fp); s.SetShape(pcbnew.SHAPE_T_SEGMENT); s.SetLayer(pcbnew.F_Fab); s.SetWidth(mm(0.1))

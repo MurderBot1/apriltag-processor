@@ -19,11 +19,11 @@ R2,33R,R_0402_1005Metric,15.0,2.7,0,bottom,
 C13,100n,C_0402_1005Metric,13.4,2.7,0,bottom,
 R3,10k,R_0402_1005Metric,21.0,3.9000000000000004,0,bottom,
 C14,100n,C_0402_1005Metric,22.6,3.9000000000000004,0,bottom,
-Y1,12MHz,Crystal_SMD_3225-4Pin_3.2x2.5mm,17.5,18.1,0,bottom,
+Y1,12MHz 10pF,Crystal_SMD_3225-4Pin_3.2x2.5mm,17.5,18.1,0,bottom,
 C15,15p,C_0402_1005Metric,15.2,16.3,0,bottom,
 C16,15p,C_0402_1005Metric,19.8,16.3,0,bottom,
 R4,1k,R_0402_1005Metric,17.5,15.7,0,bottom,
-U3,W25Q128JVSIQ,WSON-8-1EP_6x5mm_P1.27mm_EP3.4x4.3mm,18.5,-5.0,90,bottom,"16 MB QSPI flash: firmware, FPGA bitstream, field map/calibration slots"
+U3,W25Q128JVPIQ,WSON-8-1EP_6x5mm_P1.27mm_EP3.4x4.3mm,18.5,-5.0,90,bottom,"16 MB QSPI flash: firmware, FPGA bitstream, field map/calibration slots"
 C17,100n,C_0402_1005Metric,22.1,-2.0,0,bottom,
 SW1,BOOTSEL,SW_SPST_PTS810,20.5,2.5,0,bottom,
 R5,1k,R_0402_1005Metric,20.0,8.0,0,bottom,
@@ -55,13 +55,13 @@ C24,10u,C_0805_2012Metric,-0.10000000000000009,-23.5,0,bottom,
 C25,22u,C_0805_2012Metric,8.9,-21.5,0,bottom,
 C26,22u,C_0805_2012Metric,11.100000000000001,-21.5,0,bottom,
 C27,22u,C_0805_2012Metric,10.2,-21.0,0,bottom,
-U6,TLV75525,SOT-23-5,-21.0,4.0,0,bottom,LDO +2V5
+U6,ME6211C25,SOT-23-5,-21.0,4.0,0,bottom,LDO +2V5
 C28,1u,C_0603_1608Metric,-18.0,2.8,0,bottom,
 C29,2u2,C_0603_1608Metric,-18.0,5.2,0,bottom,
 U7,TLV75518,SOT-23-5,-21.0,9.0,0,bottom,LDO +1V8
 C30,1u,C_0603_1608Metric,-18.0,7.8,0,bottom,
 C31,2u2,C_0603_1608Metric,-18.0,10.2,0,bottom,
-U8,TLV75528,SOT-23-5,-21.0,14.0,0,bottom,LDO +2V8
+U8,ME6211C28,SOT-23-5,-21.0,14.0,0,bottom,LDO +2V8
 C32,1u,C_0603_1608Metric,-18.0,12.8,0,bottom,
 C33,2u2,C_0603_1608Metric,-18.0,15.2,0,bottom,
 U9,TLV75512,SOT-23-5,-21.0,19.0,0,bottom,LDO +1V2

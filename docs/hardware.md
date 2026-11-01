@@ -14,9 +14,9 @@ PCB: 48 x 48 mm, 4 layers (F.Cu signal / In1 GND plane / In2 3V3 plane / B.Cu si
 ```
 USB-C VBUS --ferrite--> +5V --+-- TLV62569 buck --> +3V3 (MCU, flash, FPGA banks 2/3/6/7/8, LDO inputs)
                               +-- TLV62569 buck --> +1V1 (ECP5 core, 20 balls)
-+3V3 --+-- TLV75525 LDO --> +2V5 (ECP5 VCCAUX)
++3V3 --+-- ME6211C25 LDO --> +2V5 (ECP5 VCCAUX)
        +-- TLV75518 LDO --> +1V8 (ECP5 banks 0/1/7 = MIPI + sensor control, 24 MHz oscillator, sensor DOVDD)
-       +-- TLV75528 LDO --> +2V8 (sensor AVDD/EVDD, via ferrite)
+       +-- ME6211C28 LDO --> +2V8 (sensor AVDD/EVDD, via ferrite)
        +-- TLV75512 LDO --> +1V2 (sensor DVDD/PVDD, via ferrite)
 RP2350 internal buck (VREG_LX, 3.3 uH) --> +1V1MCU (DVDD)
 ```
@@ -59,15 +59,24 @@ rather than hidden:
 4. The RP2350 slave-SPI FPGA configuration opcodes (`firmware/rp2350/fpga_config.c`) come from memory of Lattice
    TN1260 and are unverified.
 
-## Architecture A3 board status (2026-10-31)
+## Architecture A3 board status (2026-11-01, production-readiness pass)
 
 `pcb/design.py` (netlist source of truth) has U1 = `LFE5U-25F-8BG381I` (value changed from the 45F on 2026-11-01 for stock reasons; same CABGA-381 footprint, no re-route; `tools/pin_compat.py`: all 31 used balls have the same bank and
 pad function as on the 85F) and the 10 frame-bus nets `FB_D0..FB_D7`, `FB_CLK`, `FB_FS` (FPGA bank 6 outer ball row facing the MCU <-> RP2350 GPIO16..25). The board
-was **re-routed completely** with the repository's grid router (`pcb/route_sweep.py`, seed 128): KiCad DRC **69 violations + 10 unconnected items** (baseline of the 85F
-board: 72 + 12); all 10 new nets are connected; no clearance / short / hole violations. Gerbers, drill, pick-and-place, STEP, renders, netlist, `bom.csv` are regenerated
-(`pcb/make_outputs.py`, `render/run_all.sh`). The remaining DRC items are the same kinds as before: dangling plane-stitch vias (26), silk overlaps (9 + 32), 2 library
-footprint warnings, and 10 plane fan-out artefacts (pad-to-plane stubs on +3V3 / GND) that KiCad reports as unconnected, as it did for the previous board; they
-were not investigated for electrical effect (`Pad 20 / Pad 11 [+3V3]` of the MCU is one of them).
+was re-routed completely with the repository's grid router (`pcb/route_sweep.py`, seed 128).
+
+Production pass (`pcb/fix_power_links.py`, `pcb/apply_prod.py`, `tests/test_pcb_erc.py`):
+
+- **Unconnected items.** KiCad DRC reported 10 unconnected items. They were not harmless: the router treats "pad + via" as connected to the +3V3 plane on In2, but In2 also carries
+  signals and the +1V1 island, and the +3V3 pour is cut into islands by the BGA via lattice and by signal tracks. Six +3V3 pad clusters (U1 balls L6/L7/M6, P9, P10, L14/L15/M15, capacitors C2, C4,
+  resistor R2, and **U2 pads 20 and 11, two RP2350 IOVDD pins**) hung on vias that touch no pour and so were electrically floating, and two GND pairs (C48 pad 2, U1 P11/P12 vias) were
+  likewise split. They were fixed with short single-net links found by an A* search on a 0.05 mm grid (vias 0.45/0.2 mm, hole clearance 0.25 mm respected), plus a local re-route of one
+  signal (QSPI_SD0) that blocked the escape of U2 pad 20. **After: 0 unconnected items, no clearance / short / hole violations.**
+- **Dangling vias (24 left, was 26).** These are plane-stitch vias at power pads whose pad is connected by other copper (DRC reports no unconnected item for them); harmless.
+- **Remaining DRC items** are silk overlap (9), silk over copper (32), dangling vias (24), 2 library-footprint warnings (sensor and lens-holder placeholders): all cosmetic.
+- **Lens holder screw holes** are 1.9 mm (M1.6 self-tapping screws bear on the FR4); they were 2.6 mm.
+- **Parts**: flash label `W25Q128JVPIQ` (WSON-8 package), LDOs U6/U8 = `ME6211C25M5G-N` / `ME6211C28M5G-N` (same SOT-23-5 pinout, in stock), crystal load check in `docs/bom/bom.json`
+  (CL = 15*15/30 + 3 pF stray = 10.5 pF for the 10 pF ABM8-272-T3).
 
 How it got there: an incremental route (`pcb/route_a3.py`, `pcb/ripup_region.py`: keep all other copper, rip up the 20-25 signal nets crossing the MCU's left/bottom
 escape area, re-route with `pcb/router/router14.exe`) routed only 9 of the 10 nets whichever MCU pad, FPGA ball or seed was used (the 7th data bit stayed open;
