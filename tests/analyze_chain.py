@@ -8,7 +8,7 @@ ROOT = geom.ROOT
 
 def load():
     gt = json.load(open(os.path.join(ROOT, 'test_images', 'ground_truth.json')))['images']
-    rtl = json.load(open(os.path.join(ROOT, 'results', 'rtl_chain_results.json')))
+    rtl = json.load(open(os.environ.get('CHAIN_OUT') or os.path.join(ROOT, 'results', 'rtl_chain_results.json')))
     ref = json.load(open(os.path.join(ROOT, 'results', 'reference_baseline.json')))        # 100-image baseline (tools/reference_pipeline.py)
     return gt, rtl, ref
 

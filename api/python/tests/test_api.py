@@ -141,6 +141,16 @@ class CameraTests(unittest.TestCase):
             cam.set_sensor(0)
         self.assertEqual(e.exception.code, P.ERR_RANGE)
 
+    def test_set_track_ratio_byte(self):
+        cam, dev, t, _ = self.make()
+        sent = []
+        cam._request = lambda cmd, payload=b'': sent.append((cmd, bytes(payload)))
+        cam.set_track()
+        cam.set_track(24, 64, 10, 2, ratio=2)
+        self.assertEqual(sent, [(P.CMD_SET_TRACK, bytes([24, 64, 10, 2])), (P.CMD_SET_TRACK, bytes([24, 64, 10, 2 | 2 << 6]))])
+        with self.assertRaises(ValueError):
+            cam.set_track(ratio=4)
+
     def test_interleaved_stream(self):
         cam, dev, t, _ = self.make()
         cam.stream(True, 2)

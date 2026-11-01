@@ -41,7 +41,7 @@ module cam_core #(
     wire bus_re_pulse = bus_re;
     // ------------------------------------------------------------------ registers
     reg        ctrl_enable, ctrl_reject_border, ctrl_despeckle;
-    reg [7:0]  thr_diff, thr_abs, thr_mindim; reg [5:0] thr_maxham;
+    reg [7:0]  thr_diff, thr_abs, thr_mindim; reg [5:0] thr_maxham; reg [1:0] thr_ratio;
     reg [23:0] min_area, max_area;
     reg [15:0] line_cyc;
     reg [31:0] scratch;
@@ -99,7 +99,7 @@ module cam_core #(
 
     // ------------------------------------------------------------------ threshold / binarize
     wire b_valid, b0, b1, b_first, b_last, b_fs, b_fe, busy_err; wire [9:0] b_y;
-    thresh_binarize #(.LINE_CYC(800)) th(.clk(clk), .rst(rst), .cfg_diff_min(thr_diff), .cfg_abs_black(thr_abs),
+    thresh_binarize #(.LINE_CYC(800)) th(.clk(clk), .rst(rst), .cfg_diff_min(thr_diff), .cfg_abs_black(thr_abs), .cfg_ratio(thr_ratio),
         .cfg_line_cyc(line_cyc), .vin_valid(g_valid), .vin_p0(pix0), .vin_p1(pix1), .vin_fs(g_fs), .vin_fe(g_fe),
         .o_valid(b_valid), .o_b0(b0), .o_b1(b1), .o_first(b_first), .o_last(b_last), .o_y(b_y),
         .o_frame_start(b_fs), .o_frame_end(b_fe), .o_busy_err(busy_err));
@@ -167,7 +167,7 @@ module cam_core #(
             6'h00: regmux = 32'h41544731;
             6'h01: regmux = 32'h00020000;                    // version 2.0: A3 (no TPU / frame store in the FPGA)
             6'h02: regmux = {29'd0, ctrl_despeckle, ctrl_reject_border, ctrl_enable};
-            6'h03: regmux = {2'd0, thr_maxham, thr_mindim, thr_abs, thr_diff};
+            6'h03: regmux = {thr_ratio, thr_maxham, thr_mindim, thr_abs, thr_diff};
             6'h04: regmux = {8'd0, min_area};
             6'h05: regmux = {8'd0, max_area};
             6'h06: regmux = status;
@@ -200,13 +200,13 @@ module cam_core #(
     always @(posedge clk) begin
         i2c_go_h <= 0;
         if (rst) begin
-            ctrl_enable <= 1; ctrl_reject_border <= 1; ctrl_despeckle <= 1; thr_diff <= 24; thr_abs <= 64; thr_mindim <= 10; thr_maxham <= 2;
+            ctrl_enable <= 1; ctrl_reject_border <= 1; ctrl_despeckle <= 1; thr_diff <= 24; thr_abs <= 64; thr_mindim <= 10; thr_maxham <= 2; thr_ratio <= 0;
             min_area <= 100; max_area <= 400000; line_cyc <= LINE_CYC_DEFAULT; scratch <= 0;
             i2c_rw_h <= 0; i2c_dev_h <= 7'h60; i2c_reg_h <= 0; i2c_wd_h <= 0;
         end else if (bus_we && bus_addr[23:12] == 12'h000) begin
             case (bus_addr[7:2])
                 6'h02: begin ctrl_enable <= bus_wdata[0]; ctrl_reject_border <= bus_wdata[1]; ctrl_despeckle <= bus_wdata[2]; end
-                6'h03: begin thr_diff <= bus_wdata[7:0]; thr_abs <= bus_wdata[15:8]; thr_mindim <= bus_wdata[23:16]; thr_maxham <= bus_wdata[29:24]; end
+                6'h03: begin thr_diff <= bus_wdata[7:0]; thr_abs <= bus_wdata[15:8]; thr_mindim <= bus_wdata[23:16]; thr_maxham <= bus_wdata[29:24]; thr_ratio <= bus_wdata[31:30]; end
                 6'h04: min_area <= bus_wdata[23:0];
                 6'h05: max_area <= bus_wdata[23:0];
                 6'h0F: line_cyc <= bus_wdata[15:0];

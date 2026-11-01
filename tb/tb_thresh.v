@@ -9,7 +9,7 @@ module tb_thresh;
     reg vin_valid = 0; reg [7:0] p0 = 0, p1 = 0; reg fs = 0, fe = 0;
     wire o_valid, o_b0, o_b1, o_first, o_last, o_fs, o_fe, o_err; wire [9:0] o_y;
     reg [7:0] dth = 24, dab = 64;
-    thresh_binarize #(.LINE_CYC(LINE)) dut(.clk(clk), .rst(rst), .cfg_diff_min(dth), .cfg_abs_black(dab), .cfg_line_cyc(LINE[15:0]),
+    thresh_binarize #(.LINE_CYC(LINE)) dut(.clk(clk), .rst(rst), .cfg_diff_min(dth), .cfg_abs_black(dab), .cfg_ratio(2'd0), .cfg_line_cyc(LINE[15:0]),
         .vin_valid(vin_valid), .vin_p0(p0), .vin_p1(p1), .vin_fs(fs), .vin_fe(fe),
         .o_valid(o_valid), .o_b0(o_b0), .o_b1(o_b1), .o_first(o_first), .o_last(o_last), .o_y(o_y),
         .o_frame_start(o_fs), .o_frame_end(o_fe), .o_busy_err(o_err));

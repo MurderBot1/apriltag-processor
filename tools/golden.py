@@ -10,6 +10,8 @@ from scipy import ndimage
 W, H = 1280, 800
 DIFF_MIN_DEFAULT = 24
 ABS_BLACK_DEFAULT = 64
+RATIO_K = (2, 3, 4)
+RATIO_DEFAULT = 0        # contrast-ratio test of a tile: 0: 2*diff>=max, 1: 3*diff>=max, 2: 4*diff>=max, 3: off (THRESH register bits 31:30)
 MIN_AREA_DEFAULT = 100
 MAX_AREA_DEFAULT = 400000
 MIN_DIM_DEFAULT = 10
@@ -19,7 +21,7 @@ MAX_RUNS_ROW = 256       # runs kept per row (rtl/run_ccl.v MAXR)
 
 
 # ------------------------------------------------------------------ threshold
-def binarize(img, diff_min=DIFF_MIN_DEFAULT, abs_black=ABS_BLACK_DEFAULT):
+def binarize(img, diff_min=DIFF_MIN_DEFAULT, abs_black=ABS_BLACK_DEFAULT, ratio=RATIO_DEFAULT):
     p = img.astype(np.int32)
     h, w = p.shape
     b = (p[0::2, 0::2] + p[0::2, 1::2] + p[1::2, 0::2] + p[1::2, 1::2] + 2) >> 2
@@ -29,7 +31,9 @@ def binarize(img, diff_min=DIFF_MIN_DEFAULT, abs_black=ABS_BLACK_DEFAULT):
     nmin = ndimage.minimum_filter(tmin, size=3, mode='nearest')
     nmax = ndimage.maximum_filter(tmax, size=3, mode='nearest')
     diff = nmax - nmin
-    hi = (diff >= diff_min) & (2 * diff >= nmax)
+    hi = (diff >= diff_min)
+    if ratio != 3:
+        hi &= (RATIO_K[ratio] * diff >= nmax)
     thr = (nmin + nmax) >> 1
     hi8 = np.kron(hi, np.ones((8, 8), bool))
     thr8 = np.kron(thr, np.ones((8, 8), np.int32))
@@ -43,8 +47,8 @@ def despeckle(mask):
     return s >= 4
 
 
-def binarize_clean(img, diff_min=DIFF_MIN_DEFAULT, abs_black=ABS_BLACK_DEFAULT):
-    return despeckle(binarize(img, diff_min, abs_black))
+def binarize_clean(img, diff_min=DIFF_MIN_DEFAULT, abs_black=ABS_BLACK_DEFAULT, ratio=RATIO_DEFAULT):
+    return despeckle(binarize(img, diff_min, abs_black, ratio))
 
 
 # -------------------------------------------------------------------- CCL

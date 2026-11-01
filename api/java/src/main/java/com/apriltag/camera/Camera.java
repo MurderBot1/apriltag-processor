@@ -185,10 +185,15 @@ public class Camera implements AutoCloseable {
 
     /** Reset values 24, 64, 10, 2. */
     public void setTrack(int diff, int absBlack, int mindim, int maxham) throws IOException {
-        if (maxham > 63 || diff < 0 || diff > 255 || absBlack < 0 || absBlack > 255 || mindim < 0 || mindim > 255 || maxham < 0) {
+        setTrack(diff, absBlack, mindim, maxham, 0);
+    }
+
+    /** ratio: tile contrast-ratio test, 0: 2*diff>=max (reset), 1: 3*diff>=max, 2: 4*diff>=max (low-contrast scenes), 3: off. */
+    public void setTrack(int diff, int absBlack, int mindim, int maxham, int ratio) throws IOException {
+        if (ratio < 0 || ratio > 3 || maxham > 63 || diff < 0 || diff > 255 || absBlack < 0 || absBlack > 255 || mindim < 0 || mindim > 255 || maxham < 0) {
             throw new IllegalArgumentException("tracking parameter out of range");
         }
-        ack(CMD_SET_TRACK, new byte[] {(byte) diff, (byte) absBlack, (byte) mindim, (byte) maxham});
+        ack(CMD_SET_TRACK, new byte[] {(byte) diff, (byte) absBlack, (byte) mindim, (byte) (maxham | (ratio << 6))});
     }
 
     public Status getStatus() throws IOException {

@@ -20,7 +20,8 @@ ROOT = rtlutil.ROOT
 def work(name):
     img = cv2.imread(os.path.join(ROOT, 'test_images', 'sensor', name + '.png'), 0)
     vvp = os.path.join(rtlutil.SIM, 'tb_cam.vvp')
-    log, res, el = chain.run_frames(vvp, [img], 'ds_' + name)
+    thr = int(os.environ['CHAIN_THR'], 16) if os.environ.get('CHAIN_THR') else None      # optional THRESH register value (chain.thr_word), e.g. 80000000 + defaults = ratio 2
+    log, res, el = chain.run_frames(vvp, [img], 'ds_' + name + os.environ.get('CHAIN_TAG', ''), thr=thr)
     tags = []
     if res['results']:
         pk = res['results'][0]['packet']                       # kept for tools/m33_cycles.py --packets (timing of the C tag unit on the real FPGA output)
@@ -37,7 +38,7 @@ if __name__ == '__main__':
     gt = json.load(open(os.path.join(ROOT, 'test_images', 'ground_truth.json')))
     names = sorted(gt['images'])
     args = sys.argv[1:]; merge = '--merge' in args; args = [a for a in args if a != '--merge']
-    path = os.path.join(ROOT, 'results', 'rtl_chain_results.json')
+    path = os.environ.get('CHAIN_OUT') or os.path.join(ROOT, 'results', 'rtl_chain_results.json')
     out = json.load(open(path)) if merge and os.path.exists(path) else {}
     only = args or ([n for n in names if n not in out] if merge else names)
     t0 = time.time()
@@ -45,6 +46,6 @@ if __name__ == '__main__':
         for n, r in p.imap_unordered(work, only):
             out[n] = r; print(f'{n}: {len(r["tags"])} tags  {r["seconds"]:.0f}s', flush=True)
             if merge: json.dump(out, open(path, 'w'))        # checkpoint after every frame so an interrupted run can resume
-    os.makedirs(os.path.join(ROOT, 'results'), exist_ok=True)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
     json.dump(out, open(path, 'w'))
     print('done', len(out), 'images in', round(time.time() - t0), 's')
