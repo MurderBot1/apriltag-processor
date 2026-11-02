@@ -52,7 +52,7 @@ py -3.12 tools/make_dataset_100.py        # the 100-image dataset: Blender rende
 py -3.12 tools/tpu_prog.py                # assemble the reference TPU program (ref/tpu/tpu_prog.hex)
 py -3.12 tools/m33_cycles.py              # run time of the C tag unit on a Cortex-M33 (Unicorn + cycle model)
 py -3.12 tests/run_all.py                 # the whole verification suite
-bash tools/fpga_flow.sh                   # yosys + nextpnr-ecp5 (+ ecppack bitstream)
+bash tools/fpga_flow.sh                   # yosys + nextpnr-ecp5 (+ ecppack bitstream), default device 25k = shipping LFE5U-25F; FPGA_DEVICE=45k|85k for experiments
 "C:/Program Files/KiCad/10.0/bin/python.exe" pcb/build_pcb.py --route ; py -3.12 pcb/make_outputs.py
 ```
 Tools used: Icarus Verilog 13, Yosys 0.66, nextpnr-ecp5 0.7, KiCad 10, Freerouting 2.1, OpenSCAD 2021, Blender 5.1,
@@ -65,8 +65,7 @@ arm-none-eabi-gcc, Pico SDK (all installed during the build; see `docs/`).
 Products: FPGA bitstream + netlist/config + timing/utilisation reports (yosys, nextpnr-ecp5, ecppack), RP2350 firmware (`.uf2/.elf/.bin`, needs
 arm-none-eabi-gcc + Pico SDK via `PICO_SDK_PATH`), native firmware-sim library, host bundle + configs, Python wheel, C++ static lib + headers,
 Java jar, Rust `.crate`/rlib, docs tarball and the committed PCB gerbers/BOM (copied, not regenerated; needs KiCad). A step whose toolchain is
-missing is recorded as `skipped` in the manifest (never faked); set `REQUIRE="fpga firmware ..."` to make that an error. A timing miss in the FPGA
-flow is recorded as a `warning`, and the bitstream is still produced.
+missing is recorded as `skipped` in the manifest (never faked); set `REQUIRE="fpga firmware ..."` to make that an error. The FPGA flow targets the shipping part LFE5U-25F-8BG381I by default (nextpnr `--25k --package CABGA381 --speed 8`; `FPGA_DEVICE`/`FPGA_SPEED` override for experiments). The manifest has an `fpga` block (device, speed, package, part) and `fpga/summary.txt` states it. A timing miss for every seed in `FPGA_SEEDS`, or a bitstream for any other device or speed, is recorded as `failed` (the bitstream is still produced; `FPGA_ALLOW_NONSHIPPING=1` downgrades the device check to a warning for experiments).
 
 **RP2350 firmware image.** Build on Linux (the Windows msys `ld` 2.47 fails the Pico SDK link with "pico_flash_region.ld appears multiple times", so
 Windows is not a supported firmware build host). Needs `gcc-arm-none-eabi` (CI: Ubuntu 24.04 package, 13.2.1), `libnewlib-arm-none-eabi`, `cmake`, `ninja` and
@@ -85,7 +84,7 @@ It installs the toolchains, runs `tools/build_all.sh --strict`, uploads `product
 tagged `deploy-<run_number>-<short sha>` with the products and manifest attached and notes listing the commit, date, tool versions and
 build/test results. Earlier releases are never overwritten. `main` does not trigger releases. The workflow can also be started manually
 (workflow_dispatch) from any ref; the manual run has a `dry_run` input (default true) that does everything except `gh release create`
-(it still lists the assets and checks that `firmware_apriltag_cam.uf2/.elf` are present). It uses `GITHUB_TOKEN` with `contents: write`.
+(it still lists the assets and checks that `firmware_apriltag_cam.uf2/.elf` are present). A "Verify the build targets the shipping design" step fails the release unless the FPGA is 25k / CABGA381 / speed 8 with timing met, the uf2 exists, `products/docs/bom.csv` equals `pcb/output/bom.csv` with U1 = LFE5U-25F-8BG381I, and the committed PCB carries that part. It uses `GITHUB_TOKEN` with `contents: write`.
 
 ## Headline results (details and caveats in `docs/verification.md`, `docs/fpga.md`, `docs/hardware.md`)
 

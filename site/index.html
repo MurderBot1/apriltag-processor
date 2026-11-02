@@ -55,7 +55,7 @@
 <a class="navlink" href="#/config" data-id="config">Field map &amp; calibration</a>
   </div>
   <div id="navempty" class="muted" hidden>no match</div>
-  <div class="navfoot muted">built 2026-11-01 20:15</div>
+  <div class="navfoot muted">built 2026-11-01 20:43</div>
 </nav>
 <main id="main">
 <section class="page" id="page-home" hidden><h1>AprilTag camera: project browser</h1>
@@ -73,7 +73,7 @@ Everything below is generated from the repository by <code>site/build_site.py</c
                         -> 8-bit frame bus -> RP2350 MCU: 3 frame buffers, tag unit (C), pose solve, USB, field map -> host</pre>
 <img class="hero" src="img/r_hero_s.jpg" alt="housing assembly render"></section>
 <section class="page" id="page-about" hidden><h1>About this site</h1>
-<p>Generated 2026-11-01 20:15 by <code>site/build_site.py</code> (run <code>py -3.12 site/build_site.py</code>; reads the repo, writes only under <code>site/</code>). All data is embedded or loaded with <code>&lt;script src&gt;</code>, so it works from file://.</p>
+<p>Generated 2026-11-01 20:43 by <code>site/build_site.py</code> (run <code>py -3.12 site/build_site.py</code>; reads the repo, writes only under <code>site/</code>). All data is embedded or loaded with <code>&lt;script src&gt;</code>, so it works from file://.</p>
 <ul><li>3D: three.js r147 (non-module build + OrbitControls) vendored in <code>site/vendor/</code>, MIT licence.</li>
 <li>PCB 3D: full-assembly GLB from kicad-cli (<code>render/out/apriltag_cam_full.glb</code>) converted by <code>site/glb_convert.py</code>; the STEP was <code>render/out/apriltag_cam_full.step</code>.</li>
 <li>Markdown rendered with markdown-it-py; charts are inline SVG.</li>
@@ -160,7 +160,7 @@ py -3.12 tools/make_dataset_100.py        # the 100-image dataset: Blender rende
 py -3.12 tools/tpu_prog.py                # assemble the reference TPU program (ref/tpu/tpu_prog.hex)
 py -3.12 tools/m33_cycles.py              # run time of the C tag unit on a Cortex-M33 (Unicorn + cycle model)
 py -3.12 tests/run_all.py                 # the whole verification suite
-bash tools/fpga_flow.sh                   # yosys + nextpnr-ecp5 (+ ecppack bitstream)
+bash tools/fpga_flow.sh                   # yosys + nextpnr-ecp5 (+ ecppack bitstream), default device 25k = shipping LFE5U-25F; FPGA_DEVICE=45k|85k for experiments
 &quot;C:/Program Files/KiCad/10.0/bin/python.exe&quot; pcb/build_pcb.py --route ; py -3.12 pcb/make_outputs.py
 </code></pre>
 <p>Tools used: Icarus Verilog 13, Yosys 0.66, nextpnr-ecp5 0.7, KiCad 10, Freerouting 2.1, OpenSCAD 2021, Blender 5.1,
@@ -171,8 +171,7 @@ arm-none-eabi-gcc, Pico SDK (all installed during the build; see <code>docs/</co
 Products: FPGA bitstream + netlist/config + timing/utilisation reports (yosys, nextpnr-ecp5, ecppack), RP2350 firmware (<code>.uf2/.elf/.bin</code>, needs
 arm-none-eabi-gcc + Pico SDK via <code>PICO_SDK_PATH</code>), native firmware-sim library, host bundle + configs, Python wheel, C++ static lib + headers,
 Java jar, Rust <code>.crate</code>/rlib, docs tarball and the committed PCB gerbers/BOM (copied, not regenerated; needs KiCad). A step whose toolchain is
-missing is recorded as <code>skipped</code> in the manifest (never faked); set <code>REQUIRE=&quot;fpga firmware ...&quot;</code> to make that an error. A timing miss in the FPGA
-flow is recorded as a <code>warning</code>, and the bitstream is still produced.</p>
+missing is recorded as <code>skipped</code> in the manifest (never faked); set <code>REQUIRE=&quot;fpga firmware ...&quot;</code> to make that an error. The FPGA flow targets the shipping part LFE5U-25F-8BG381I by default (nextpnr <code>--25k --package CABGA381 --speed 8</code>; <code>FPGA_DEVICE</code>/<code>FPGA_SPEED</code> override for experiments). The manifest has an <code>fpga</code> block (device, speed, package, part) and <code>fpga/summary.txt</code> states it. A timing miss for every seed in <code>FPGA_SEEDS</code>, or a bitstream for any other device or speed, is recorded as <code>failed</code> (the bitstream is still produced; <code>FPGA_ALLOW_NONSHIPPING=1</code> downgrades the device check to a warning for experiments).</p>
 <p><strong>RP2350 firmware image.</strong> Build on Linux (the Windows msys <code>ld</code> 2.47 fails the Pico SDK link with &quot;pico_flash_region.ld appears multiple times&quot;, so
 Windows is not a supported firmware build host). Needs <code>gcc-arm-none-eabi</code> (CI: Ubuntu 24.04 package, 13.2.1), <code>libnewlib-arm-none-eabi</code>, <code>cmake</code>, <code>ninja</code> and
 Pico SDK <strong>2.1.1</strong> with submodules (tinyusb); the SDK builds picotool from source on first configure (network needed):</p>
@@ -188,7 +187,7 @@ It installs the toolchains, runs <code>tools/build_all.sh --strict</code>, uploa
 tagged <code>deploy-&lt;run_number&gt;-&lt;short sha&gt;</code> with the products and manifest attached and notes listing the commit, date, tool versions and
 build/test results. Earlier releases are never overwritten. <code>main</code> does not trigger releases. The workflow can also be started manually
 (workflow_dispatch) from any ref; the manual run has a <code>dry_run</code> input (default true) that does everything except <code>gh release create</code>
-(it still lists the assets and checks that <code>firmware_apriltag_cam.uf2/.elf</code> are present). It uses <code>GITHUB_TOKEN</code> with <code>contents: write</code>.</p>
+(it still lists the assets and checks that <code>firmware_apriltag_cam.uf2/.elf</code> are present). A &quot;Verify the build targets the shipping design&quot; step fails the release unless the FPGA is 25k / CABGA381 / speed 8 with timing met, the uf2 exists, <code>products/docs/bom.csv</code> equals <code>pcb/output/bom.csv</code> with U1 = LFE5U-25F-8BG381I, and the committed PCB carries that part. It uses <code>GITHUB_TOKEN</code> with <code>contents: write</code>.</p>
 <h2>Headline results (details and caveats in <code>docs/verification.md</code>, <code>docs/fpga.md</code>, <code>docs/hardware.md</code>)</h2>
 <ul>
 <li><strong>120.08 fps</strong> sustained in full-chip simulation at true sensor timing (832,800 clocks per frame at 100 MHz), every frame leaves the FPGA
@@ -864,8 +863,8 @@ set at the real 686-clock line: slowest CCL row &lt;= 686 clocks in 485 of 500 f
 <p>Architecture A3 (<code>docs/costdown.md</code>): the FPGA keeps CSI-2/D-PHY receive, threshold, despeckle, the connected-component labeller
 and a streamer; the tag processing unit (TPU) and the two binary frame banks moved into the RP2350 (firmware C code + SRAM). That is
 what allows the smaller LFE5U-25F in the same CABGA-381 footprint (the old design needed the 85F: 196 of 208 block RAMs).</p>
-<p>Flow: <code>bash tools/fpga_flow.sh &lt;seed&gt; &lt;freq&gt;</code> (synth_ecp5 -&gt; nextpnr-ecp5 <code>--45k --package CABGA381 --speed 8</code>; speed grade is <code>FPGA_SPEED=6|7|8</code>, see &quot;Speed grades&quot; below with <code>rtl/apriltag_cam.lpf</code> -&gt; ecppack;
-env <code>FPGA_OUT=dir</code>, <code>FPGA_DEVICE=45k|85k|25k</code> for parallel runs / other devices). A real bitstream is produced (<code>sim/apriltag_cam.bit</code>).
+<p>Flow: <code>bash tools/fpga_flow.sh &lt;seed&gt; &lt;freq&gt;</code> (synth_ecp5 -&gt; nextpnr-ecp5 <code>--25k --package CABGA381 --speed 8</code>, the shipping LFE5U-25F-8BG381I; default device is 25k; speed grade is <code>FPGA_SPEED=6|7|8</code>, see &quot;Speed grades&quot; below with <code>rtl/apriltag_cam.lpf</code> -&gt; ecppack;
+env <code>FPGA_OUT=dir</code>, <code>FPGA_DEVICE=25k|45k|85k</code> (default 25k; 45k/85k are fallbacks for experiments) for parallel runs / other devices). A real bitstream is produced (<code>sim/apriltag_cam.bit</code>).
 Nothing has been loaded onto a physical device. All numbers below are from nextpnr (estimates, not signoff), yosys 0.66, nextpnr 0.7.</p>
 <h2>Resource use on the 45F (older RTL, seed 1, MSYS2 tools; the 25F shipping numbers are in the first paragraph)</h2>
 <div class="tablewrap"><table>
@@ -981,7 +980,7 @@ Reproduce: <code>FPGA_OUT=sim/fpga_s&lt;N&gt; bash tools/fpga_flow.sh &lt;N&gt; 
 the sensor rate (frame 1041 lines = 8.328 ms). Removing the TPU (whose multiplier/divider operand routing was a critical path of some seeds) is the likely
 reason the core clock now closes on most seeds; that causal link was not isolated.</p>
 <h2>Speed grades and tool versions</h2>
-<p><code>FPGA_SPEED=6|7|8</code> (default 8) and <code>FPGA_DEVICE=45k|25k</code> select the part; <code>tools/fpga_sweep.sh &quot;&lt;seeds&gt;&quot; &lt;speed&gt; &lt;device&gt;</code> runs several seeds in parallel and prints the table.
+<p><code>FPGA_SPEED=6|7|8</code> (default 8) and <code>FPGA_DEVICE=25k|45k|85k</code> (default 25k) select the part; <code>tools/fpga_sweep.sh &quot;&lt;seeds&gt;&quot; &lt;speed&gt; &lt;device&gt;</code> runs several seeds in parallel and prints the table.
 Full study with per-seed numbers: <code>results/fpga_speed_grades.md</code>. Result (nextpnr estimate, not signoff, OSS CAD Suite 2025-09-01 as pinned in <code>release.yml</code>, 6 seeds):
 LFE5U-45F speed 8: 6 of 6 seeds close both clocks; speed 7: 0 of 6 (core 72 - 78 MHz, D-PHY 181 - 191 MHz); speed 6: 0 of 6 (core 62 - 70 MHz, D-PHY 155 - 172 MHz).
 LFE5U-25F speed 8: 5 of 6 close on the RTL of 33e0207 (56/56 block RAM), 7 of 7 on main 828bf22 (see top of this file); speeds 7 and 6: 0 of 6. A -6 or -7 FPGA therefore cannot be used with this design: the labeller carry chains limit the core clock, and the 800 Mb/s lanes need a faster
@@ -3043,7 +3042,7 @@ openscad -D &quot;part=\&quot;exploded\&quot;&quot; --render --imgsize 1200,1200
 </div>
 <div class="tabpane" data-pane="m-p" hidden>
  <div class="v3host" id="v-pcb"><div class="vmsg">loading 3D...</div></div>
- <p class="muted">Full-assembly model <code>render/out/apriltag_cam_full.step</code> / <code>.glb</code> (exported 2026-11-01 19:33 with kicad-cli; every footprint carries a real 3D model: KiCad 10 official library for passives, SOT, WSON, header, switch, crystal; dimensionally accurate parametric models from <code>render/models/gen_models.py</code> for the ECP5 caBGA-381, RP2350 QFN-60, USB-C, oscillator, OV9281 CSP, M12 lens holder + lens and test pads): 340 model colour groups (149), 132868 triangles. Colours are the colours stored in the models. The copper traces on the 3D board are a texture from the routed .kicad_pcb (toggle &quot;traces&quot;) and are in the PCB layout tab and the renders.</p>
+ <p class="muted">Full-assembly model <code>render/out/apriltag_cam_full.step</code> / <code>.glb</code> (exported 2026-11-01 20:41 with kicad-cli; every footprint carries a real 3D model: KiCad 10 official library for passives, SOT, WSON, header, switch, crystal; dimensionally accurate parametric models from <code>render/models/gen_models.py</code> for the ECP5 caBGA-381, RP2350 QFN-60, USB-C, oscillator, OV9281 CSP, M12 lens holder + lens and test pads): 340 model colour groups (149), 132868 triangles. Colours are the colours stored in the models. The copper traces on the 3D board are a texture from the routed .kicad_pcb (toggle &quot;traces&quot;) and are in the PCB layout tab and the renders.</p>
  <div class="gridimgs"><figure><img src="img/board_top.png" alt="PCB top (board_top.png)" loading="lazy"><figcaption>PCB top (board_top.png)</figcaption></figure><figure><img src="img/board_bottom.png" alt="PCB bottom (board_bottom.png)" loading="lazy"><figcaption>PCB bottom (board_bottom.png)</figcaption></figure><figure><img src="img/board_iso.png" alt="PCB iso (board_iso.png)" loading="lazy"><figcaption>PCB iso (board_iso.png)</figcaption></figure></div>
 </div>
 <div class="tabpane" data-pane="m-r" hidden>

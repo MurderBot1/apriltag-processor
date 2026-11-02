@@ -6,8 +6,8 @@ Architecture A3 (`docs/costdown.md`): the FPGA keeps CSI-2/D-PHY receive, thresh
 and a streamer; the tag processing unit (TPU) and the two binary frame banks moved into the RP2350 (firmware C code + SRAM). That is
 what allows the smaller LFE5U-25F in the same CABGA-381 footprint (the old design needed the 85F: 196 of 208 block RAMs).
 
-Flow: `bash tools/fpga_flow.sh <seed> <freq>` (synth_ecp5 -> nextpnr-ecp5 `--45k --package CABGA381 --speed 8`; speed grade is `FPGA_SPEED=6|7|8`, see "Speed grades" below with `rtl/apriltag_cam.lpf` -> ecppack;
-env `FPGA_OUT=dir`, `FPGA_DEVICE=45k|85k|25k` for parallel runs / other devices). A real bitstream is produced (`sim/apriltag_cam.bit`).
+Flow: `bash tools/fpga_flow.sh <seed> <freq>` (synth_ecp5 -> nextpnr-ecp5 `--25k --package CABGA381 --speed 8`, the shipping LFE5U-25F-8BG381I; default device is 25k; speed grade is `FPGA_SPEED=6|7|8`, see "Speed grades" below with `rtl/apriltag_cam.lpf` -> ecppack;
+env `FPGA_OUT=dir`, `FPGA_DEVICE=25k|45k|85k` (default 25k; 45k/85k are fallbacks for experiments) for parallel runs / other devices). A real bitstream is produced (`sim/apriltag_cam.bit`).
 Nothing has been loaded onto a physical device. All numbers below are from nextpnr (estimates, not signoff), yosys 0.66, nextpnr 0.7.
 
 ## Resource use on the 45F (older RTL, seed 1, MSYS2 tools; the 25F shipping numbers are in the first paragraph)
@@ -45,7 +45,7 @@ reason the core clock now closes on most seeds; that causal link was not isolate
 
 ## Speed grades and tool versions
 
-`FPGA_SPEED=6|7|8` (default 8) and `FPGA_DEVICE=45k|25k` select the part; `tools/fpga_sweep.sh "<seeds>" <speed> <device>` runs several seeds in parallel and prints the table.
+`FPGA_SPEED=6|7|8` (default 8) and `FPGA_DEVICE=25k|45k|85k` (default 25k) select the part; `tools/fpga_sweep.sh "<seeds>" <speed> <device>` runs several seeds in parallel and prints the table.
 Full study with per-seed numbers: `results/fpga_speed_grades.md`. Result (nextpnr estimate, not signoff, OSS CAD Suite 2025-09-01 as pinned in `release.yml`, 6 seeds):
 LFE5U-45F speed 8: 6 of 6 seeds close both clocks; speed 7: 0 of 6 (core 72 - 78 MHz, D-PHY 181 - 191 MHz); speed 6: 0 of 6 (core 62 - 70 MHz, D-PHY 155 - 172 MHz).
 LFE5U-25F speed 8: 5 of 6 close on the RTL of 33e0207 (56/56 block RAM), 7 of 7 on main 828bf22 (see top of this file); speeds 7 and 6: 0 of 6. A -6 or -7 FPGA therefore cannot be used with this design: the labeller carry chains limit the core clock, and the 800 Mb/s lanes need a faster

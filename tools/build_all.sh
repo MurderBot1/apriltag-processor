@@ -9,10 +9,15 @@
 # Nothing is faked: a step that cannot run is recorded in the manifest as skipped/failed with a note.
 # Environment: PICO_SDK_PATH (RP2350 firmware), FPGA_SEEDS (space separated, default "1 3 5 4 7": first seed whose final
 #   post-route timing closes both clocks is kept; if none closes, the best-core-fmax seed is kept and a warning is recorded),
-#   FPGA_FREQ, FPGA_SPEED (ECP5 speed grade 6|7|8, default 8; grade 6/7 do not close, see docs/fpga.md), FPGA_DEVICE (45k|25k),
+#   FPGA_FREQ, FPGA_SPEED (ECP5 speed grade 6|7|8, default 8; grade 6/7 do not close, see docs/fpga.md), FPGA_DEVICE (25k|45k|85k, default 25k = the shipping LFE5U-25F-8BG381I; any other device or speed grade makes the
+#   fpga-target step FAIL, set FPGA_ALLOW_NONSHIPPING=1 for experiments),
 #   RUN_SUITE=1 (also run tests/run_all.py).
 set -u
 STRICT=0; TESTS=1; FPGA=1
+# Shipping FPGA (BOM U1): LFE5U-25F-8BG381I = nextpnr --25k --package CABGA381 --speed 8
+SHIP_DEVICE=25k; SHIP_SPEED=8; SHIP_PART=LFE5U-25F-8BG381I
+FPGA_DEVICE=${FPGA_DEVICE:-$SHIP_DEVICE}; FPGA_SPEED=${FPGA_SPEED:-$SHIP_SPEED}; export FPGA_DEVICE FPGA_SPEED FPGA_PART SHIP_PART
+FPGA_PART=$SHIP_PART; [ "$FPGA_DEVICE" = "$SHIP_DEVICE" ] || FPGA_PART="ECP5 $FPGA_DEVICE (NOT the shipping part)"
 ROOT=$(cd "$(dirname "$0")/.." && pwd); OUT="$ROOT/products"
 while [ $# -gt 0 ]; do
   case $1 in
@@ -54,12 +59,17 @@ elif have yosys && have nextpnr-ecp5 && have ecppack; then
   USESEED=${GOODSEED:-$BESTSEED}
   if [ -n "$USESEED" ]; then cp sim/seed_$USESEED/* sim/ 2>/dev/null; fi
   if [ -n "$USESEED" ] && [ -f sim/apriltag_cam.bit ] && grep -q FLOW_DONE sim/nextpnr.out 2>/dev/null; then
-    record fpga ok "seed $USESEED, speed grade ${FPGA_SPEED:-8}, device ${FPGA_DEVICE:-45k}"
+    record fpga ok "seed $USESEED, speed grade $FPGA_SPEED, device $FPGA_DEVICE, part $FPGA_PART"
+    if [ "$FPGA_DEVICE" = "$SHIP_DEVICE" ] && [ "$FPGA_SPEED" = "$SHIP_SPEED" ] && grep -q "device=$SHIP_DEVICE package=CABGA381 speed=$SHIP_SPEED" "sim/seed_$USESEED/flow_params.txt" 2>/dev/null; then
+      record fpga-target ok "bitstream built for $SHIP_PART (nextpnr --$FPGA_DEVICE --package CABGA381 --speed $FPGA_SPEED)"
+    elif [ "${FPGA_ALLOW_NONSHIPPING:-0}" = 1 ]; then record fpga-target warning "bitstream is for $FPGA_DEVICE speed $FPGA_SPEED, NOT the shipping $SHIP_PART (FPGA_ALLOW_NONSHIPPING=1)"
+    else record fpga-target failed "bitstream is for $FPGA_DEVICE speed $FPGA_SPEED, but the shipping part is $SHIP_PART ($SHIP_DEVICE speed $SHIP_SPEED)"; fi
     cp sim/apriltag_cam.bit sim/timing.json sim/yosys_top.out sim/nextpnr.log "$OUT/fpga/" 2>/dev/null
     gzip -9 -c sim/top.json > "$OUT/fpga/top.json.gz"; gzip -9 -c sim/top.cfg > "$OUT/fpga/top.cfg.gz"   # netlist + textual config (large)
     cp rtl/apriltag_cam.lpf "$OUT/fpga/"
-    { echo "seed $USESEED, speed grade ${FPGA_SPEED:-8}, device ${FPGA_DEVICE:-45k}, target ${FPGA_FREQ:-85.714} MHz (final post-route report)"; grep -E "Max frequency for clock" sim/nextpnr.log | tail -2; grep -A14 "Device utilisation" sim/nextpnr.log | tail -15; } > "$OUT/fpga/summary.txt"
-    if [ -z "$GOODSEED" ]; then record fpga-timing warning "timing NOT met at ${FPGA_FREQ:-85.714} MHz target for any of seeds ${FPGA_SEEDS:-${FPGA_SEED:-1 3 5 4 7}} (see fpga/summary.txt); best seed $USESEED, bitstream still produced"; fi
+    { echo "device $FPGA_DEVICE, part $FPGA_PART, package CABGA381, speed grade $FPGA_SPEED"; echo "seed $USESEED, speed grade $FPGA_SPEED, device $FPGA_DEVICE, target ${FPGA_FREQ:-85.714} MHz (final post-route report)"; grep -E "Max frequency for clock" sim/nextpnr.log | tail -2; grep -A14 "Device utilisation" sim/nextpnr.log | tail -15; } > "$OUT/fpga/summary.txt"
+    if [ -z "$GOODSEED" ]; then record fpga-timing failed "timing NOT met at ${FPGA_FREQ:-85.714} MHz target for any of seeds ${FPGA_SEEDS:-${FPGA_SEED:-1 3 5 4 7}} (see fpga/summary.txt); best seed $USESEED, bitstream still produced"
+    else record fpga-timing ok "core clk100 and D-PHY sclk both close at seed $GOODSEED"; fi
   else
     record fpga-bitstream failed "no bitstream / FLOW_DONE marker (see logs/)"; cp sim/*.out sim/*.log "$OUT/logs/" 2>/dev/null; tail -n 15 sim/yosys_top.out sim/nextpnr.out 2>/dev/null
   fi
@@ -70,7 +80,7 @@ if have arm-none-eabi-gcc && have cmake && [ -n "${PICO_SDK_PATH:-}" ] && [ -f "
   GEN=""; have ninja && GEN="-G Ninja"
   if step firmware firmware bash -c "cmake -S firmware/rp2350 -B build/rp2350 $GEN -DPICO_SDK_PATH='$PICO_SDK_PATH' && cmake --build build/rp2350 -j"; then
     for e in uf2 elf bin hex elf.map; do [ -f "build/rp2350/apriltag_cam.$e" ] && cp "build/rp2350/apriltag_cam.$e" "$OUT/firmware/"; done
-    [ -f "$OUT/firmware/apriltag_cam.uf2" ] || record firmware-uf2 failed "build ok but no uf2 produced"
+    if [ -s "$OUT/firmware/apriltag_cam.uf2" ]; then record firmware-uf2 ok "apriltag_cam.uf2 $(wc -c < "$OUT/firmware/apriltag_cam.uf2") bytes"; else record firmware-uf2 failed "build ok but no uf2 produced"; fi
     if [ -f "$OUT/firmware/apriltag_cam.elf" ] && have arm-none-eabi-size; then
       step firmware-size firmware_size $PY tools/fw_size.py "$OUT/firmware/apriltag_cam.elf"         $([ -f "$OUT/firmware/apriltag_cam.bin" ] && echo --bin "$OUT/firmware/apriltag_cam.bin")         $([ -f "$OUT/firmware/apriltag_cam.uf2" ] && echo --uf2 "$OUT/firmware/apriltag_cam.uf2") --out "$OUT/firmware/size.md"
     fi
@@ -159,6 +169,7 @@ dirty = subprocess.run(['git', 'status', '--porcelain', '--untracked-files=no'],
 m = {'git_commit': sh('git', 'rev-parse', 'HEAD'), 'git_branch': sh('git', 'rev-parse', '--abbrev-ref', 'HEAD'), 'git_dirty': bool(dirty),
      'build_date_utc': datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), 'host_platform': sys.platform,
      'tool_versions': {k: v for k, v in tools.items() if v}, 'tools_missing': [k for k, v in tools.items() if not v],
+     'fpga': {'device': os.environ.get('FPGA_DEVICE'), 'speed_grade': os.environ.get('FPGA_SPEED'), 'package': 'CABGA381', 'part': os.environ.get('FPGA_PART'), 'shipping_part': os.environ.get('SHIP_PART')},
      'steps': steps, 'files': files}
 json.dump(m, open(os.path.join(out, 'MANIFEST.json'), 'w'), indent=2)
 with open(os.path.join(out, 'MANIFEST.txt'), 'w') as t:

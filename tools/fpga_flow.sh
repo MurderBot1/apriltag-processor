@@ -1,9 +1,9 @@
 #!/bin/bash
-# Open-source FPGA flow for the ECP5-45F (LFE5U-45F-8BG381C, architecture A3): yosys synthesis -> nextpnr-ecp5 place & route (+ timing report).
-# usage: tools/fpga_flow.sh [seed (default 1: closes core 85.714 MHz and D-PHY 200 MHz)] [freq_mhz (default 85.714)]        env: FPGA_OUT=dir (default sim), FPGA_DEVICE=45k|85k|25k (default 45k), FPGA_SPEED=6|7|8 (ECP5 speed grade, default 8; 6 and 7 do NOT close timing, see docs/fpga.md)
+# Open-source FPGA flow for the ECP5-25F (shipping part LFE5U-25F-8BG381I, architecture A3): yosys synthesis -> nextpnr-ecp5 place & route (+ timing report).
+# usage: tools/fpga_flow.sh [seed (default 1: closes core 85.714 MHz and D-PHY 200 MHz on 25F)] [freq_mhz (default 85.714)]        env: FPGA_OUT=dir (default sim), FPGA_DEVICE=25k|45k|85k (default 25k = shipping part; 45k/85k are for experiments only), FPGA_SPEED=6|7|8 (ECP5 speed grade, default 8; 6 and 7 do NOT close timing, see docs/fpga.md)
 export PATH=/c/msys64/ucrt64/bin:$PATH
 cd "$(dirname "$0")/.."
-SEED=${1:-1}; FREQ=${2:-85.714}; OUT=${FPGA_OUT:-sim}; DEV=${FPGA_DEVICE:-45k}; SPEED=${FPGA_SPEED:-8}
+SEED=${1:-1}; FREQ=${2:-85.714}; OUT=${FPGA_OUT:-sim}; DEV=${FPGA_DEVICE:-25k}; SPEED=${FPGA_SPEED:-8}
 mkdir -p "$OUT"
 echo "fpga_flow: device=$DEV package=CABGA381 speed=$SPEED seed=$SEED freq=$FREQ" > $OUT/flow_params.txt
 python tools/pins.py > /dev/null 2>&1 || py -3.12 tools/pins.py > /dev/null

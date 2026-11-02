@@ -1,10 +1,10 @@
 #!/bin/bash
 # Run tools/fpga_flow.sh for several seeds in parallel and print a markdown table of the FINAL (post-route) nextpnr numbers.
-# usage: tools/fpga_sweep.sh "<seeds, e.g. 1 2 3 4 5 6>" [speed (default 8)] [device 45k|25k (default 45k)] [freq (default 85.714)]
+# usage: tools/fpga_sweep.sh "<seeds, e.g. 1 2 3 4 5 6>" [speed (default 8)] [device 25k|45k|85k (default 25k)] [freq (default 85.714)]
 # Output dirs: sim/sweep_<device>_g<speed>_s<seed>/.   nextpnr numbers are estimates, not signoff.
 # Exit status 0 if at least one seed closes every clock (core clk100 at <freq>, D-PHY sclk at 200 MHz), else 1.
 cd "$(dirname "$0")/.."
-SEEDS=${1:-1}; SPEED=${2:-8}; DEV=${3:-45k}; FREQ=${4:-85.714}
+SEEDS=${1:-1}; SPEED=${2:-8}; DEV=${3:-25k}; FREQ=${4:-85.714}
 for s in $SEEDS; do FPGA_SPEED=$SPEED FPGA_DEVICE=$DEV FPGA_OUT=sim/sweep_${DEV}_g${SPEED}_s$s bash tools/fpga_flow.sh $s $FREQ >/dev/null 2>&1 & done
 wait
 echo "| seed | core clk100 fmax (target $FREQ) | D-PHY sclk fmax (target 200) | LUT4 | DP16KD | both close |"
