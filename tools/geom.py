@@ -14,13 +14,18 @@ import numpy as np
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 W, H = 1280, 800
-HFOV_DEG = 90.0   # nominal pinhole of the SIMULATED test set. The product lens (CIL023, 2.2 mm) is 82.2 deg rectilinear, fx 733 px; the dataset is not re-rendered for it
-FX = FY = (W / 2.0) / math.tan(math.radians(HFOV_DEG / 2))   # 640 px
+# Product lens: Commonlands CIL023-F2.2-M12B650, EFL 2.2 mm, on the OV9281 (3 um pixels, 1280x800 full resolution).
+# The dataset frames are 1280x800 = the sensor's full resolution, so fx = EFL / pixel pitch with no scaling.
+EFL_MM, PIXEL_UM = 2.2, 3.0
+FX = FY = EFL_MM / (PIXEL_UM * 1e-3)                          # 733.33 px
+HFOV_DEG = math.degrees(2 * math.atan((W / 2.0) / FX))        # 82.2 deg rectilinear (VFOV 57.2 deg)
 CX, CY = W / 2.0 - 0.5, H / 2.0 - 0.5                           # 639.5, 399.5
 TAG_SIZE = 0.1651                                               # 6.5in (FRC)
 
-# Lens distortion used for the test set (OpenCV k1 k2 p1 p2 k3) - plausible M12 90deg lens
-DIST_TRUE = np.array([-0.18, 0.045, 0.0004, -0.0003, 0.0])
+# Lens distortion used for the test set (OpenCV k1 k2 p1 p2 k3): CIL023 is specified at -5 % TV distortion.  TV distortion taken as the sag of the
+# top picture edge (corner height minus edge-midpoint height) divided by the full picture height at the edge midpoint (2 * midpoint
+# half-height), for r_d = r (1 + k1 r^2): k1 = -0.126 gives -5.0 % (corner radial shift about -11.6 %).  k2, k3, p1, p2 = 0 (not specified).
+DIST_TRUE = np.array([-0.126, 0.0, 0.0, 0.0, 0.0])
 
 
 def K_matrix(fx=FX, fy=FY, cx=CX, cy=CY):

@@ -65,6 +65,20 @@ def tag_samples(tmap, tid, n=NSAMP):
     return (R @ loc.T).T + p
 
 
+def fold_radius(dist):
+    """Largest undistorted radius tan(theta) = sqrt(x^2+y^2)/z that the radial polynomial r_d = r (1 + k1 r^2 + k2 r^4 + k3 r^6) maps monotonically
+    (d r_d / d r > 0).  Rays beyond it fold back into the image and project to false in-frame pixels (the physical lens does not image them)."""
+    k1, k2, k3 = dist[0], dist[1], dist[4]
+    r = np.linspace(0, 6, 60001); d = 1 + 3 * k1 * r ** 2 + 5 * k2 * r ** 4 + 7 * k3 * r ** 6
+    bad = np.nonzero(d <= 0)[0]
+    return float(r[bad[0]]) if len(bad) else 1e9
+
+
+def ray_radius(pts_w, R, t):
+    pc = (R.T @ (np.asarray(pts_w) - t).T).T
+    return np.hypot(pc[:, 0], pc[:, 1]) / np.maximum(pc[:, 2], 1e-9)
+
+
 def tag_geometry(R, t, tmap, K, dist, occluders=(), W=W, H=H):
     """Per-tag dict (no image-derived fields).  R,t = camera->world pose."""
     out = {}
@@ -77,12 +91,13 @@ def tag_geometry(R, t, tmap, K, dist, occluders=(), W=W, H=H):
         facing = cosang > 0
         inc = math.degrees(math.acos(max(-1.0, min(1.0, cosang))))
         b = DETECT['border_px']
-        inimg = bool(np.all(z > 0.05) and np.all((px[:, 0] > b) & (px[:, 0] < W - 1 - b) & (px[:, 1] > b) & (px[:, 1] < H - 1 - b)))
+        rfold = fold_radius(dist)
+        inimg = bool(np.all(z > 0.05) and np.all(ray_radius(cw, R, t) < rfold) and np.all((px[:, 0] > b) & (px[:, 0] < W - 1 - b) & (px[:, 1] > b) & (px[:, 1] < H - 1 - b)))
         edges = [np.linalg.norm(px[1] - px[0]), np.linalg.norm(px[2] - px[3]), np.linalg.norm(px[3] - px[0]), np.linalg.norm(px[2] - px[1])]
         px_width = float(np.mean(edges[:2]))
         sm = tag_samples(tmap, tid)
         spx, sz = project(sm, R, t, K, dist)
-        inf = (sz > 0.05) & (spx[:, 0] >= 0) & (spx[:, 0] <= W - 1) & (spx[:, 1] >= 0) & (spx[:, 1] <= H - 1)
+        inf = (sz > 0.05) & (ray_radius(sm, R, t) < rfold) & (spx[:, 0] >= 0) & (spx[:, 0] <= W - 1) & (spx[:, 1] >= 0) & (spx[:, 1] <= H - 1)
         occ = segment_hits(t, sm, list(occluders)) if (facing and len(occluders)) else np.zeros(len(sm), bool)
         occ_frac = float(occ.mean()); vis_frac = float((inf & ~occ).mean()) if facing else 0.0
         reasons = []

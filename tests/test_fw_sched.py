@@ -173,7 +173,7 @@ def test_model_real_dataset_numbers():
         assert fb.run_design('pipe', tpu, pose, 3)[1] == 0
     nominal = [r['cycles']['nominal'] / (d['mhz'] * 1000.0) for r in d['rows']]
     pose = [pm[r['name']]['nominal'] if r['tags'] else 0.0 for r in d['rows']]
-    assert fb.run_design('single', nominal, pose, 2)[1] == 60                   # the first design: 2 buffers, 3 %
+    assert fb.run_design('single', nominal, pose, 2)[1] == 40                   # the first design: 2 buffers, 2 %
 
 
 def test_buffer_is_released_before_the_pose_message():

@@ -55,7 +55,7 @@
 <a class="navlink" href="#/config" data-id="config">Field map &amp; calibration</a>
   </div>
   <div id="navempty" class="muted" hidden>no match</div>
-  <div class="navfoot muted">built 2026-11-01 07:08</div>
+  <div class="navfoot muted">built 2026-11-01 20:15</div>
 </nav>
 <main id="main">
 <section class="page" id="page-home" hidden><h1>AprilTag camera: project browser</h1>
@@ -73,7 +73,7 @@ Everything below is generated from the repository by <code>site/build_site.py</c
                         -> 8-bit frame bus -> RP2350 MCU: 3 frame buffers, tag unit (C), pose solve, USB, field map -> host</pre>
 <img class="hero" src="img/r_hero_s.jpg" alt="housing assembly render"></section>
 <section class="page" id="page-about" hidden><h1>About this site</h1>
-<p>Generated 2026-11-01 07:08 by <code>site/build_site.py</code> (run <code>py -3.12 site/build_site.py</code>; reads the repo, writes only under <code>site/</code>). All data is embedded or loaded with <code>&lt;script src&gt;</code>, so it works from file://.</p>
+<p>Generated 2026-11-01 20:15 by <code>site/build_site.py</code> (run <code>py -3.12 site/build_site.py</code>; reads the repo, writes only under <code>site/</code>). All data is embedded or loaded with <code>&lt;script src&gt;</code>, so it works from file://.</p>
 <ul><li>3D: three.js r147 (non-module build + OrbitControls) vendored in <code>site/vendor/</code>, MIT licence.</li>
 <li>PCB 3D: full-assembly GLB from kicad-cli (<code>render/out/apriltag_cam_full.glb</code>) converted by <code>site/glb_convert.py</code>; the STEP was <code>render/out/apriltag_cam_full.step</code>.</li>
 <li>Markdown rendered with markdown-it-py; charts are inline SVG.</li>
@@ -193,10 +193,10 @@ build/test results. Earlier releases are never overwritten. <code>main</code> do
 <ul>
 <li><strong>120.08 fps</strong> sustained in full-chip simulation at true sensor timing (832,800 clocks per frame at 100 MHz), every frame leaves the FPGA
 as a complete packet; the MCU has two frame buffers so capture never stalls.</li>
-<li>100 rendered frames (10 conditions x 10) through the simulated chip + the MCU's solver: <strong>median camera position error about
-1-3 mm and 0.02-0.05 deg</strong> where tags are found; <strong>87 % of the detectable tags overall (562 / 647; the reference AprilTag library: 97 %)</strong>,
-(identical to the previous all-FPGA design, tag by tag), up from 70 % before the noise-robust labeller - 100 % on normal / dark / grad / noise, 97 % clutter, 90-92 % blur / persp / shadow, but still
-<strong>0 % on the low-contrast category</strong>, see <code>docs/verification.md</code>.</li>
+<li>100 rendered frames (10 conditions x 10, rendered for the shipping lens: CIL023, 82.2 degrees HFOV, fx 733 px, -5 % TV distortion) through the simulated chip + the MCU's solver: <strong>median camera position error about
+1-5 mm and 0.03-0.17 deg per category</strong> where tags are found; <strong>88 % of the detectable tags overall (501 / 570; the reference AprilTag library: 98 %)</strong>,
+100 % on dark / grad / noise / normal, 99 % bright, 92-94 % clutter / blur / persp, 90 % shadow, but still
+<strong>2 % on the low-contrast category</strong> with the reset THRESH ratio (54 / 54 with ratio 1, chosen automatically by the firmware), see <code>docs/verification.md</code>.</li>
 <li>GitHub Actions: one check per dataset category (<code>N/10 detected</code>, reference detector) plus an all-tests workflow, see <code>docs/verification.md</code>.</li>
 <li>RTL is verified bit-exact against Python golden models (threshold, despeckle, labelling), the C tag unit bit-exact against the golden model of the old FPGA processor, and the whole
 chain is exercised with real CSI-2 packets and a bit-level D-PHY model with lane skew and clock offsets.</li>
@@ -641,6 +641,15 @@ the committed frames are the reference, tests never need Blender. Generation is 
 (<code>CASE_SEED</code>, <code>SENSOR_SEED</code>), one numpy generator per category, per-frame stratified parameters (a linspace over the 10 frames,
 so each category sweeps its condition from mild to severe), rejection sampling so that every frame has at least one detectable tag.
 The case list (poses, lights, occluders, sensor knobs) is stored in <code>test_images/cases.json</code>.</p>
+<p><strong>Camera model of the dataset = the shipping lens</strong> (<code>tools/geom.py</code>): Commonlands CIL023, EFL 2.2 mm, on the OV9281 at 3 um pixels. The frames are the sensor's full
+1280x800, so there is no scaling: fx = fy = 2.2 mm / 3 um = 733.33 px, cx = 639.5, cy = 399.5, HFOV 82.2 degrees (VFOV 57.2). Distortion is OpenCV k1 = -0.126, k2 = k3 = p1 = p2 = 0:
+k1 is chosen so that the -5 % TV distortion of the datasheet comes out (TV taken as the sag of the top picture edge, corner height minus edge-midpoint height, divided by the full picture
+height at the edge midpoint; this definition is my reading, the lens page does not define it, so the real k1 can differ and must be calibrated). The same values are in
+<code>config/camera_calibration.json</code>, which the pose tests, host library and firmware tests load. Blender still renders an ideal pinhole canvas (1920x1200, f = 640 px) and
+<code>tools/make_dataset.py:distortion_maps</code> resamples it through the distortion model. The ground truth marks a tag outside the frame when any corner ray is beyond the point where the polynomial folds back
+(tan(theta) &gt; 1.63, about 58 degrees; <code>tools/dataset_gt.py:fold_radius</code>): beyond it the OpenCV polynomial projects to false in-frame pixels. Poses and seeds are the same as the earlier
+90 degree set (<code>cases.json</code> did not change); only the optics changed, so tags are about 14.6 % larger in pixels and fewer are in view (570 detectable tags against 647). The firmware default calibration
+(fx = fy = 640, <code>at_app_t</code> before the first <code>set_calibration</code>) is a placeholder and was left unchanged; load <code>config/camera_calibration.json</code> to match this dataset.</p>
 <div class="tablewrap"><table>
 <thead>
 <tr>
@@ -693,13 +702,14 @@ The case list (poses, lights, occluders, sensor knobs) is stored in <code>test_i
 </table></div>
 <h3>Reference detector per category (<code>tools/reference_pipeline.py</code>, <code>results/reference_baseline.md</code>)</h3>
 <p>A frame <em>succeeds</em> when every ground-truth-detectable tag is found and no false id is reported. Measured (python 3.12,
-pupil-apriltags 1.0.4): <code>normal</code> 10/10, <code>bright</code> 10/10, <code>dark</code> 10/10, <code>lowcon</code> 10/10, <code>grad</code> 10/10, <code>clutter</code> 10/10, <code>noise</code> 10/10,
-<code>blur</code> 9/10, <code>shadow</code> 7/10, <code>persp</code> 7/10. 630 of 647 detectable tags found (97.4 %), no false ids, median corner error 0.28 px,
-median camera position error 0.7 mm (p95 4.5 mm, max 6.3 mm).</p>
+pupil-apriltags 1.0.4): <code>normal</code> 10/10, <code>bright</code> 10/10, <code>dark</code> 9/10, <code>lowcon</code> 9/10, <code>grad</code> 10/10, <code>clutter</code> 8/10, <code>noise</code> 10/10,
+<code>blur</code> 9/10, <code>shadow</code> 7/10, <code>persp</code> 7/10. 560 of 570 detectable tags found (98.2 %), median corner error 0.31 px,
+median camera position error 0.7 mm (p95 7.9 mm, max 19.8 mm). The 5 &quot;false ids&quot; are tags whose corners are 0.2 to 2 px inside the 2 px border margin of the ground-truth <code>in_frame</code> rule, which the detector still reads; none is a wrong id.
+The dataset is rendered with the shipping lens model (CIL023, 82.2 degrees, -5 % TV distortion, see below); the earlier 90 degree set had 647 detectable tags, 630 found by the reference.</p>
 <h3>Whole-pipeline accuracy (RTL simulation of the chip -&gt; firmware solver -&gt; ground truth)</h3>
 <p>Chip (CSI-2 at 120 fps timing, simulated RTL as it is in this branch) -&gt; tag estimates over SPI -&gt; C pose solver, versus the reference
 detector on the <em>same</em> 100 images (<code>tests/run_chain_dataset.py</code>, <code>tests/analyze_chain.py</code>, <code>results/rtl_chain_results.json</code>;
-measured 474 s for the 100 frames with 12 workers):</p>
+re-run on the CIL023 dataset: 344 s for the 100 frames with 12 workers):</p>
 <div class="tablewrap"><table>
 <thead>
 <tr>
@@ -713,93 +723,92 @@ measured 474 s for the 100 frames with 12 workers):</p>
 <tbody>
 <tr>
 <td>normal</td>
-<td>62</td>
-<td>62 (100 %)</td>
-<td>2.0 / 7.2</td>
-<td>0.6</td>
+<td>52</td>
+<td>52 (100 %)</td>
+<td>1.9 / 7.0</td>
+<td>0.8</td>
 </tr>
 <tr>
 <td>bright</td>
-<td>81</td>
-<td>80 (99 %)</td>
-<td>1.1 / 5.7</td>
-<td>1.5</td>
+<td>78</td>
+<td>77 (99 %)</td>
+<td>1.5 / 5.5</td>
+<td>1.2</td>
 </tr>
 <tr>
 <td>dark</td>
-<td>69</td>
-<td>69 (100 %)</td>
-<td>1.9 / 2.9</td>
-<td>0.6</td>
+<td>59</td>
+<td>59 (100 %)</td>
+<td>1.3 / 4.2</td>
+<td>0.5</td>
 </tr>
 <tr>
 <td>lowcon</td>
-<td>66</td>
-<td><strong>0 (0 %)</strong> with reset values, <strong>66 (100 %)</strong> with THRESH ratio 2</td>
-<td>no pose / 2.2 / 8.9</td>
-<td>1.0</td>
+<td>54</td>
+<td><strong>1 (2 %)</strong> with reset values, <strong>54 (100 %)</strong> with THRESH ratio 1 or 2</td>
+<td>no pose / 1.7 / 24.0</td>
+<td>0.7</td>
 </tr>
 <tr>
 <td>grad</td>
-<td>75</td>
-<td>75 (100 %)</td>
-<td>1.3 / 2.0</td>
+<td>66</td>
+<td>66 (100 %)</td>
+<td>1.5 / 3.4</td>
 <td>0.5</td>
 </tr>
 <tr>
 <td>shadow</td>
-<td>47</td>
-<td>43 (91 %)</td>
-<td>3.0 / 13.6</td>
-<td>1.9</td>
+<td>42</td>
+<td>38 (90 %)</td>
+<td>4.6 / 44.9</td>
+<td>3.6</td>
 </tr>
 <tr>
 <td>noise</td>
-<td>57</td>
-<td>57 (100 %)</td>
-<td>2.2 / 8.0</td>
-<td>0.7</td>
+<td>50</td>
+<td>50 (100 %)</td>
+<td>2.1 / 13.9</td>
+<td>1.1</td>
 </tr>
 <tr>
 <td>clutter</td>
-<td>59</td>
-<td>57 (97 %)</td>
-<td>1.7 / 17.0</td>
-<td>0.6</td>
+<td>51</td>
+<td>47 (92 %)</td>
+<td>1.5 / 11.7</td>
+<td>0.5</td>
 </tr>
 <tr>
 <td>blur</td>
-<td>59</td>
-<td>54 (92 %)</td>
-<td>2.0 / 14.9</td>
-<td>0.8</td>
+<td>52</td>
+<td>49 (94 %)</td>
+<td>3.1 / 11.9</td>
+<td>1.0</td>
 </tr>
 <tr>
 <td>persp</td>
-<td>72</td>
-<td>65 (90 %)</td>
-<td>1.3 / 2.5</td>
-<td>0.6</td>
+<td>66</td>
+<td>62 (94 %)</td>
+<td>1.4 / 3.9</td>
+<td>0.7</td>
 </tr>
 <tr>
 <td><strong>all</strong></td>
-<td>647</td>
-<td><strong>562 (86.9 %)</strong></td>
+<td>570</td>
+<td><strong>501 (87.9 %)</strong></td>
 <td></td>
-<td>reference 630 (97 %)</td>
+<td>reference 560 (98 %)</td>
 </tr>
 </tbody>
 </table></div>
 <p>0 false-id detections, no dropped frames (single-frame runs). These numbers are with the noise-robust labeller (<code>rtl/run_ccl.v</code>: 256 runs
 per row, ~3 clocks per run on the common path, label recycling, the 64 largest candidates by area; CCL flags are diagnostics of a degraded
-frame, never a rejection). Before that rework the same harness gave <strong>450 / 647 (70 %)</strong>: dark 72 %, noise 70 %, shadow 68 %, clutter 14 %.
+frame, never a rejection). Before that rework the same harness gave <strong>450 / 647 (70 %)</strong> on the earlier 90 degree dataset: dark 72 %, noise 70 %, shadow 68 %, clutter 14 %.
 The <code>lowcon</code> weakness (0 % with the reset values) was traced to the tile ratio test <code>2*diff &gt;= max</code>, not to the 24-level margin: with the new THRESH <code>ratio</code>
-field set to 2 or 1 the chip detects 66 / 66 (see <code>results/lowcon_ratio.md</code>). The reset value stays 0 because the ratio tests 3x / 4x cost <code>noise</code> frames (57 -&gt; 31 / 24 of 57) through labeller row drops.
+field set to 2 or 1 the chip detects 54 / 54 (see <code>results/lowcon_ratio.md</code>). The reset value stays 0 because the ratio tests 3x / 4x cost <code>noise</code> frames (50 -&gt; 29 / 19 of 50) through labeller row drops. The firmware therefore picks the ratio per frame (<code>firmware/core/atratio.c</code>, on after boot): ratio 1 after 3 tagless frames, back to 0 on a CCL <code>row dropped</code> flag, with lockout and backoff. Simulated on the measured per-frame chain results (<code>tools/auto_ratio_sim.py</code>, <code>tests/test_fw_ratio.py</code>, <code>results/auto_ratio.md</code>): lowcon 66 / 66 in steady state after 4 lost frames at the scene start, every other category identical to ratio 0 (562 + 66 = 628 / 647 in steady state; noise stays 57). The switching latency is modelled, not measured on hardware.
 The chip now misses only a few tags in <code>blur</code>, <code>persp</code> and <code>shadow</code> (small / grazing / shadowed tags).
 CCL status flag set on 6 of the 100 frames (candidate table full, i.e. more than 64 candidates, only the 64 largest kept), no dropped rows.</p>
-<p><strong>Architecture A3 (tag unit on the MCU), same 100 frames, full RTL chain (<code>tests/run_chain_dataset.py</code>, 470 s with 10 workers) then the C tag unit on the
-packets that leave the FPGA bus: 562 / 647 detectable tags, per category identical to the table above; tag ids and corners are bit-identical to the old
-all-FPGA run for every one of the 100 frames (max corner difference 0 px, 0 frames with a different tag set).</strong> This is measured (simulation), not estimated.</p>
+<p><strong>Architecture A3 (tag unit on the MCU), same 100 frames, full RTL chain (<code>tests/run_chain_dataset.py</code>, 344 s with 12 workers) then the C tag unit on the
+packets that leave the FPGA bus: 501 / 570 detectable tags, per category identical to the table above.</strong> (The bit-identity with the old all-FPGA run was measured on the earlier 90 degree dataset; the C tag unit equals the instruction-set simulator word for word on the 100 current frames, <code>tests/test_fw_tpu.py</code>.) This is measured (simulation), not estimated.</p>
 <p>Tag-unit time on the MCU (<strong>estimates</strong>: <code>tools/m33_cycles.py</code>, Unicorn runs the Cortex-M33 machine code of the -O3 build and a static latency table costs it;
 150 MHz, one core; not measured on silicon; <code>results/tpu_c_m33_cycles.md</code>): median 1.59 ms, p95 6.3 ms, worst 9.3 ms (optimistic model 1.25 / 7.4, pessimistic
 1.89 / 11.0). The old FPGA processor needed a median 427k clocks = 5.0 ms and a worst 2.55 M clocks = 29.8 ms at 85.714 MHz. Pose solver
@@ -1154,6 +1163,12 @@ idempotent, so a host may retry on timeout. While streaming is enabled, unsolici
 <td>0</td>
 <td>TIME</td>
 </tr>
+<tr>
+<td>0x10</td>
+<td>SET_AUTO_RATIO</td>
+<td>1</td>
+<td>ACK</td>
+</tr>
 </tbody>
 </table></div>
 <p>Device to host:</p>
@@ -1378,7 +1393,12 @@ lines then gain up to 0xFF, at most 4x change per step, one frame skipped after 
 </tr>
 <tr>
 <td>46</td>
-<td>u16</td>
+<td>u8</td>
+<td>contrast-ratio state: bits 1:0 the <code>ratio</code> field currently in the FPGA THRESH register, bit 2 automatic ratio selection on (see SET_AUTO_RATIO)</td>
+</tr>
+<tr>
+<td>47</td>
+<td>u8</td>
 <td>reserved (0)</td>
 </tr>
 </tbody>
@@ -1387,12 +1407,27 @@ lines then gain up to 0xFF, at most 4x change per step, one frame skipped after 
 <p><code>diff u8 | abs_black u8 | mindim u8 | maxham u8 (bits 5:0) + ratio (bits 7:6)</code>, written to the FPGA THRESH register (0x0C):
 local contrast threshold, absolute black level, minimum tag dimension in pixels, maximum accepted Hamming distance. The first three are used by
 the FPGA; <code>maxham</code> is kept by the MCU (the tag unit runs there) and stored in the FPGA register for read-back only.
-Reset values 24, 64, 10, 2, ratio 0.</p>
+Reset values 24, 64, 10, 2, ratio 0. The firmware keeps the last THRESH word and changes only bits 31:30 when the automatic ratio switches, so the other fields stay as set here.</p>
 <p>The fifth parameter is the tile contrast-ratio field <code>ratio</code> (bits 7:6 of the fourth byte; the message stays 4 bytes, clients that send maxham &lt;= 63 get ratio 0), written to THRESH bits 31:30 (reset 0). A tile only gets the adaptive threshold
 (&quot;contrasty&quot;) if <code>diff &gt;= diff_min</code> and <code>k * diff &gt;= max</code> with k = 2 / 3 / 4 for ratio 0 / 1 / 2 (ratio 3: no ratio test). The reset value k = 2 means
 <code>min &lt;= max / 2</code>; a frame whose contrast is compressed so that black stays above half of white (the <code>lowcon</code> dataset category: black ~69, white ~167) has
-no contrasty tile and the chip then sees nothing. SET_TRACK with ratio 1 or 2 fixes that (<code>set_track(..., ratio=2)</code> in the Python API, <code>set_tracking_params(ratio=2)</code> in the host module; C++ / Java / Rust likewise). The default stays 0 because it is the more robust
-setting for very noisy frames (see <code>docs/verification.md</code>). Every SET_TRACK sets all fields, so one that omits ratio resets it to 0.</p>
+no contrasty tile and the chip then sees nothing. SET_TRACK with ratio 1 or 2 fixes that (<code>set_track(..., ratio=2)</code> in the Python API, <code>set_tracking_params(ratio=2)</code> in the host module; C++ / Java / Rust likewise). The register reset value stays 0 because it is the more robust
+setting for very noisy frames (see <code>docs/verification.md</code>); the firmware chooses the ratio per frame by itself (SET_AUTO_RATIO, on after boot).
+A SET_TRACK with ratio 1..3 is an explicit choice and <strong>switches the automatic ratio off</strong>. A SET_TRACK with ratio 0 leaves the automatic mode as it is
+(with it on, the ratio stays what the policy chose), so clients that do not know the field keep working. To fix the ratio at 0 send SET_AUTO_RATIO 0.</p>
+<h3>0x10 SET_AUTO_RATIO</h3>
+<p><code>enable u8</code> (0 or 1, else NAK RANGE). 1 turns the automatic contrast-ratio selection on (it is on after boot), 0 turns it off and fixes the ratio at 0.
+Both start from ratio 0 (the register is written). Policy (<code>firmware/core/atratio.c</code>, input per processed frame: tags found by the tag unit and the CCL
+<code>flags</code> of the frame packet; model, results and what is not yet measured: <code>results/auto_ratio.md</code>):</p>
+<ul>
+<li>ratio 0: 3 frames in a row without any tag -&gt; ratio 1 (unless locked out).</li>
+<li>ratio 1: a frame with the CCL flag <code>row dropped</code> (bit 8) -&gt; back to ratio 0 and ratio 1 is locked out for 32 frames; 6 frames in a row without a tag
+and no tag seen since the switch -&gt; back to ratio 0 and the same lockout. Every failed trial doubles the next lockout (32, 64, ... 512 frames). 8 frames with
+tags at ratio 1 count as success: the lockout resets to 32, and 6 tagless frames after that return to ratio 0 without lockout (scene gone).</li>
+<li>A frame that shows tags at ratio 0 never leaves ratio 0, so every scene that works with the reset value is untouched.</li>
+</ul>
+<p>The register write takes effect some frames later (the packet is processed 1.5 to 2 frame periods after its capture), so a scene that needs ratio 1 loses
+about 4 frames at its start.</p>
 <h3>0x0B GET_POSE -&gt; POSE</h3>
 <p>Latest solved pose. NAK NO_POSE if none yet.</p>
 <p>POSE (52 bytes), also the unsolicited streaming message:</p>
@@ -1711,8 +1746,8 @@ openscad -D &quot;part=\&quot;exploded\&quot;&quot; --render --imgsize 1200,1200
 </section>
 <section class="page" id="page-reference-baseline" hidden><h1>Reference baseline</h1><p class="muted">rendered from <code>results/reference_baseline.md</code></p><h1>Reference pipeline baseline</h1>
 <p>undistort -&gt; pupil-apriltags tag36h11 -&gt; SQPnP + LM over all detected tag corners.</p>
-<p>A tag is <em>detectable</em> when it faces the camera, is fully inside the frame, is &gt;= 10 px wide, is within 75 deg of the camera axis, is &lt;= 50 % occluded and is not washed out / flat in the image (tools/dataset_gt.py). Rates are detected / detectable; <code>vis</code> = legacy geometric visibility (facing + inside the frame) is kept for comparison with the 100-image baseline.</p>
-<p>Overall: 630 / 647 detectable tags detected (97.4%); legacy vis: 630 / 652; false-ID detections 0.</p>
+<p>A tag is <em>detectable</em> when it faces the camera, is fully inside the frame, is &gt;= 10 px wide, is within 75 deg of the camera axis, is &lt;= 50 % occluded and is not washed out / flat in the image (tools/dataset_gt.py). Rates are detected / detectable; <code>vis</code> = legacy geometric visibility (facing + inside the frame) is kept for comparison with the old geometric-visibility numbers.</p>
+<p>Overall: 560 / 570 detectable tags detected (98.2%); legacy vis: 560 / 575; false-ID detections 5.</p>
 <h2>Per category</h2>
 <div class="tablewrap"><table>
 <thead>
@@ -1735,146 +1770,146 @@ openscad -D &quot;part=\&quot;exploded\&quot;&quot; --render --imgsize 1200,1200
 <tr>
 <td>blur</td>
 <td>10</td>
-<td>59</td>
-<td>51</td>
-<td>0.86</td>
-<td>59</td>
-<td>0.86</td>
+<td>52</td>
+<td>49</td>
+<td>0.94</td>
+<td>52</td>
+<td>0.94</td>
 <td>0</td>
-<td>0.33/0.31/1.42</td>
-<td>9</td>
-<td>1.4/4.2</td>
-<td>0.053/0.174</td>
+<td>0.35/0.29/1.65</td>
+<td>10</td>
+<td>2.0/7.9</td>
+<td>0.065/0.257</td>
 </tr>
 <tr>
 <td>bright</td>
 <td>10</td>
-<td>81</td>
-<td>81</td>
+<td>78</td>
+<td>78</td>
 <td>1.00</td>
-<td>81</td>
+<td>78</td>
 <td>1.00</td>
 <td>0</td>
-<td>0.62/0.61/1.87</td>
+<td>0.72/0.72/2.32</td>
 <td>10</td>
-<td>1.5/2.6</td>
-<td>0.028/0.053</td>
+<td>1.5/3.0</td>
+<td>0.026/0.061</td>
 </tr>
 <tr>
 <td>clutter</td>
 <td>10</td>
-<td>59</td>
-<td>59</td>
+<td>51</td>
+<td>51</td>
 <td>1.00</td>
-<td>60</td>
+<td>52</td>
 <td>0.98</td>
-<td>0</td>
-<td>0.25/0.24/0.54</td>
+<td>2</td>
+<td>0.29/0.28/0.74</td>
 <td>10</td>
-<td>0.9/2.9</td>
-<td>0.029/0.112</td>
+<td>1.7/8.7</td>
+<td>0.057/0.296</td>
 </tr>
 <tr>
 <td>dark</td>
 <td>10</td>
-<td>69</td>
-<td>69</td>
+<td>59</td>
+<td>59</td>
 <td>1.00</td>
-<td>69</td>
+<td>59</td>
 <td>1.00</td>
-<td>0</td>
-<td>0.24/0.23/0.59</td>
+<td>1</td>
+<td>0.28/0.27/0.65</td>
 <td>10</td>
-<td>0.6/1.1</td>
-<td>0.013/0.023</td>
+<td>0.7/2.6</td>
+<td>0.023/0.137</td>
 </tr>
 <tr>
 <td>grad</td>
 <td>10</td>
-<td>75</td>
-<td>75</td>
+<td>66</td>
+<td>66</td>
 <td>1.00</td>
-<td>75</td>
+<td>66</td>
 <td>1.00</td>
 <td>0</td>
-<td>0.25/0.25/0.66</td>
+<td>0.29/0.29/0.70</td>
 <td>10</td>
-<td>0.6/1.0</td>
-<td>0.013/0.023</td>
+<td>0.5/0.7</td>
+<td>0.012/0.019</td>
 </tr>
 <tr>
 <td>lowcon</td>
 <td>10</td>
-<td>66</td>
-<td>66</td>
+<td>54</td>
+<td>54</td>
 <td>1.00</td>
-<td>66</td>
+<td>54</td>
 <td>1.00</td>
-<td>0</td>
-<td>0.30/0.28/0.78</td>
+<td>1</td>
+<td>0.33/0.31/0.75</td>
 <td>10</td>
-<td>1.0/2.1</td>
-<td>0.031/0.085</td>
+<td>1.8/8.7</td>
+<td>0.064/0.392</td>
 </tr>
 <tr>
 <td>noise</td>
 <td>10</td>
-<td>57</td>
-<td>57</td>
+<td>50</td>
+<td>50</td>
 <td>1.00</td>
-<td>57</td>
+<td>50</td>
 <td>1.00</td>
 <td>0</td>
-<td>0.28/0.27/0.65</td>
+<td>0.30/0.30/0.91</td>
 <td>10</td>
-<td>1.2/4.8</td>
-<td>0.046/0.213</td>
+<td>1.6/4.0</td>
+<td>0.058/0.176</td>
 </tr>
 <tr>
 <td>normal</td>
 <td>10</td>
-<td>62</td>
-<td>62</td>
+<td>52</td>
+<td>52</td>
 <td>1.00</td>
-<td>62</td>
+<td>52</td>
 <td>1.00</td>
 <td>0</td>
-<td>0.25/0.25/0.56</td>
+<td>0.28/0.28/0.61</td>
 <td>10</td>
-<td>1.2/6.3</td>
-<td>0.047/0.350</td>
+<td>2.1/6.1</td>
+<td>0.079/0.254</td>
 </tr>
 <tr>
 <td>persp</td>
 <td>10</td>
-<td>72</td>
 <td>66</td>
-<td>0.92</td>
-<td>76</td>
-<td>0.87</td>
-<td>0</td>
-<td>0.26/0.25/1.15</td>
+<td>62</td>
+<td>0.94</td>
+<td>70</td>
+<td>0.89</td>
+<td>1</td>
+<td>0.32/0.31/2.55</td>
 <td>10</td>
-<td>1.1/4.6</td>
-<td>0.029/0.187</td>
+<td>1.1/3.7</td>
+<td>0.030/0.144</td>
 </tr>
 <tr>
 <td>shadow</td>
 <td>10</td>
-<td>47</td>
-<td>44</td>
-<td>0.94</td>
-<td>47</td>
-<td>0.94</td>
+<td>42</td>
+<td>39</td>
+<td>0.93</td>
+<td>42</td>
+<td>0.93</td>
 <td>0</td>
-<td>0.25/0.25/0.62</td>
+<td>0.30/0.28/1.22</td>
 <td>10</td>
-<td>2.4/5.9</td>
-<td>0.061/0.173</td>
+<td>5.7/19.8</td>
+<td>0.134/0.368</td>
 </tr>
 </tbody>
 </table></div>
-<h2>Detectable tags the reference missed (17)</h2>
+<h2>Detectable tags the reference missed (10)</h2>
 <div class="tablewrap"><table>
 <thead>
 <tr>
@@ -1891,97 +1926,34 @@ openscad -D &quot;part=\&quot;exploded\&quot;&quot; --render --imgsize 1200,1200
 <tr>
 <td>blur_009</td>
 <td>3</td>
-<td>33.9</td>
+<td>40.0</td>
 <td>41.5</td>
 <td>0.00</td>
 <td>0.00</td>
-<td>89</td>
-</tr>
-<tr>
-<td>blur_009</td>
-<td>17</td>
-<td>43.2</td>
-<td>26.6</td>
-<td>0.00</td>
-<td>0.00</td>
-<td>108</td>
-</tr>
-<tr>
-<td>blur_009</td>
-<td>42</td>
-<td>50.2</td>
-<td>7.0</td>
-<td>0.00</td>
-<td>0.00</td>
-<td>104</td>
-</tr>
-<tr>
-<td>blur_009</td>
-<td>58</td>
-<td>50.2</td>
-<td>15.5</td>
-<td>0.00</td>
-<td>0.00</td>
-<td>118</td>
+<td>102</td>
 </tr>
 <tr>
 <td>blur_009</td>
 <td>77</td>
-<td>34.3</td>
+<td>39.8</td>
 <td>43.4</td>
 <td>0.00</td>
 <td>0.00</td>
-<td>82</td>
+<td>97</td>
 </tr>
 <tr>
 <td>blur_009</td>
 <td>101</td>
-<td>43.1</td>
+<td>50.4</td>
 <td>31.1</td>
-<td>0.00</td>
-<td>0.00</td>
-<td>90</td>
-</tr>
-<tr>
-<td>blur_009</td>
-<td>133</td>
-<td>49.7</td>
-<td>19.6</td>
 <td>0.00</td>
 <td>0.00</td>
 <td>103</td>
 </tr>
 <tr>
-<td>blur_009</td>
-<td>202</td>
-<td>49.7</td>
-<td>23.5</td>
-<td>0.00</td>
-<td>0.00</td>
-<td>95</td>
-</tr>
-<tr>
-<td>persp_006</td>
-<td>58</td>
-<td>13.5</td>
-<td>63.0</td>
-<td>0.00</td>
-<td>0.00</td>
-<td>150</td>
-</tr>
-<tr>
-<td>persp_006</td>
-<td>202</td>
-<td>14.8</td>
-<td>64.0</td>
-<td>0.00</td>
-<td>0.00</td>
-<td>128</td>
-</tr>
-<tr>
 <td>persp_008</td>
 <td>17</td>
-<td>14.2</td>
+<td>16.4</td>
 <td>74.5</td>
 <td>0.00</td>
 <td>0.00</td>
@@ -1990,7 +1962,7 @@ openscad -D &quot;part=\&quot;exploded\&quot;&quot; --render --imgsize 1200,1200
 <tr>
 <td>persp_008</td>
 <td>101</td>
-<td>10.6</td>
+<td>12.2</td>
 <td>74.0</td>
 <td>0.00</td>
 <td>0.00</td>
@@ -1999,34 +1971,34 @@ openscad -D &quot;part=\&quot;exploded\&quot;&quot; --render --imgsize 1200,1200
 <tr>
 <td>persp_009</td>
 <td>77</td>
-<td>36.4</td>
+<td>42.1</td>
 <td>73.9</td>
 <td>0.00</td>
 <td>0.00</td>
-<td>136</td>
+<td>141</td>
 </tr>
 <tr>
 <td>persp_009</td>
 <td>101</td>
-<td>34.9</td>
+<td>40.0</td>
 <td>74.1</td>
 <td>0.00</td>
 <td>0.00</td>
-<td>129</td>
+<td>138</td>
 </tr>
 <tr>
 <td>shadow_002</td>
 <td>311</td>
-<td>38.6</td>
+<td>44.2</td>
 <td>49.4</td>
 <td>0.00</td>
 <td>0.00</td>
-<td>175</td>
+<td>176</td>
 </tr>
 <tr>
 <td>shadow_006</td>
 <td>58</td>
-<td>47.4</td>
+<td>54.6</td>
 <td>35.9</td>
 <td>0.13</td>
 <td>0.00</td>
@@ -2035,15 +2007,15 @@ openscad -D &quot;part=\&quot;exploded\&quot;&quot; --render --imgsize 1200,1200
 <tr>
 <td>shadow_008</td>
 <td>250</td>
-<td>59.1</td>
+<td>67.7</td>
 <td>33.6</td>
 <td>0.00</td>
 <td>0.00</td>
-<td>182</td>
+<td>183</td>
 </tr>
 </tbody>
 </table></div>
-<h2>Detections of tags not geometrically visible / unknown ids (n_false &gt; 0): []</h2>
+<h2>Detections of tags not geometrically visible / unknown ids (n_false &gt; 0): [('clutter_000', 1), ('clutter_007', 1), ('dark_004', 1), ('lowcon_003', 1), ('persp_000', 1)]</h2>
 <p>Tags flagged undetectable but still found by the reference: 0</p>
 <h2>Per image</h2>
 <div class="tablewrap"><table>
@@ -2065,1000 +2037,1000 @@ openscad -D &quot;part=\&quot;exploded\&quot;&quot; --render --imgsize 1200,1200
 <td>8</td>
 <td>8</td>
 <td>8</td>
-<td>0.27</td>
-<td>0.26</td>
-<td>0.7</td>
-<td>0.022</td>
+<td>0.33</td>
+<td>0.32</td>
+<td>0.6</td>
+<td>0.016</td>
 </tr>
 <tr>
 <td>blur_001</td>
-<td>3</td>
-<td>3</td>
-<td>3</td>
-<td>0.25</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
 <td>0.19</td>
-<td>1.3</td>
-<td>0.067</td>
+<td>0.21</td>
+<td>0.9</td>
+<td>0.040</td>
 </tr>
 <tr>
 <td>blur_002</td>
-<td>8</td>
-<td>8</td>
-<td>8</td>
-<td>0.28</td>
-<td>0.27</td>
+<td>7</td>
+<td>7</td>
+<td>7</td>
+<td>0.37</td>
+<td>0.32</td>
 <td>0.4</td>
-<td>0.012</td>
+<td>0.015</td>
 </tr>
 <tr>
 <td>blur_003</td>
-<td>6</td>
-<td>6</td>
-<td>6</td>
-<td>0.31</td>
-<td>0.31</td>
-<td>0.5</td>
-<td>0.007</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>0.28</td>
+<td>0.27</td>
+<td>0.7</td>
+<td>0.019</td>
 </tr>
 <tr>
 <td>blur_004</td>
 <td>8</td>
 <td>8</td>
 <td>8</td>
+<td>0.36</td>
 <td>0.32</td>
-<td>0.37</td>
-<td>1.2</td>
-<td>0.025</td>
+<td>1.1</td>
+<td>0.027</td>
 </tr>
 <tr>
 <td>blur_005</td>
-<td>6</td>
-<td>6</td>
-<td>6</td>
-<td>0.31</td>
-<td>0.32</td>
-<td>0.8</td>
-<td>0.027</td>
+<td>3</td>
+<td>3</td>
+<td>3</td>
+<td>0.55</td>
+<td>0.39</td>
+<td>7.9</td>
+<td>0.257</td>
 </tr>
 <tr>
 <td>blur_006</td>
 <td>2</td>
 <td>2</td>
 <td>2</td>
-<td>0.28</td>
-<td>0.26</td>
-<td>2.8</td>
-<td>0.131</td>
+<td>0.19</td>
+<td>0.20</td>
+<td>1.9</td>
+<td>0.093</td>
 </tr>
 <tr>
 <td>blur_007</td>
 <td>2</td>
 <td>2</td>
 <td>2</td>
-<td>0.35</td>
-<td>0.35</td>
-<td>4.2</td>
-<td>0.174</td>
+<td>0.24</td>
+<td>0.22</td>
+<td>2.2</td>
+<td>0.087</td>
 </tr>
 <tr>
 <td>blur_008</td>
-<td>8</td>
-<td>8</td>
-<td>8</td>
-<td>0.49</td>
-<td>0.55</td>
+<td>7</td>
+<td>7</td>
+<td>7</td>
+<td>0.32</td>
+<td>0.35</td>
 <td>0.7</td>
-<td>0.008</td>
+<td>0.013</td>
 </tr>
 <tr>
 <td>blur_009</td>
 <td>8</td>
 <td>8</td>
-<td>0</td>
-<td>-</td>
-<td>-</td>
-<td>-</td>
-<td>-</td>
+<td>5</td>
+<td>0.47</td>
+<td>0.50</td>
+<td>3.3</td>
+<td>0.084</td>
 </tr>
 <tr>
 <td>bright_000</td>
 <td>8</td>
 <td>8</td>
 <td>8</td>
-<td>0.35</td>
-<td>0.36</td>
+<td>0.40</td>
+<td>0.40</td>
 <td>0.7</td>
-<td>0.019</td>
+<td>0.014</td>
 </tr>
 <tr>
 <td>bright_001</td>
 <td>9</td>
 <td>9</td>
 <td>9</td>
-<td>0.44</td>
-<td>0.45</td>
+<td>0.49</td>
+<td>0.50</td>
 <td>0.7</td>
-<td>0.010</td>
+<td>0.012</td>
 </tr>
 <tr>
 <td>bright_002</td>
 <td>8</td>
 <td>8</td>
 <td>8</td>
-<td>0.52</td>
-<td>0.52</td>
-<td>2.3</td>
-<td>0.040</td>
+<td>0.60</td>
+<td>0.61</td>
+<td>1.8</td>
+<td>0.030</td>
 </tr>
 <tr>
 <td>bright_003</td>
-<td>9</td>
-<td>9</td>
-<td>9</td>
-<td>0.61</td>
-<td>0.63</td>
-<td>1.9</td>
-<td>0.028</td>
+<td>8</td>
+<td>8</td>
+<td>8</td>
+<td>0.67</td>
+<td>0.67</td>
+<td>1.2</td>
+<td>0.020</td>
 </tr>
 <tr>
 <td>bright_004</td>
 <td>8</td>
 <td>8</td>
 <td>8</td>
-<td>0.62</td>
-<td>0.62</td>
-<td>2.0</td>
-<td>0.042</td>
+<td>0.70</td>
+<td>0.71</td>
+<td>1.7</td>
+<td>0.035</td>
 </tr>
 <tr>
 <td>bright_005</td>
 <td>4</td>
 <td>4</td>
 <td>4</td>
-<td>0.62</td>
-<td>0.63</td>
-<td>0.9</td>
-<td>0.026</td>
+<td>0.70</td>
+<td>0.71</td>
+<td>0.8</td>
+<td>0.016</td>
 </tr>
 <tr>
 <td>bright_006</td>
-<td>8</td>
-<td>8</td>
-<td>8</td>
-<td>0.69</td>
-<td>0.69</td>
+<td>7</td>
+<td>7</td>
+<td>7</td>
+<td>0.91</td>
+<td>0.80</td>
 <td>1.1</td>
-<td>0.022</td>
+<td>0.024</td>
 </tr>
 <tr>
 <td>bright_007</td>
-<td>10</td>
-<td>10</td>
-<td>10</td>
-<td>0.71</td>
-<td>0.72</td>
-<td>0.8</td>
-<td>0.006</td>
+<td>9</td>
+<td>9</td>
+<td>9</td>
+<td>0.86</td>
+<td>0.86</td>
+<td>1.2</td>
+<td>0.015</td>
 </tr>
 <tr>
 <td>bright_008</td>
 <td>8</td>
 <td>8</td>
 <td>8</td>
-<td>0.76</td>
-<td>0.77</td>
-<td>2.6</td>
-<td>0.053</td>
+<td>0.88</td>
+<td>0.89</td>
+<td>3.0</td>
+<td>0.061</td>
 </tr>
 <tr>
 <td>bright_009</td>
 <td>9</td>
 <td>9</td>
 <td>9</td>
-<td>0.85</td>
-<td>0.86</td>
-<td>2.5</td>
-<td>0.035</td>
+<td>0.95</td>
+<td>0.98</td>
+<td>2.6</td>
+<td>0.037</td>
 </tr>
 <tr>
 <td>clutter_000</td>
-<td>5</td>
-<td>5</td>
-<td>5</td>
-<td>0.24</td>
-<td>0.25</td>
-<td>0.5</td>
-<td>0.013</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>0.28</td>
+<td>0.29</td>
+<td>0.6</td>
+<td>0.012</td>
 </tr>
 <tr>
 <td>clutter_001</td>
-<td>3</td>
-<td>3</td>
-<td>3</td>
-<td>0.24</td>
-<td>0.23</td>
-<td>2.5</td>
-<td>0.084</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>0.22</td>
+<td>0.21</td>
+<td>8.7</td>
+<td>0.296</td>
 </tr>
 <tr>
 <td>clutter_002</td>
 <td>5</td>
 <td>5</td>
 <td>5</td>
-<td>0.26</td>
-<td>0.24</td>
+<td>0.32</td>
+<td>0.28</td>
 <td>0.4</td>
-<td>0.012</td>
+<td>0.008</td>
 </tr>
 <tr>
 <td>clutter_003</td>
 <td>6</td>
 <td>6</td>
 <td>6</td>
-<td>0.25</td>
-<td>0.25</td>
+<td>0.27</td>
+<td>0.26</td>
 <td>0.4</td>
-<td>0.007</td>
+<td>0.005</td>
 </tr>
 <tr>
 <td>clutter_004</td>
 <td>2</td>
 <td>2</td>
 <td>2</td>
-<td>0.34</td>
-<td>0.34</td>
-<td>2.9</td>
-<td>0.112</td>
+<td>0.37</td>
+<td>0.37</td>
+<td>5.2</td>
+<td>0.204</td>
 </tr>
 <tr>
 <td>clutter_005</td>
-<td>7</td>
-<td>7</td>
-<td>7</td>
-<td>0.26</td>
-<td>0.25</td>
-<td>0.8</td>
-<td>0.019</td>
+<td>6</td>
+<td>6</td>
+<td>6</td>
+<td>0.29</td>
+<td>0.30</td>
+<td>0.5</td>
+<td>0.012</td>
 </tr>
 <tr>
 <td>clutter_006</td>
-<td>10</td>
-<td>10</td>
-<td>10</td>
-<td>0.25</td>
-<td>0.25</td>
-<td>0.8</td>
-<td>0.014</td>
+<td>9</td>
+<td>9</td>
+<td>9</td>
+<td>0.29</td>
+<td>0.30</td>
+<td>0.7</td>
+<td>0.011</td>
 </tr>
 <tr>
 <td>clutter_007</td>
-<td>8</td>
-<td>8</td>
-<td>8</td>
-<td>0.24</td>
-<td>0.23</td>
-<td>0.2</td>
-<td>0.009</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>0.30</td>
+<td>0.31</td>
+<td>0.1</td>
+<td>0.005</td>
 </tr>
 <tr>
 <td>clutter_008</td>
 <td>8</td>
 <td>7</td>
 <td>7</td>
-<td>0.24</td>
-<td>0.24</td>
-<td>0.7</td>
-<td>0.019</td>
+<td>0.29</td>
+<td>0.28</td>
+<td>0.4</td>
+<td>0.012</td>
 </tr>
 <tr>
 <td>clutter_009</td>
-<td>6</td>
-<td>6</td>
-<td>6</td>
-<td>0.22</td>
-<td>0.22</td>
-<td>0.2</td>
-<td>0.003</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>0.26</td>
+<td>0.26</td>
+<td>0.4</td>
+<td>0.006</td>
 </tr>
 <tr>
 <td>dark_000</td>
-<td>8</td>
-<td>8</td>
-<td>8</td>
-<td>0.24</td>
-<td>0.24</td>
-<td>0.7</td>
-<td>0.014</td>
+<td>7</td>
+<td>7</td>
+<td>7</td>
+<td>0.27</td>
+<td>0.28</td>
+<td>0.4</td>
+<td>0.007</td>
 </tr>
 <tr>
 <td>dark_001</td>
-<td>7</td>
-<td>7</td>
-<td>7</td>
+<td>6</td>
+<td>6</td>
+<td>6</td>
+<td>0.28</td>
 <td>0.29</td>
-<td>0.29</td>
-<td>0.4</td>
-<td>0.010</td>
+<td>0.2</td>
+<td>0.007</td>
 </tr>
 <tr>
 <td>dark_002</td>
-<td>6</td>
-<td>6</td>
-<td>6</td>
-<td>0.24</td>
-<td>0.23</td>
-<td>0.7</td>
-<td>0.013</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>0.29</td>
+<td>0.29</td>
+<td>0.3</td>
+<td>0.010</td>
 </tr>
 <tr>
 <td>dark_003</td>
-<td>8</td>
-<td>8</td>
-<td>8</td>
-<td>0.27</td>
-<td>0.24</td>
-<td>0.3</td>
-<td>0.004</td>
+<td>6</td>
+<td>6</td>
+<td>6</td>
+<td>0.33</td>
+<td>0.30</td>
+<td>0.5</td>
+<td>0.005</td>
 </tr>
 <tr>
 <td>dark_004</td>
-<td>8</td>
-<td>8</td>
-<td>8</td>
-<td>0.25</td>
-<td>0.24</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>0.30</td>
+<td>0.28</td>
 <td>0.4</td>
-<td>0.004</td>
+<td>0.003</td>
 </tr>
 <tr>
 <td>dark_005</td>
-<td>4</td>
-<td>4</td>
-<td>4</td>
-<td>0.25</td>
-<td>0.24</td>
-<td>0.4</td>
-<td>0.015</td>
+<td>3</td>
+<td>3</td>
+<td>3</td>
+<td>0.29</td>
+<td>0.23</td>
+<td>0.8</td>
+<td>0.031</td>
 </tr>
 <tr>
 <td>dark_006</td>
 <td>9</td>
 <td>9</td>
 <td>9</td>
-<td>0.26</td>
-<td>0.24</td>
-<td>1.0</td>
-<td>0.023</td>
+<td>0.30</td>
+<td>0.29</td>
+<td>0.5</td>
+<td>0.013</td>
 </tr>
 <tr>
 <td>dark_007</td>
-<td>3</td>
-<td>3</td>
-<td>3</td>
-<td>0.26</td>
-<td>0.19</td>
-<td>0.5</td>
-<td>0.009</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>0.22</td>
+<td>0.21</td>
+<td>2.6</td>
+<td>0.137</td>
 </tr>
 <tr>
 <td>dark_008</td>
 <td>8</td>
 <td>8</td>
 <td>8</td>
-<td>0.20</td>
-<td>0.22</td>
-<td>0.8</td>
-<td>0.017</td>
+<td>0.24</td>
+<td>0.25</td>
+<td>0.5</td>
+<td>0.012</td>
 </tr>
 <tr>
 <td>dark_009</td>
 <td>8</td>
 <td>8</td>
 <td>8</td>
-<td>0.19</td>
-<td>0.21</td>
-<td>1.1</td>
-<td>0.022</td>
+<td>0.24</td>
+<td>0.25</td>
+<td>0.4</td>
+<td>0.007</td>
 </tr>
 <tr>
 <td>grad_000</td>
 <td>6</td>
 <td>6</td>
 <td>6</td>
-<td>0.25</td>
-<td>0.26</td>
-<td>0.5</td>
-<td>0.010</td>
+<td>0.28</td>
+<td>0.29</td>
+<td>0.6</td>
+<td>0.012</td>
 </tr>
 <tr>
 <td>grad_001</td>
 <td>8</td>
 <td>8</td>
 <td>8</td>
-<td>0.24</td>
-<td>0.24</td>
-<td>0.8</td>
-<td>0.020</td>
+<td>0.28</td>
+<td>0.27</td>
+<td>0.5</td>
+<td>0.010</td>
 </tr>
 <tr>
 <td>grad_002</td>
-<td>5</td>
-<td>5</td>
-<td>5</td>
-<td>0.26</td>
-<td>0.24</td>
-<td>0.3</td>
-<td>0.002</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>0.29</td>
+<td>0.27</td>
+<td>0.4</td>
+<td>0.006</td>
 </tr>
 <tr>
 <td>grad_003</td>
 <td>8</td>
 <td>8</td>
 <td>8</td>
-<td>0.25</td>
-<td>0.25</td>
+<td>0.29</td>
+<td>0.30</td>
 <td>0.6</td>
-<td>0.012</td>
+<td>0.015</td>
 </tr>
 <tr>
 <td>grad_004</td>
 <td>8</td>
 <td>8</td>
 <td>8</td>
-<td>0.25</td>
-<td>0.26</td>
-<td>0.4</td>
-<td>0.014</td>
+<td>0.29</td>
+<td>0.29</td>
+<td>0.5</td>
+<td>0.013</td>
 </tr>
 <tr>
 <td>grad_005</td>
 <td>9</td>
 <td>9</td>
 <td>9</td>
-<td>0.26</td>
-<td>0.26</td>
-<td>1.0</td>
-<td>0.021</td>
+<td>0.31</td>
+<td>0.29</td>
+<td>0.6</td>
+<td>0.014</td>
 </tr>
 <tr>
 <td>grad_006</td>
-<td>8</td>
-<td>8</td>
-<td>8</td>
-<td>0.25</td>
-<td>0.25</td>
-<td>0.4</td>
-<td>0.006</td>
+<td>6</td>
+<td>6</td>
+<td>6</td>
+<td>0.29</td>
+<td>0.29</td>
+<td>0.7</td>
+<td>0.013</td>
 </tr>
 <tr>
 <td>grad_007</td>
-<td>8</td>
-<td>8</td>
-<td>8</td>
-<td>0.26</td>
-<td>0.25</td>
-<td>0.7</td>
-<td>0.017</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>0.27</td>
+<td>0.27</td>
+<td>0.3</td>
+<td>0.012</td>
 </tr>
 <tr>
 <td>grad_008</td>
-<td>8</td>
-<td>8</td>
-<td>8</td>
-<td>0.25</td>
-<td>0.25</td>
-<td>0.3</td>
-<td>0.006</td>
+<td>6</td>
+<td>6</td>
+<td>6</td>
+<td>0.27</td>
+<td>0.26</td>
+<td>0.2</td>
+<td>0.007</td>
 </tr>
 <tr>
 <td>grad_009</td>
 <td>7</td>
 <td>7</td>
 <td>7</td>
-<td>0.25</td>
-<td>0.25</td>
-<td>1.0</td>
-<td>0.023</td>
-</tr>
-<tr>
-<td>lowcon_000</td>
-<td>8</td>
-<td>8</td>
-<td>8</td>
-<td>0.30</td>
-<td>0.31</td>
+<td>0.29</td>
+<td>0.28</td>
 <td>0.7</td>
 <td>0.019</td>
 </tr>
 <tr>
+<td>lowcon_000</td>
+<td>7</td>
+<td>7</td>
+<td>7</td>
+<td>0.34</td>
+<td>0.34</td>
+<td>0.6</td>
+<td>0.020</td>
+</tr>
+<tr>
 <td>lowcon_001</td>
-<td>2</td>
-<td>2</td>
-<td>2</td>
-<td>0.27</td>
-<td>0.20</td>
-<td>2.1</td>
-<td>0.085</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>0.24</td>
+<td>0.09</td>
+<td>8.7</td>
+<td>0.392</td>
 </tr>
 <tr>
 <td>lowcon_002</td>
 <td>8</td>
 <td>8</td>
 <td>8</td>
-<td>0.27</td>
-<td>0.28</td>
-<td>0.3</td>
-<td>0.010</td>
+<td>0.31</td>
+<td>0.32</td>
+<td>0.4</td>
+<td>0.005</td>
 </tr>
 <tr>
 <td>lowcon_003</td>
-<td>5</td>
-<td>5</td>
-<td>5</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>0.30</td>
 <td>0.29</td>
-<td>0.27</td>
-<td>1.7</td>
-<td>0.055</td>
+<td>2.1</td>
+<td>0.088</td>
 </tr>
 <tr>
 <td>lowcon_004</td>
 <td>8</td>
 <td>8</td>
 <td>8</td>
-<td>0.25</td>
-<td>0.27</td>
-<td>0.6</td>
-<td>0.012</td>
+<td>0.32</td>
+<td>0.33</td>
+<td>0.4</td>
+<td>0.007</td>
 </tr>
 <tr>
 <td>lowcon_005</td>
 <td>4</td>
 <td>4</td>
 <td>4</td>
-<td>0.33</td>
-<td>0.32</td>
-<td>1.3</td>
-<td>0.031</td>
+<td>0.26</td>
+<td>0.29</td>
+<td>0.6</td>
+<td>0.009</td>
 </tr>
 <tr>
 <td>lowcon_006</td>
-<td>8</td>
-<td>8</td>
-<td>8</td>
-<td>0.33</td>
-<td>0.33</td>
-<td>0.6</td>
-<td>0.011</td>
+<td>6</td>
+<td>6</td>
+<td>6</td>
+<td>0.28</td>
+<td>0.29</td>
+<td>0.7</td>
+<td>0.017</td>
 </tr>
 <tr>
 <td>lowcon_007</td>
-<td>8</td>
-<td>8</td>
-<td>8</td>
-<td>0.36</td>
-<td>0.38</td>
-<td>1.3</td>
-<td>0.029</td>
+<td>6</td>
+<td>6</td>
+<td>6</td>
+<td>0.35</td>
+<td>0.37</td>
+<td>2.3</td>
+<td>0.054</td>
 </tr>
 <tr>
 <td>lowcon_008</td>
-<td>7</td>
-<td>7</td>
-<td>7</td>
-<td>0.33</td>
-<td>0.36</td>
-<td>1.2</td>
-<td>0.036</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>0.41</td>
+<td>0.39</td>
+<td>0.8</td>
+<td>0.023</td>
 </tr>
 <tr>
 <td>lowcon_009</td>
-<td>8</td>
-<td>8</td>
-<td>8</td>
-<td>0.28</td>
-<td>0.31</td>
-<td>0.7</td>
-<td>0.018</td>
+<td>7</td>
+<td>7</td>
+<td>7</td>
+<td>0.36</td>
+<td>0.38</td>
+<td>1.2</td>
+<td>0.028</td>
 </tr>
 <tr>
 <td>noise_000</td>
-<td>5</td>
-<td>5</td>
-<td>5</td>
-<td>0.25</td>
-<td>0.25</td>
-<td>0.4</td>
-<td>0.021</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>0.27</td>
+<td>0.26</td>
+<td>0.6</td>
+<td>0.015</td>
 </tr>
 <tr>
 <td>noise_001</td>
 <td>8</td>
 <td>8</td>
 <td>8</td>
-<td>0.25</td>
-<td>0.27</td>
-<td>0.5</td>
-<td>0.012</td>
+<td>0.28</td>
+<td>0.30</td>
+<td>0.3</td>
+<td>0.009</td>
 </tr>
 <tr>
 <td>noise_002</td>
 <td>2</td>
 <td>2</td>
 <td>2</td>
-<td>0.24</td>
-<td>0.13</td>
-<td>4.8</td>
-<td>0.213</td>
+<td>0.28</td>
+<td>0.27</td>
+<td>4.0</td>
+<td>0.176</td>
 </tr>
 <tr>
 <td>noise_003</td>
 <td>8</td>
 <td>8</td>
 <td>8</td>
-<td>0.27</td>
-<td>0.28</td>
-<td>0.7</td>
-<td>0.017</td>
+<td>0.29</td>
+<td>0.30</td>
+<td>1.2</td>
+<td>0.026</td>
 </tr>
 <tr>
 <td>noise_004</td>
 <td>8</td>
 <td>8</td>
 <td>8</td>
-<td>0.27</td>
-<td>0.29</td>
-<td>0.8</td>
-<td>0.022</td>
+<td>0.33</td>
+<td>0.35</td>
+<td>1.0</td>
+<td>0.021</td>
 </tr>
 <tr>
 <td>noise_005</td>
-<td>4</td>
-<td>4</td>
-<td>4</td>
-<td>0.25</td>
-<td>0.25</td>
-<td>0.8</td>
-<td>0.023</td>
+<td>3</td>
+<td>3</td>
+<td>3</td>
+<td>0.30</td>
+<td>0.30</td>
+<td>3.4</td>
+<td>0.124</td>
 </tr>
 <tr>
 <td>noise_006</td>
-<td>7</td>
-<td>7</td>
-<td>7</td>
-<td>0.31</td>
-<td>0.33</td>
-<td>0.9</td>
-<td>0.024</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>0.27</td>
+<td>0.28</td>
+<td>1.3</td>
+<td>0.040</td>
 </tr>
 <tr>
 <td>noise_007</td>
-<td>3</td>
-<td>3</td>
-<td>3</td>
-<td>0.31</td>
-<td>0.27</td>
-<td>1.8</td>
-<td>0.094</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>0.25</td>
+<td>0.22</td>
+<td>2.5</td>
+<td>0.106</td>
 </tr>
 <tr>
 <td>noise_008</td>
-<td>6</td>
-<td>6</td>
-<td>6</td>
-<td>0.32</td>
-<td>0.30</td>
-<td>0.5</td>
-<td>0.018</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>0.39</td>
+<td>0.34</td>
+<td>1.1</td>
+<td>0.040</td>
 </tr>
 <tr>
 <td>noise_009</td>
-<td>6</td>
-<td>6</td>
-<td>6</td>
-<td>0.32</td>
-<td>0.30</td>
-<td>0.6</td>
-<td>0.019</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>0.31</td>
+<td>0.31</td>
+<td>0.5</td>
+<td>0.020</td>
 </tr>
 <tr>
 <td>normal_000</td>
 <td>3</td>
 <td>3</td>
 <td>3</td>
-<td>0.26</td>
-<td>0.21</td>
-<td>0.5</td>
-<td>0.026</td>
+<td>0.30</td>
+<td>0.24</td>
+<td>0.3</td>
+<td>0.012</td>
 </tr>
 <tr>
 <td>normal_001</td>
 <td>1</td>
 <td>1</td>
 <td>1</td>
-<td>0.22</td>
-<td>0.06</td>
-<td>6.3</td>
-<td>0.350</td>
+<td>0.23</td>
+<td>0.04</td>
+<td>4.8</td>
+<td>0.233</td>
 </tr>
 <tr>
 <td>normal_002</td>
-<td>4</td>
-<td>4</td>
-<td>4</td>
-<td>0.26</td>
-<td>0.23</td>
-<td>0.4</td>
-<td>0.005</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>0.24</td>
+<td>0.18</td>
+<td>5.0</td>
+<td>0.193</td>
 </tr>
 <tr>
 <td>normal_003</td>
-<td>5</td>
-<td>5</td>
-<td>5</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>0.27</td>
 <td>0.26</td>
-<td>0.22</td>
-<td>0.2</td>
-<td>0.012</td>
+<td>6.1</td>
+<td>0.254</td>
 </tr>
 <tr>
 <td>normal_004</td>
-<td>6</td>
-<td>6</td>
-<td>6</td>
-<td>0.27</td>
-<td>0.24</td>
-<td>0.4</td>
-<td>0.012</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>0.29</td>
+<td>0.28</td>
+<td>0.5</td>
+<td>0.019</td>
 </tr>
 <tr>
 <td>normal_005</td>
 <td>8</td>
 <td>8</td>
 <td>8</td>
-<td>0.24</td>
 <td>0.26</td>
-<td>0.4</td>
-<td>0.007</td>
+<td>0.27</td>
+<td>0.6</td>
+<td>0.012</td>
 </tr>
 <tr>
 <td>normal_006</td>
-<td>8</td>
-<td>8</td>
-<td>8</td>
-<td>0.26</td>
-<td>0.26</td>
-<td>0.9</td>
-<td>0.017</td>
+<td>6</td>
+<td>6</td>
+<td>6</td>
+<td>0.28</td>
+<td>0.28</td>
+<td>0.5</td>
+<td>0.014</td>
 </tr>
 <tr>
 <td>normal_007</td>
 <td>8</td>
 <td>8</td>
 <td>8</td>
-<td>0.25</td>
-<td>0.26</td>
-<td>0.7</td>
-<td>0.014</td>
+<td>0.27</td>
+<td>0.28</td>
+<td>0.8</td>
+<td>0.015</td>
 </tr>
 <tr>
 <td>normal_008</td>
 <td>9</td>
 <td>9</td>
 <td>9</td>
-<td>0.25</td>
-<td>0.26</td>
-<td>0.9</td>
-<td>0.012</td>
+<td>0.29</td>
+<td>0.30</td>
+<td>0.8</td>
+<td>0.006</td>
 </tr>
 <tr>
 <td>normal_009</td>
-<td>10</td>
-<td>10</td>
-<td>10</td>
-<td>0.23</td>
-<td>0.23</td>
-<td>1.1</td>
-<td>0.013</td>
+<td>9</td>
+<td>9</td>
+<td>9</td>
+<td>0.28</td>
+<td>0.29</td>
+<td>2.0</td>
+<td>0.027</td>
 </tr>
 <tr>
 <td>persp_000</td>
-<td>9</td>
-<td>9</td>
-<td>9</td>
-<td>0.26</td>
-<td>0.26</td>
-<td>0.9</td>
-<td>0.020</td>
+<td>8</td>
+<td>8</td>
+<td>8</td>
+<td>0.31</td>
+<td>0.29</td>
+<td>0.7</td>
+<td>0.015</td>
 </tr>
 <tr>
 <td>persp_001</td>
 <td>8</td>
 <td>8</td>
 <td>8</td>
-<td>0.24</td>
-<td>0.25</td>
-<td>0.6</td>
-<td>0.013</td>
+<td>0.28</td>
+<td>0.29</td>
+<td>0.7</td>
+<td>0.016</td>
 </tr>
 <tr>
 <td>persp_002</td>
 <td>6</td>
 <td>6</td>
 <td>6</td>
-<td>0.22</td>
-<td>0.23</td>
-<td>0.3</td>
-<td>0.007</td>
+<td>0.26</td>
+<td>0.27</td>
+<td>0.7</td>
+<td>0.014</td>
 </tr>
 <tr>
 <td>persp_003</td>
-<td>7</td>
-<td>7</td>
-<td>7</td>
-<td>0.26</td>
-<td>0.24</td>
-<td>0.5</td>
-<td>0.004</td>
+<td>5</td>
+<td>5</td>
+<td>5</td>
+<td>0.49</td>
+<td>0.30</td>
+<td>0.7</td>
+<td>0.015</td>
 </tr>
 <tr>
 <td>persp_004</td>
-<td>8</td>
-<td>8</td>
-<td>8</td>
-<td>0.26</td>
-<td>0.26</td>
-<td>0.5</td>
-<td>0.012</td>
+<td>6</td>
+<td>6</td>
+<td>6</td>
+<td>0.31</td>
+<td>0.27</td>
+<td>0.4</td>
+<td>0.021</td>
 </tr>
 <tr>
 <td>persp_005</td>
 <td>8</td>
 <td>8</td>
 <td>8</td>
-<td>0.26</td>
-<td>0.23</td>
+<td>0.30</td>
+<td>0.27</td>
 <td>0.6</td>
-<td>0.005</td>
+<td>0.006</td>
 </tr>
 <tr>
 <td>persp_006</td>
-<td>8</td>
-<td>8</td>
-<td>6</td>
-<td>0.24</td>
-<td>0.24</td>
-<td>0.4</td>
-<td>0.007</td>
+<td>7</td>
+<td>7</td>
+<td>7</td>
+<td>0.32</td>
+<td>0.31</td>
+<td>1.4</td>
+<td>0.031</td>
 </tr>
 <tr>
 <td>persp_007</td>
 <td>3</td>
 <td>3</td>
 <td>3</td>
-<td>0.33</td>
-<td>0.25</td>
-<td>4.6</td>
-<td>0.187</td>
+<td>0.38</td>
+<td>0.31</td>
+<td>3.7</td>
+<td>0.144</td>
 </tr>
 <tr>
 <td>persp_008</td>
 <td>10</td>
 <td>8</td>
 <td>6</td>
-<td>0.28</td>
-<td>0.26</td>
+<td>0.32</td>
+<td>0.30</td>
 <td>0.8</td>
-<td>0.007</td>
+<td>0.004</td>
 </tr>
 <tr>
 <td>persp_009</td>
 <td>9</td>
 <td>7</td>
 <td>5</td>
-<td>0.36</td>
-<td>0.38</td>
-<td>1.7</td>
-<td>0.031</td>
+<td>0.33</td>
+<td>0.33</td>
+<td>1.6</td>
+<td>0.032</td>
 </tr>
 <tr>
 <td>shadow_000</td>
 <td>2</td>
 <td>2</td>
 <td>2</td>
-<td>0.23</td>
 <td>0.24</td>
-<td>3.0</td>
-<td>0.086</td>
+<td>0.24</td>
+<td>11.3</td>
+<td>0.342</td>
 </tr>
 <tr>
 <td>shadow_001</td>
-<td>5</td>
-<td>5</td>
-<td>5</td>
-<td>0.26</td>
-<td>0.23</td>
-<td>0.5</td>
-<td>0.003</td>
+<td>4</td>
+<td>4</td>
+<td>4</td>
+<td>0.40</td>
+<td>0.27</td>
+<td>0.7</td>
+<td>0.020</td>
 </tr>
 <tr>
 <td>shadow_002</td>
-<td>3</td>
-<td>3</td>
 <td>2</td>
-<td>0.25</td>
-<td>0.25</td>
-<td>3.1</td>
-<td>0.056</td>
+<td>2</td>
+<td>1</td>
+<td>0.27</td>
+<td>0.08</td>
+<td>19.8</td>
+<td>0.294</td>
 </tr>
 <tr>
 <td>shadow_003</td>
-<td>7</td>
-<td>7</td>
-<td>7</td>
-<td>0.22</td>
-<td>0.22</td>
+<td>6</td>
+<td>6</td>
+<td>6</td>
+<td>0.29</td>
+<td>0.29</td>
 <td>0.2</td>
-<td>0.007</td>
+<td>0.010</td>
 </tr>
 <tr>
 <td>shadow_004</td>
-<td>3</td>
-<td>3</td>
-<td>3</td>
-<td>0.31</td>
-<td>0.29</td>
-<td>4.8</td>
-<td>0.162</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>0.28</td>
+<td>0.22</td>
+<td>10.5</td>
+<td>0.368</td>
 </tr>
 <tr>
 <td>shadow_005</td>
-<td>10</td>
-<td>10</td>
-<td>10</td>
-<td>0.26</td>
-<td>0.28</td>
-<td>0.4</td>
-<td>0.005</td>
+<td>9</td>
+<td>9</td>
+<td>9</td>
+<td>0.32</td>
+<td>0.31</td>
+<td>0.3</td>
+<td>0.002</td>
 </tr>
 <tr>
 <td>shadow_006</td>
 <td>6</td>
 <td>6</td>
 <td>5</td>
-<td>0.25</td>
-<td>0.24</td>
+<td>0.29</td>
+<td>0.28</td>
 <td>0.6</td>
-<td>0.016</td>
+<td>0.010</td>
 </tr>
 <tr>
 <td>shadow_007</td>
 <td>8</td>
 <td>8</td>
 <td>8</td>
-<td>0.26</td>
-<td>0.26</td>
-<td>0.8</td>
-<td>0.013</td>
+<td>0.27</td>
+<td>0.28</td>
+<td>0.6</td>
+<td>0.009</td>
 </tr>
 <tr>
 <td>shadow_008</td>
 <td>2</td>
 <td>2</td>
 <td>1</td>
-<td>0.23</td>
-<td>0.03</td>
-<td>5.9</td>
-<td>0.173</td>
+<td>0.26</td>
+<td>0.05</td>
+<td>6.4</td>
+<td>0.227</td>
 </tr>
 <tr>
 <td>shadow_009</td>
 <td>1</td>
 <td>1</td>
 <td>1</td>
-<td>0.22</td>
-<td>0.05</td>
-<td>4.5</td>
-<td>0.092</td>
+<td>0.30</td>
+<td>0.02</td>
+<td>6.5</td>
+<td>0.054</td>
 </tr>
 </tbody>
 </table></div>
@@ -3071,7 +3043,7 @@ openscad -D &quot;part=\&quot;exploded\&quot;&quot; --render --imgsize 1200,1200
 </div>
 <div class="tabpane" data-pane="m-p" hidden>
  <div class="v3host" id="v-pcb"><div class="vmsg">loading 3D...</div></div>
- <p class="muted">Full-assembly model <code>render/out/apriltag_cam_full.step</code> / <code>.glb</code> (exported 2026-11-01 07:03 with kicad-cli; every footprint carries a real 3D model: KiCad 10 official library for passives, SOT, WSON, header, switch, crystal; dimensionally accurate parametric models from <code>render/models/gen_models.py</code> for the ECP5 caBGA-381, RP2350 QFN-60, USB-C, oscillator, OV9281 CSP, M12 lens holder + lens and test pads): 340 model colour groups (149), 132868 triangles. Colours are the colours stored in the models. The copper traces on the 3D board are a texture from the routed .kicad_pcb (toggle &quot;traces&quot;) and are in the PCB layout tab and the renders.</p>
+ <p class="muted">Full-assembly model <code>render/out/apriltag_cam_full.step</code> / <code>.glb</code> (exported 2026-11-01 19:33 with kicad-cli; every footprint carries a real 3D model: KiCad 10 official library for passives, SOT, WSON, header, switch, crystal; dimensionally accurate parametric models from <code>render/models/gen_models.py</code> for the ECP5 caBGA-381, RP2350 QFN-60, USB-C, oscillator, OV9281 CSP, M12 lens holder + lens and test pads): 340 model colour groups (149), 132868 triangles. Colours are the colours stored in the models. The copper traces on the 3D board are a texture from the routed .kicad_pcb (toggle &quot;traces&quot;) and are in the PCB layout tab and the renders.</p>
  <div class="gridimgs"><figure><img src="img/board_top.png" alt="PCB top (board_top.png)" loading="lazy"><figcaption>PCB top (board_top.png)</figcaption></figure><figure><img src="img/board_bottom.png" alt="PCB bottom (board_bottom.png)" loading="lazy"><figcaption>PCB bottom (board_bottom.png)</figcaption></figure><figure><img src="img/board_iso.png" alt="PCB iso (board_iso.png)" loading="lazy"><figcaption>PCB iso (board_iso.png)</figcaption></figure></div>
 </div>
 <div class="tabpane" data-pane="m-r" hidden>
@@ -3091,31 +3063,31 @@ openscad -D &quot;part=\&quot;exploded\&quot;&quot; --render --imgsize 1200,1200
   <div class="minfo" id="m-info"></div></div></div></div></section>
 <section class="page" id="page-results" hidden><h1>Verification results</h1><div class="cards">
 <div class="card"><b>260</b><span>pytest tests (16 suites)</span></div>
-<div class="card"><b>562 / 647</b><span>tags found by chip (87%)</span></div>
-<div class="card"><b>630 / 647</b><span>found by reference (97%)</span></div>
-<div class="card"><b>1.7 mm</b><span>median camera position error (chip+solver)</span></div>
-<div class="card"><b>0.032 deg</b><span>median orientation error</span></div>
+<div class="card"><b>501 / 570</b><span>tags found by chip (88%)</span></div>
+<div class="card"><b>560 / 570</b><span>found by reference (98%)</span></div>
+<div class="card"><b>1.8 mm</b><span>median camera position error (chip+solver)</span></div>
+<div class="card"><b>0.038 deg</b><span>median orientation error</span></div>
 <div class="card"><b>120.08 fps</b><span>sustained, 832,800 clocks/frame @ 100 MHz sim</span></div>
 </div>
 <h2>Tests per suite</h2>
 <svg class="chart" viewBox="0 0 760 450" role="img" aria-label="pytest tests per verification layer (total 260)"><text x="0" y="14" class="ct">pytest tests per verification layer (total 260)</text><text x="242" y="42" class="cl" text-anchor="end">dataset</text><rect x="250" y="28" width="36.3" height="18" rx="3" class="bar c1"/><text x="292.3" y="42" class="cv">9</text><text x="242" y="68" class="cl" text-anchor="end">device clock (RTL)</text><rect x="250" y="54" width="4.0" height="18" rx="3" class="bar c1"/><text x="260.0" y="68" class="cv">1</text><text x="242" y="94" class="cl" text-anchor="end">CSI-2 packet layer (RTL)</text><rect x="250" y="80" width="32.3" height="18" rx="3" class="bar c1"/><text x="288.3" y="94" class="cv">8</text><text x="242" y="120" class="cl" text-anchor="end">D-PHY receiver (RTL, bit level)</text><rect x="250" y="106" width="48.4" height="18" rx="3" class="bar c1"/><text x="304.4" y="120" class="cv">12</text><text x="242" y="146" class="cl" text-anchor="end">despeckle (RTL)</text><rect x="250" y="132" width="16.1" height="18" rx="3" class="bar c1"/><text x="272.1" y="146" class="cv">4</text><text x="242" y="172" class="cl" text-anchor="end">connected components (RTL)</text><rect x="250" y="158" width="56.5" height="18" rx="3" class="bar c1"/><text x="312.5" y="172" class="cv">14</text><text x="242" y="198" class="cl" text-anchor="end">TPU reference (old FPGA processor, `ref/tpu`)</text><rect x="250" y="184" width="56.5" height="18" rx="3" class="bar c1"/><text x="312.5" y="198" class="cv">14</text><text x="242" y="224" class="cl" text-anchor="end">tag unit in C (architecture A3)</text><rect x="250" y="210" width="68.6" height="18" rx="3" class="bar c1"/><text x="324.6" y="224" class="cv">17</text><text x="242" y="250" class="cl" text-anchor="end">MCU frame bus (RTL)</text><rect x="250" y="236" width="16.1" height="18" rx="3" class="bar c1"/><text x="272.1" y="250" class="cv">4</text><text x="242" y="276" class="cl" text-anchor="end">sensor bring-up</text><rect x="250" y="262" width="4.0" height="18" rx="3" class="bar c1"/><text x="260.0" y="276" class="cv">1</text><text x="242" y="302" class="cl" text-anchor="end">system (RTL)</text><rect x="250" y="288" width="24.2" height="18" rx="3" class="bar c1"/><text x="280.2" y="302" class="cv">6</text><text x="242" y="328" class="cl" text-anchor="end">pose solver (C)</text><rect x="250" y="314" width="44.4" height="18" rx="3" class="bar c1"/><text x="300.4" y="328" class="cv">11</text><text x="242" y="354" class="cl" text-anchor="end">MCU firmware</text><rect x="250" y="340" width="407.4" height="18" rx="3" class="bar c1"/><text x="663.4" y="354" class="cv">101</text><text x="242" y="380" class="cl" text-anchor="end">host + end to end</text><rect x="250" y="366" width="129.1" height="18" rx="3" class="bar c1"/><text x="385.1" y="380" class="cv">32</text><text x="242" y="406" class="cl" text-anchor="end">board data</text><rect x="250" y="392" width="52.4" height="18" rx="3" class="bar c1"/><text x="308.4" y="406" class="cv">13</text><text x="242" y="432" class="cl" text-anchor="end">housing</text><rect x="250" y="418" width="52.4" height="18" rx="3" class="bar c1"/><text x="308.4" y="432" class="cv">13</text></svg>
 <h2>Detection and pose accuracy by image category</h2>
-<svg class="chart" viewBox="0 0 760 250" role="img" aria-label="Detection rate (% of ground-truth-visible tags)"><text x="0" y="14" class="ct">Detection rate (% of ground-truth-visible tags)</text><line x1="44" x2="750" y1="204.0" y2="204.0" class="grid"/><text x="40" y="208.0" class="ca" text-anchor="end">0</text><line x1="44" x2="750" y1="161.5" y2="161.5" class="grid"/><text x="40" y="165.5" class="ca" text-anchor="end">28</text><line x1="44" x2="750" y1="119.0" y2="119.0" class="grid"/><text x="40" y="123.0" class="ca" text-anchor="end">56</text><line x1="44" x2="750" y1="76.5" y2="76.5" class="grid"/><text x="40" y="80.5" class="ca" text-anchor="end">84</text><line x1="44" x2="750" y1="34.0" y2="34.0" class="grid"/><text x="40" y="38.0" class="ca" text-anchor="end">112</text><rect x="55.8" y="65.1" width="22.5" height="138.9" rx="2" class="bar c1"><title>blur chip: 92%</title></rect><rect x="79.3" y="72.8" width="22.5" height="131.2" rx="2" class="bar c2"><title>blur reference: 86%</title></rect><text x="79.3" y="220" class="ca" text-anchor="middle">blur</text><rect x="126.4" y="54.1" width="22.5" height="149.9" rx="2" class="bar c1"><title>bright chip: 99%</title></rect><rect x="149.9" y="52.2" width="22.5" height="151.8" rx="2" class="bar c2"><title>bright reference: 100%</title></rect><text x="149.9" y="220" class="ca" text-anchor="middle">bright</text><rect x="197.0" y="57.4" width="22.5" height="146.6" rx="2" class="bar c1"><title>clutter chip: 97%</title></rect><rect x="220.5" y="52.2" width="22.5" height="151.8" rx="2" class="bar c2"><title>clutter reference: 100%</title></rect><text x="220.5" y="220" class="ca" text-anchor="middle">clutter</text><rect x="267.6" y="52.2" width="22.5" height="151.8" rx="2" class="bar c1"><title>dark chip: 100%</title></rect><rect x="291.1" y="52.2" width="22.5" height="151.8" rx="2" class="bar c2"><title>dark reference: 100%</title></rect><text x="291.1" y="220" class="ca" text-anchor="middle">dark</text><rect x="338.2" y="52.2" width="22.5" height="151.8" rx="2" class="bar c1"><title>grad chip: 100%</title></rect><rect x="361.7" y="52.2" width="22.5" height="151.8" rx="2" class="bar c2"><title>grad reference: 100%</title></rect><text x="361.7" y="220" class="ca" text-anchor="middle">grad</text><rect x="408.8" y="204.0" width="22.5" height="0.5" rx="2" class="bar c1"><title>lowcon chip: 0%</title></rect><rect x="432.3" y="52.2" width="22.5" height="151.8" rx="2" class="bar c2"><title>lowcon reference: 100%</title></rect><text x="432.3" y="220" class="ca" text-anchor="middle">lowcon</text><rect x="479.4" y="52.2" width="22.5" height="151.8" rx="2" class="bar c1"><title>noise chip: 100%</title></rect><rect x="502.9" y="52.2" width="22.5" height="151.8" rx="2" class="bar c2"><title>noise reference: 100%</title></rect><text x="502.9" y="220" class="ca" text-anchor="middle">noise</text><rect x="550.0" y="52.2" width="22.5" height="151.8" rx="2" class="bar c1"><title>normal chip: 100%</title></rect><rect x="573.5" y="52.2" width="22.5" height="151.8" rx="2" class="bar c2"><title>normal reference: 100%</title></rect><text x="573.5" y="220" class="ca" text-anchor="middle">normal</text><rect x="620.6" y="67.0" width="22.5" height="137.0" rx="2" class="bar c1"><title>persp chip: 90%</title></rect><rect x="644.1" y="64.9" width="22.5" height="139.1" rx="2" class="bar c2"><title>persp reference: 92%</title></rect><text x="644.1" y="220" class="ca" text-anchor="middle">persp</text><rect x="691.2" y="65.1" width="22.5" height="138.9" rx="2" class="bar c1"><title>shadow chip: 91%</title></rect><rect x="714.7" y="61.9" width="22.5" height="142.1" rx="2" class="bar c2"><title>shadow reference: 94%</title></rect><text x="714.7" y="220" class="ca" text-anchor="middle">shadow</text><rect x="652" y="4" width="11" height="11" rx="2" class="bar c2"/><text x="667" y="14" class="cl">reference</text><rect x="594" y="4" width="11" height="11" rx="2" class="bar c1"/><text x="609" y="14" class="cl">chip</text></svg>
-<svg class="chart" viewBox="0 0 760 250" role="img" aria-label="Median camera position error (mm)"><text x="0" y="14" class="ct">Median camera position error (mm)</text><line x1="44" x2="750" y1="204.0" y2="204.0" class="grid"/><text x="40" y="208.0" class="ca" text-anchor="end">0.0</text><line x1="44" x2="750" y1="161.5" y2="161.5" class="grid"/><text x="40" y="165.5" class="ca" text-anchor="end">0.8</text><line x1="44" x2="750" y1="119.0" y2="119.0" class="grid"/><text x="40" y="123.0" class="ca" text-anchor="end">1.7</text><line x1="44" x2="750" y1="76.5" y2="76.5" class="grid"/><text x="40" y="80.5" class="ca" text-anchor="end">2.5</text><line x1="44" x2="750" y1="34.0" y2="34.0" class="grid"/><text x="40" y="38.0" class="ca" text-anchor="end">3.3</text><rect x="55.8" y="101.8" width="22.5" height="102.2" rx="2" class="bar c1"><title>blur chip + MCU solver: 2.0 mm</title></rect><rect x="79.3" y="163.8" width="22.5" height="40.2" rx="2" class="bar c2"><title>blur reference: 0.8 mm</title></rect><text x="79.3" y="220" class="ca" text-anchor="middle">blur</text><rect x="126.4" y="146.8" width="22.5" height="57.2" rx="2" class="bar c1"><title>bright chip + MCU solver: 1.1 mm</title></rect><rect x="149.9" y="128.5" width="22.5" height="75.5" rx="2" class="bar c2"><title>bright reference: 1.5 mm</title></rect><text x="149.9" y="220" class="ca" text-anchor="middle">bright</text><rect x="197.0" y="115.0" width="22.5" height="89.0" rx="2" class="bar c1"><title>clutter chip + MCU solver: 1.8 mm</title></rect><rect x="220.5" y="172.7" width="22.5" height="31.3" rx="2" class="bar c2"><title>clutter reference: 0.6 mm</title></rect><text x="220.5" y="220" class="ca" text-anchor="middle">clutter</text><rect x="267.6" y="106.6" width="22.5" height="97.4" rx="2" class="bar c1"><title>dark chip + MCU solver: 1.9 mm</title></rect><rect x="291.1" y="174.8" width="22.5" height="29.2" rx="2" class="bar c2"><title>dark reference: 0.6 mm</title></rect><text x="291.1" y="220" class="ca" text-anchor="middle">dark</text><rect x="338.2" y="136.4" width="22.5" height="67.6" rx="2" class="bar c1"><title>grad chip + MCU solver: 1.3 mm</title></rect><rect x="361.7" y="176.5" width="22.5" height="27.5" rx="2" class="bar c2"><title>grad reference: 0.5 mm</title></rect><text x="361.7" y="220" class="ca" text-anchor="middle">grad</text><rect x="432.3" y="154.7" width="22.5" height="49.3" rx="2" class="bar c2"><title>lowcon reference: 1.0 mm</title></rect><text x="432.3" y="220" class="ca" text-anchor="middle">lowcon</text><rect x="479.4" y="92.4" width="22.5" height="111.6" rx="2" class="bar c1"><title>noise chip + MCU solver: 2.2 mm</title></rect><rect x="502.9" y="166.1" width="22.5" height="37.9" rx="2" class="bar c2"><title>noise reference: 0.7 mm</title></rect><text x="502.9" y="220" class="ca" text-anchor="middle">noise</text><rect x="550.0" y="103.8" width="22.5" height="100.2" rx="2" class="bar c1"><title>normal chip + MCU solver: 2.0 mm</title></rect><rect x="573.5" y="175.5" width="22.5" height="28.5" rx="2" class="bar c2"><title>normal reference: 0.6 mm</title></rect><text x="573.5" y="220" class="ca" text-anchor="middle">normal</text><rect x="620.6" y="137.9" width="22.5" height="66.1" rx="2" class="bar c1"><title>persp chip + MCU solver: 1.3 mm</title></rect><rect x="644.1" y="174.5" width="22.5" height="29.5" rx="2" class="bar c2"><title>persp reference: 0.6 mm</title></rect><text x="644.1" y="220" class="ca" text-anchor="middle">persp</text><rect x="691.2" y="52.2" width="22.5" height="151.8" rx="2" class="bar c1"><title>shadow chip + MCU solver: 3.0 mm</title></rect><rect x="714.7" y="108.1" width="22.5" height="95.9" rx="2" class="bar c2"><title>shadow reference: 1.9 mm</title></rect><text x="714.7" y="220" class="ca" text-anchor="middle">shadow</text><rect x="652" y="4" width="11" height="11" rx="2" class="bar c2"/><text x="667" y="14" class="cl">reference</text><rect x="490" y="4" width="11" height="11" rx="2" class="bar c1"/><text x="505" y="14" class="cl">chip + MCU solver</text></svg>
-<svg class="chart" viewBox="0 0 760 250" role="img" aria-label="Median camera orientation error (deg)"><text x="0" y="14" class="ct">Median camera orientation error (deg)</text><line x1="44" x2="750" y1="204.0" y2="204.0" class="grid"/><text x="40" y="208.0" class="ca" text-anchor="end">0.000</text><line x1="44" x2="750" y1="161.5" y2="161.5" class="grid"/><text x="40" y="165.5" class="ca" text-anchor="end">0.023</text><line x1="44" x2="750" y1="119.0" y2="119.0" class="grid"/><text x="40" y="123.0" class="ca" text-anchor="end">0.045</text><line x1="44" x2="750" y1="76.5" y2="76.5" class="grid"/><text x="40" y="80.5" class="ca" text-anchor="end">0.068</text><line x1="44" x2="750" y1="34.0" y2="34.0" class="grid"/><text x="40" y="38.0" class="ca" text-anchor="end">0.090</text><rect x="55.8" y="103.1" width="22.5" height="100.9" rx="2" class="bar c1"><title>blur chip + MCU solver: 0.054 deg</title></rect><rect x="79.3" y="156.1" width="22.5" height="47.9" rx="2" class="bar c2"><title>blur reference: 0.025 deg</title></rect><text x="79.3" y="220" class="ca" text-anchor="middle">blur</text><rect x="126.4" y="148.4" width="22.5" height="55.6" rx="2" class="bar c1"><title>bright chip + MCU solver: 0.029 deg</title></rect><rect x="149.9" y="153.5" width="22.5" height="50.5" rx="2" class="bar c2"><title>bright reference: 0.027 deg</title></rect><text x="149.9" y="220" class="ca" text-anchor="middle">bright</text><rect x="197.0" y="152.1" width="22.5" height="51.9" rx="2" class="bar c1"><title>clutter chip + MCU solver: 0.028 deg</title></rect><rect x="220.5" y="178.3" width="22.5" height="25.7" rx="2" class="bar c2"><title>clutter reference: 0.014 deg</title></rect><text x="220.5" y="220" class="ca" text-anchor="middle">clutter</text><rect x="267.6" y="146.5" width="22.5" height="57.5" rx="2" class="bar c1"><title>dark chip + MCU solver: 0.030 deg</title></rect><rect x="291.1" y="178.8" width="22.5" height="25.2" rx="2" class="bar c2"><title>dark reference: 0.013 deg</title></rect><text x="291.1" y="220" class="ca" text-anchor="middle">dark</text><rect x="338.2" y="168.2" width="22.5" height="35.8" rx="2" class="bar c1"><title>grad chip + MCU solver: 0.019 deg</title></rect><rect x="361.7" y="179.5" width="22.5" height="24.5" rx="2" class="bar c2"><title>grad reference: 0.013 deg</title></rect><text x="361.7" y="220" class="ca" text-anchor="middle">grad</text><rect x="432.3" y="158.6" width="22.5" height="45.4" rx="2" class="bar c2"><title>lowcon reference: 0.024 deg</title></rect><text x="432.3" y="220" class="ca" text-anchor="middle">lowcon</text><rect x="479.4" y="130.5" width="22.5" height="73.5" rx="2" class="bar c1"><title>noise chip + MCU solver: 0.039 deg</title></rect><rect x="502.9" y="164.0" width="22.5" height="40.0" rx="2" class="bar c2"><title>noise reference: 0.021 deg</title></rect><text x="502.9" y="220" class="ca" text-anchor="middle">noise</text><rect x="550.0" y="127.6" width="22.5" height="76.4" rx="2" class="bar c1"><title>normal chip + MCU solver: 0.040 deg</title></rect><rect x="573.5" y="180.1" width="22.5" height="23.9" rx="2" class="bar c2"><title>normal reference: 0.013 deg</title></rect><text x="573.5" y="220" class="ca" text-anchor="middle">normal</text><rect x="620.6" y="156.9" width="22.5" height="47.1" rx="2" class="bar c1"><title>persp chip + MCU solver: 0.025 deg</title></rect><rect x="644.1" y="186.3" width="22.5" height="17.7" rx="2" class="bar c2"><title>persp reference: 0.009 deg</title></rect><text x="644.1" y="220" class="ca" text-anchor="middle">persp</text><rect x="691.2" y="52.2" width="22.5" height="151.8" rx="2" class="bar c1"><title>shadow chip + MCU solver: 0.081 deg</title></rect><rect x="714.7" y="136.1" width="22.5" height="67.9" rx="2" class="bar c2"><title>shadow reference: 0.036 deg</title></rect><text x="714.7" y="220" class="ca" text-anchor="middle">shadow</text><rect x="652" y="4" width="11" height="11" rx="2" class="bar c2"/><text x="667" y="14" class="cl">reference</text><rect x="490" y="4" width="11" height="11" rx="2" class="bar c1"/><text x="505" y="14" class="cl">chip + MCU solver</text></svg>
+<svg class="chart" viewBox="0 0 760 250" role="img" aria-label="Detection rate (% of ground-truth-visible tags)"><text x="0" y="14" class="ct">Detection rate (% of ground-truth-visible tags)</text><line x1="44" x2="750" y1="204.0" y2="204.0" class="grid"/><text x="40" y="208.0" class="ca" text-anchor="end">0</text><line x1="44" x2="750" y1="161.5" y2="161.5" class="grid"/><text x="40" y="165.5" class="ca" text-anchor="end">28</text><line x1="44" x2="750" y1="119.0" y2="119.0" class="grid"/><text x="40" y="123.0" class="ca" text-anchor="end">56</text><line x1="44" x2="750" y1="76.5" y2="76.5" class="grid"/><text x="40" y="80.5" class="ca" text-anchor="end">84</text><line x1="44" x2="750" y1="34.0" y2="34.0" class="grid"/><text x="40" y="38.0" class="ca" text-anchor="end">112</text><rect x="55.8" y="61.0" width="22.5" height="143.0" rx="2" class="bar c1"><title>blur chip: 94%</title></rect><rect x="79.3" y="61.0" width="22.5" height="143.0" rx="2" class="bar c2"><title>blur reference: 94%</title></rect><text x="79.3" y="220" class="ca" text-anchor="middle">blur</text><rect x="126.4" y="54.2" width="22.5" height="149.8" rx="2" class="bar c1"><title>bright chip: 99%</title></rect><rect x="149.9" y="52.2" width="22.5" height="151.8" rx="2" class="bar c2"><title>bright reference: 100%</title></rect><text x="149.9" y="220" class="ca" text-anchor="middle">bright</text><rect x="197.0" y="64.1" width="22.5" height="139.9" rx="2" class="bar c1"><title>clutter chip: 92%</title></rect><rect x="220.5" y="52.2" width="22.5" height="151.8" rx="2" class="bar c2"><title>clutter reference: 100%</title></rect><text x="220.5" y="220" class="ca" text-anchor="middle">clutter</text><rect x="267.6" y="52.2" width="22.5" height="151.8" rx="2" class="bar c1"><title>dark chip: 100%</title></rect><rect x="291.1" y="52.2" width="22.5" height="151.8" rx="2" class="bar c2"><title>dark reference: 100%</title></rect><text x="291.1" y="220" class="ca" text-anchor="middle">dark</text><rect x="338.2" y="52.2" width="22.5" height="151.8" rx="2" class="bar c1"><title>grad chip: 100%</title></rect><rect x="361.7" y="52.2" width="22.5" height="151.8" rx="2" class="bar c2"><title>grad reference: 100%</title></rect><text x="361.7" y="220" class="ca" text-anchor="middle">grad</text><rect x="408.8" y="201.2" width="22.5" height="2.8" rx="2" class="bar c1"><title>lowcon chip: 2%</title></rect><rect x="432.3" y="52.2" width="22.5" height="151.8" rx="2" class="bar c2"><title>lowcon reference: 100%</title></rect><text x="432.3" y="220" class="ca" text-anchor="middle">lowcon</text><rect x="479.4" y="52.2" width="22.5" height="151.8" rx="2" class="bar c1"><title>noise chip: 100%</title></rect><rect x="502.9" y="52.2" width="22.5" height="151.8" rx="2" class="bar c2"><title>noise reference: 100%</title></rect><text x="502.9" y="220" class="ca" text-anchor="middle">noise</text><rect x="550.0" y="52.2" width="22.5" height="151.8" rx="2" class="bar c1"><title>normal chip: 100%</title></rect><rect x="573.5" y="52.2" width="22.5" height="151.8" rx="2" class="bar c2"><title>normal reference: 100%</title></rect><text x="573.5" y="220" class="ca" text-anchor="middle">normal</text><rect x="620.6" y="61.4" width="22.5" height="142.6" rx="2" class="bar c1"><title>persp chip: 94%</title></rect><rect x="644.1" y="61.4" width="22.5" height="142.6" rx="2" class="bar c2"><title>persp reference: 94%</title></rect><text x="644.1" y="220" class="ca" text-anchor="middle">persp</text><rect x="691.2" y="66.7" width="22.5" height="137.3" rx="2" class="bar c1"><title>shadow chip: 90%</title></rect><rect x="714.7" y="63.1" width="22.5" height="140.9" rx="2" class="bar c2"><title>shadow reference: 93%</title></rect><text x="714.7" y="220" class="ca" text-anchor="middle">shadow</text><rect x="652" y="4" width="11" height="11" rx="2" class="bar c2"/><text x="667" y="14" class="cl">reference</text><rect x="594" y="4" width="11" height="11" rx="2" class="bar c1"/><text x="609" y="14" class="cl">chip</text></svg>
+<svg class="chart" viewBox="0 0 760 250" role="img" aria-label="Median camera position error (mm)"><text x="0" y="14" class="ct">Median camera position error (mm)</text><line x1="44" x2="750" y1="204.0" y2="204.0" class="grid"/><text x="40" y="208.0" class="ca" text-anchor="end">0.0</text><line x1="44" x2="750" y1="161.5" y2="161.5" class="grid"/><text x="40" y="165.5" class="ca" text-anchor="end">15.3</text><line x1="44" x2="750" y1="119.0" y2="119.0" class="grid"/><text x="40" y="123.0" class="ca" text-anchor="end">30.5</text><line x1="44" x2="750" y1="76.5" y2="76.5" class="grid"/><text x="40" y="80.5" class="ca" text-anchor="end">45.8</text><line x1="44" x2="750" y1="34.0" y2="34.0" class="grid"/><text x="40" y="38.0" class="ca" text-anchor="end">61.1</text><rect x="55.8" y="195.3" width="22.5" height="8.7" rx="2" class="bar c1"><title>blur chip + MCU solver: 3.1 mm</title></rect><rect x="79.3" y="201.3" width="22.5" height="2.7" rx="2" class="bar c2"><title>blur reference: 1.0 mm</title></rect><text x="79.3" y="220" class="ca" text-anchor="middle">blur</text><rect x="126.4" y="199.9" width="22.5" height="4.1" rx="2" class="bar c1"><title>bright chip + MCU solver: 1.5 mm</title></rect><rect x="149.9" y="200.6" width="22.5" height="3.4" rx="2" class="bar c2"><title>bright reference: 1.2 mm</title></rect><text x="149.9" y="220" class="ca" text-anchor="middle">bright</text><rect x="197.0" y="199.9" width="22.5" height="4.1" rx="2" class="bar c1"><title>clutter chip + MCU solver: 1.5 mm</title></rect><rect x="220.5" y="202.6" width="22.5" height="1.4" rx="2" class="bar c2"><title>clutter reference: 0.5 mm</title></rect><text x="220.5" y="220" class="ca" text-anchor="middle">clutter</text><rect x="267.6" y="200.3" width="22.5" height="3.7" rx="2" class="bar c1"><title>dark chip + MCU solver: 1.3 mm</title></rect><rect x="291.1" y="202.7" width="22.5" height="1.3" rx="2" class="bar c2"><title>dark reference: 0.4 mm</title></rect><text x="291.1" y="220" class="ca" text-anchor="middle">dark</text><rect x="338.2" y="199.9" width="22.5" height="4.1" rx="2" class="bar c1"><title>grad chip + MCU solver: 1.5 mm</title></rect><rect x="361.7" y="202.5" width="22.5" height="1.5" rx="2" class="bar c2"><title>grad reference: 0.6 mm</title></rect><text x="361.7" y="220" class="ca" text-anchor="middle">grad</text><rect x="408.8" y="52.2" width="22.5" height="151.8" rx="2" class="bar c1"><title>lowcon chip + MCU solver: 54.5 mm</title></rect><rect x="432.3" y="202.0" width="22.5" height="2.0" rx="2" class="bar c2"><title>lowcon reference: 0.7 mm</title></rect><text x="432.3" y="220" class="ca" text-anchor="middle">lowcon</text><rect x="479.4" y="198.1" width="22.5" height="5.9" rx="2" class="bar c1"><title>noise chip + MCU solver: 2.1 mm</title></rect><rect x="502.9" y="200.8" width="22.5" height="3.2" rx="2" class="bar c2"><title>noise reference: 1.1 mm</title></rect><text x="502.9" y="220" class="ca" text-anchor="middle">noise</text><rect x="550.0" y="198.6" width="22.5" height="5.4" rx="2" class="bar c1"><title>normal chip + MCU solver: 1.9 mm</title></rect><rect x="573.5" y="201.9" width="22.5" height="2.1" rx="2" class="bar c2"><title>normal reference: 0.8 mm</title></rect><text x="573.5" y="220" class="ca" text-anchor="middle">normal</text><rect x="620.6" y="200.0" width="22.5" height="4.0" rx="2" class="bar c1"><title>persp chip + MCU solver: 1.4 mm</title></rect><rect x="644.1" y="202.0" width="22.5" height="2.0" rx="2" class="bar c2"><title>persp reference: 0.7 mm</title></rect><text x="644.1" y="220" class="ca" text-anchor="middle">persp</text><rect x="691.2" y="191.3" width="22.5" height="12.7" rx="2" class="bar c1"><title>shadow chip + MCU solver: 4.6 mm</title></rect><rect x="714.7" y="194.1" width="22.5" height="9.9" rx="2" class="bar c2"><title>shadow reference: 3.6 mm</title></rect><text x="714.7" y="220" class="ca" text-anchor="middle">shadow</text><rect x="652" y="4" width="11" height="11" rx="2" class="bar c2"/><text x="667" y="14" class="cl">reference</text><rect x="490" y="4" width="11" height="11" rx="2" class="bar c1"/><text x="505" y="14" class="cl">chip + MCU solver</text></svg>
+<svg class="chart" viewBox="0 0 760 250" role="img" aria-label="Median camera orientation error (deg)"><text x="0" y="14" class="ct">Median camera orientation error (deg)</text><line x1="44" x2="750" y1="204.0" y2="204.0" class="grid"/><text x="40" y="208.0" class="ca" text-anchor="end">0.000</text><line x1="44" x2="750" y1="161.5" y2="161.5" class="grid"/><text x="40" y="165.5" class="ca" text-anchor="end">0.433</text><line x1="44" x2="750" y1="119.0" y2="119.0" class="grid"/><text x="40" y="123.0" class="ca" text-anchor="end">0.865</text><line x1="44" x2="750" y1="76.5" y2="76.5" class="grid"/><text x="40" y="80.5" class="ca" text-anchor="end">1.298</text><line x1="44" x2="750" y1="34.0" y2="34.0" class="grid"/><text x="40" y="38.0" class="ca" text-anchor="end">1.730</text><rect x="55.8" y="194.7" width="22.5" height="9.3" rx="2" class="bar c1"><title>blur chip + MCU solver: 0.095 deg</title></rect><rect x="79.3" y="200.7" width="22.5" height="3.3" rx="2" class="bar c2"><title>blur reference: 0.033 deg</title></rect><text x="79.3" y="220" class="ca" text-anchor="middle">blur</text><rect x="126.4" y="200.7" width="22.5" height="3.3" rx="2" class="bar c1"><title>bright chip + MCU solver: 0.034 deg</title></rect><rect x="149.9" y="201.9" width="22.5" height="2.1" rx="2" class="bar c2"><title>bright reference: 0.022 deg</title></rect><text x="149.9" y="220" class="ca" text-anchor="middle">bright</text><rect x="197.0" y="201.3" width="22.5" height="2.7" rx="2" class="bar c1"><title>clutter chip + MCU solver: 0.028 deg</title></rect><rect x="220.5" y="202.9" width="22.5" height="1.1" rx="2" class="bar c2"><title>clutter reference: 0.011 deg</title></rect><text x="220.5" y="220" class="ca" text-anchor="middle">clutter</text><rect x="267.6" y="201.0" width="22.5" height="3.0" rx="2" class="bar c1"><title>dark chip + MCU solver: 0.030 deg</title></rect><rect x="291.1" y="203.2" width="22.5" height="0.8" rx="2" class="bar c2"><title>dark reference: 0.008 deg</title></rect><text x="291.1" y="220" class="ca" text-anchor="middle">dark</text><rect x="338.2" y="200.9" width="22.5" height="3.1" rx="2" class="bar c1"><title>grad chip + MCU solver: 0.032 deg</title></rect><rect x="361.7" y="202.8" width="22.5" height="1.2" rx="2" class="bar c2"><title>grad reference: 0.012 deg</title></rect><text x="361.7" y="220" class="ca" text-anchor="middle">grad</text><rect x="408.8" y="52.2" width="22.5" height="151.8" rx="2" class="bar c1"><title>lowcon chip + MCU solver: 1.545 deg</title></rect><rect x="432.3" y="201.9" width="22.5" height="2.1" rx="2" class="bar c2"><title>lowcon reference: 0.021 deg</title></rect><text x="432.3" y="220" class="ca" text-anchor="middle">lowcon</text><rect x="479.4" y="199.7" width="22.5" height="4.3" rx="2" class="bar c1"><title>noise chip + MCU solver: 0.044 deg</title></rect><rect x="502.9" y="200.7" width="22.5" height="3.3" rx="2" class="bar c2"><title>noise reference: 0.033 deg</title></rect><text x="502.9" y="220" class="ca" text-anchor="middle">noise</text><rect x="550.0" y="200.2" width="22.5" height="3.8" rx="2" class="bar c1"><title>normal chip + MCU solver: 0.039 deg</title></rect><rect x="573.5" y="202.3" width="22.5" height="1.7" rx="2" class="bar c2"><title>normal reference: 0.017 deg</title></rect><text x="573.5" y="220" class="ca" text-anchor="middle">normal</text><rect x="620.6" y="201.0" width="22.5" height="3.0" rx="2" class="bar c1"><title>persp chip + MCU solver: 0.030 deg</title></rect><rect x="644.1" y="202.5" width="22.5" height="1.5" rx="2" class="bar c2"><title>persp reference: 0.015 deg</title></rect><text x="644.1" y="220" class="ca" text-anchor="middle">persp</text><rect x="691.2" y="187.7" width="22.5" height="16.3" rx="2" class="bar c1"><title>shadow chip + MCU solver: 0.166 deg</title></rect><rect x="714.7" y="200.4" width="22.5" height="3.6" rx="2" class="bar c2"><title>shadow reference: 0.037 deg</title></rect><text x="714.7" y="220" class="ca" text-anchor="middle">shadow</text><rect x="652" y="4" width="11" height="11" rx="2" class="bar c2"/><text x="667" y="14" class="cl">reference</text><rect x="490" y="4" width="11" height="11" rx="2" class="bar c1"/><text x="505" y="14" class="cl">chip + MCU solver</text></svg>
 <div class="tablewrap"><table><thead><tr><th>category</th><th>images</th><th>visible tags</th><th>chip found</th><th>reference found</th><th>false IDs (chip)</th><th>mean corner err (px, chip)</th><th>pos err median chip / ref (mm)</th><th>rot err median chip / ref (deg)</th></tr></thead><tbody>
-<tr><td>blur</td><td>10</td><td>59</td><td>54 (92%)</td><td>51</td><td>0</td><td>0.69</td><td>2.0 / 0.8</td><td>0.054 / 0.025</td></tr>
-<tr><td>bright</td><td>10</td><td>81</td><td>80 (99%)</td><td>81</td><td>0</td><td>0.56</td><td>1.1 / 1.5</td><td>0.029 / 0.027</td></tr>
-<tr><td>clutter</td><td>10</td><td>59</td><td>57 (97%)</td><td>59</td><td>0</td><td>0.57</td><td>1.8 / 0.6</td><td>0.028 / 0.014</td></tr>
-<tr><td>dark</td><td>10</td><td>69</td><td>69 (100%)</td><td>69</td><td>0</td><td>0.59</td><td>1.9 / 0.6</td><td>0.030 / 0.013</td></tr>
-<tr><td>grad</td><td>10</td><td>75</td><td>75 (100%)</td><td>75</td><td>0</td><td>0.49</td><td>1.3 / 0.5</td><td>0.019 / 0.013</td></tr>
-<tr><td>lowcon</td><td>10</td><td>66</td><td>0 (0%)</td><td>66</td><td>0</td><td>-</td><td>- / 1.0</td><td>- / 0.024</td></tr>
-<tr><td>noise</td><td>10</td><td>57</td><td>57 (100%)</td><td>57</td><td>0</td><td>0.79</td><td>2.2 / 0.7</td><td>0.039 / 0.021</td></tr>
-<tr><td>normal</td><td>10</td><td>62</td><td>62 (100%)</td><td>62</td><td>0</td><td>0.48</td><td>2.0 / 0.6</td><td>0.040 / 0.013</td></tr>
-<tr><td>persp</td><td>10</td><td>72</td><td>65 (90%)</td><td>66</td><td>0</td><td>0.53</td><td>1.3 / 0.6</td><td>0.025 / 0.009</td></tr>
-<tr><td>shadow</td><td>10</td><td>47</td><td>43 (91%)</td><td>44</td><td>0</td><td>0.55</td><td>3.0 / 1.9</td><td>0.081 / 0.036</td></tr>
+<tr><td>blur</td><td>10</td><td>52</td><td>49 (94%)</td><td>49</td><td>0</td><td>0.67</td><td>3.1 / 1.0</td><td>0.095 / 0.033</td></tr>
+<tr><td>bright</td><td>10</td><td>78</td><td>77 (99%)</td><td>78</td><td>0</td><td>0.67</td><td>1.5 / 1.2</td><td>0.034 / 0.022</td></tr>
+<tr><td>clutter</td><td>10</td><td>51</td><td>47 (92%)</td><td>51</td><td>0</td><td>0.53</td><td>1.5 / 0.5</td><td>0.028 / 0.011</td></tr>
+<tr><td>dark</td><td>10</td><td>59</td><td>59 (100%)</td><td>59</td><td>0</td><td>0.62</td><td>1.3 / 0.4</td><td>0.030 / 0.008</td></tr>
+<tr><td>grad</td><td>10</td><td>66</td><td>66 (100%)</td><td>66</td><td>0</td><td>0.49</td><td>1.5 / 0.6</td><td>0.032 / 0.012</td></tr>
+<tr><td>lowcon</td><td>10</td><td>54</td><td>1 (2%)</td><td>54</td><td>0</td><td>0.42</td><td>54.5 / 0.7</td><td>1.545 / 0.021</td></tr>
+<tr><td>noise</td><td>10</td><td>50</td><td>50 (100%)</td><td>50</td><td>0</td><td>0.73</td><td>2.1 / 1.1</td><td>0.044 / 0.033</td></tr>
+<tr><td>normal</td><td>10</td><td>52</td><td>52 (100%)</td><td>52</td><td>0</td><td>0.49</td><td>1.9 / 0.8</td><td>0.039 / 0.017</td></tr>
+<tr><td>persp</td><td>10</td><td>66</td><td>62 (94%)</td><td>62</td><td>0</td><td>0.57</td><td>1.4 / 0.7</td><td>0.030 / 0.015</td></tr>
+<tr><td>shadow</td><td>10</td><td>42</td><td>38 (90%)</td><td>39</td><td>0</td><td>0.63</td><td>4.6 / 3.6</td><td>0.166 / 0.037</td></tr>
 </tbody></table></div><p class="muted">Computed at site build time from <code>results/rtl_chain_results.json</code> through the firmware pose solver (<code>tests/analyze_chain.py</code>) and <code>results/reference_baseline.json</code>. The per-image numbers are on the Test images page.</p>
-<svg class="chart" viewBox="0 0 760 200" role="img" aria-label="per-image position error"><text x="0" y="14" class="ct">Per-image camera position error, sorted (mm, clipped at 12; labelled if larger)</text><line x1="44" x2="754" y1="178.0" y2="178.0" class="grid"/><text x="40" y="182.0" class="ca" text-anchor="end">0</text><line x1="44" x2="754" y1="141.0" y2="141.0" class="grid"/><text x="40" y="145.0" class="ca" text-anchor="end">3</text><line x1="44" x2="754" y1="104.0" y2="104.0" class="grid"/><text x="40" y="108.0" class="ca" text-anchor="end">6</text><line x1="44" x2="754" y1="67.0" y2="67.0" class="grid"/><text x="40" y="71.0" class="ca" text-anchor="end">9</text><line x1="44" x2="754" y1="30.0" y2="30.0" class="grid"/><text x="40" y="34.0" class="ca" text-anchor="end">12</text><rect x="44.0" y="176.4" width="7.1" height="1.6" class="bar c1"><title>bright_006  chip 0.1 mm, ref 1.1 mm</title></rect><circle cx="47.9" cy="164.8" r="1.8" class="dot c2"/><rect x="51.9" y="169.7" width="7.1" height="8.3" class="bar c1"><title>bright_005  chip 0.7 mm, ref 0.9 mm</title></rect><circle cx="55.8" cy="166.8" r="1.8" class="dot c2"/><rect x="59.8" y="169.1" width="7.1" height="8.9" class="bar c1"><title>persp_000  chip 0.7 mm, ref 0.9 mm</title></rect><circle cx="63.7" cy="166.4" r="1.8" class="dot c2"/><rect x="67.7" y="168.9" width="7.1" height="9.1" class="bar c1"><title>persp_008  chip 0.7 mm, ref 0.8 mm</title></rect><circle cx="71.6" cy="168.0" r="1.8" class="dot c2"/><rect x="75.6" y="168.5" width="7.1" height="9.5" class="bar c1"><title>persp_003  chip 0.8 mm, ref 0.5 mm</title></rect><circle cx="79.5" cy="172.2" r="1.8" class="dot c2"/><rect x="83.4" y="168.0" width="7.1" height="10.0" class="bar c1"><title>bright_007  chip 0.8 mm, ref 0.8 mm</title></rect><circle cx="87.4" cy="167.9" r="1.8" class="dot c2"/><rect x="91.3" y="167.4" width="7.1" height="10.6" class="bar c1"><title>dark_006  chip 0.9 mm, ref 1.0 mm</title></rect><circle cx="95.3" cy="165.7" r="1.8" class="dot c2"/><rect x="99.2" y="167.1" width="7.1" height="10.9" class="bar c1"><title>bright_001  chip 0.9 mm, ref 0.7 mm</title></rect><circle cx="103.2" cy="169.5" r="1.8" class="dot c2"/><rect x="107.1" y="166.9" width="7.1" height="11.1" class="bar c1"><title>bright_004  chip 0.9 mm, ref 2.0 mm</title></rect><circle cx="111.1" cy="153.5" r="1.8" class="dot c2"/><rect x="115.0" y="166.8" width="7.1" height="11.2" class="bar c1"><title>persp_005  chip 0.9 mm, ref 0.6 mm</title></rect><circle cx="118.9" cy="171.0" r="1.8" class="dot c2"/><rect x="122.9" y="166.3" width="7.1" height="11.7" class="bar c1"><title>grad_009  chip 0.9 mm, ref 1.0 mm</title></rect><circle cx="126.8" cy="165.9" r="1.8" class="dot c2"/><rect x="130.8" y="166.0" width="7.1" height="12.0" class="bar c1"><title>grad_003  chip 1.0 mm, ref 0.6 mm</title></rect><circle cx="134.7" cy="171.1" r="1.8" class="dot c2"/><rect x="138.7" y="165.8" width="7.1" height="12.2" class="bar c1"><title>noise_004  chip 1.0 mm, ref 0.8 mm</title></rect><circle cx="142.6" cy="167.9" r="1.8" class="dot c2"/><rect x="146.6" y="165.8" width="7.1" height="12.2" class="bar c1"><title>shadow_005  chip 1.0 mm, ref 0.4 mm</title></rect><circle cx="150.5" cy="172.9" r="1.8" class="dot c2"/><rect x="154.4" y="165.5" width="7.1" height="12.5" class="bar c1"><title>shadow_006  chip 1.0 mm, ref 0.6 mm</title></rect><circle cx="158.4" cy="170.5" r="1.8" class="dot c2"/><rect x="162.3" y="165.3" width="7.1" height="12.7" class="bar c1"><title>grad_001  chip 1.0 mm, ref 0.8 mm</title></rect><circle cx="166.3" cy="168.4" r="1.8" class="dot c2"/><rect x="170.2" y="164.6" width="7.1" height="13.4" class="bar c1"><title>grad_005  chip 1.1 mm, ref 1.0 mm</title></rect><circle cx="174.2" cy="165.2" r="1.8" class="dot c2"/><rect x="178.1" y="164.3" width="7.1" height="13.7" class="bar c1"><title>blur_002  chip 1.1 mm, ref 0.4 mm</title></rect><circle cx="182.1" cy="172.9" r="1.8" class="dot c2"/><rect x="186.0" y="163.6" width="7.1" height="14.4" class="bar c1"><title>dark_001  chip 1.2 mm, ref 0.4 mm</title></rect><circle cx="189.9" cy="173.4" r="1.8" class="dot c2"/><rect x="193.9" y="163.4" width="7.1" height="14.6" class="bar c1"><title>normal_004  chip 1.2 mm, ref 0.4 mm</title></rect><circle cx="197.8" cy="173.3" r="1.8" class="dot c2"/><rect x="201.8" y="162.8" width="7.1" height="15.2" class="bar c1"><title>clutter_005  chip 1.2 mm, ref 0.8 mm</title></rect><circle cx="205.7" cy="168.5" r="1.8" class="dot c2"/><rect x="209.7" y="162.6" width="7.1" height="15.4" class="bar c1"><title>grad_000  chip 1.2 mm, ref 0.5 mm</title></rect><circle cx="213.6" cy="171.6" r="1.8" class="dot c2"/><rect x="217.6" y="162.2" width="7.1" height="15.8" class="bar c1"><title>persp_009  chip 1.3 mm, ref 1.7 mm</title></rect><circle cx="221.5" cy="157.5" r="1.8" class="dot c2"/><rect x="225.4" y="162.0" width="7.1" height="16.0" class="bar c1"><title>shadow_003  chip 1.3 mm, ref 0.2 mm</title></rect><circle cx="229.4" cy="175.4" r="1.8" class="dot c2"/><rect x="233.3" y="161.8" width="7.1" height="16.2" class="bar c1"><title>clutter_000  chip 1.3 mm, ref 0.5 mm</title></rect><circle cx="237.3" cy="171.3" r="1.8" class="dot c2"/><rect x="241.2" y="161.8" width="7.1" height="16.2" class="bar c1"><title>normal_005  chip 1.3 mm, ref 0.4 mm</title></rect><circle cx="245.2" cy="172.6" r="1.8" class="dot c2"/><rect x="249.1" y="161.7" width="7.1" height="16.3" class="bar c1"><title>persp_001  chip 1.3 mm, ref 0.6 mm</title></rect><circle cx="253.1" cy="170.7" r="1.8" class="dot c2"/><rect x="257.0" y="161.5" width="7.1" height="16.5" class="bar c1"><title>dark_000  chip 1.3 mm, ref 0.7 mm</title></rect><circle cx="260.9" cy="169.7" r="1.8" class="dot c2"/><rect x="264.9" y="161.5" width="7.1" height="16.5" class="bar c1"><title>normal_006  chip 1.3 mm, ref 0.9 mm</title></rect><circle cx="268.8" cy="166.5" r="1.8" class="dot c2"/><rect x="272.8" y="161.3" width="7.1" height="16.7" class="bar c1"><title>bright_008  chip 1.4 mm, ref 2.6 mm</title></rect><circle cx="276.7" cy="145.7" r="1.8" class="dot c2"/><rect x="280.7" y="161.3" width="7.1" height="16.7" class="bar c1"><title>persp_006  chip 1.4 mm, ref 0.5 mm</title></rect><circle cx="284.6" cy="172.4" r="1.8" class="dot c2"/><rect x="288.6" y="161.1" width="7.1" height="16.9" class="bar c1"><title>bright_000  chip 1.4 mm, ref 0.7 mm</title></rect><circle cx="292.5" cy="169.5" r="1.8" class="dot c2"/><rect x="296.4" y="160.6" width="7.1" height="17.4" class="bar c1"><title>grad_002  chip 1.4 mm, ref 0.3 mm</title></rect><circle cx="300.4" cy="174.1" r="1.8" class="dot c2"/><rect x="304.3" y="160.4" width="7.1" height="17.6" class="bar c1"><title>noise_003  chip 1.4 mm, ref 0.7 mm</title></rect><circle cx="308.3" cy="169.5" r="1.8" class="dot c2"/><rect x="312.2" y="159.9" width="7.1" height="18.1" class="bar c1"><title>blur_005  chip 1.5 mm, ref 0.8 mm</title></rect><circle cx="316.2" cy="168.3" r="1.8" class="dot c2"/><rect x="320.1" y="159.7" width="7.1" height="18.3" class="bar c1"><title>persp_004  chip 1.5 mm, ref 0.5 mm</title></rect><circle cx="324.1" cy="172.3" r="1.8" class="dot c2"/><rect x="328.0" y="159.4" width="7.1" height="18.6" class="bar c1"><title>grad_004  chip 1.5 mm, ref 0.4 mm</title></rect><circle cx="331.9" cy="172.7" r="1.8" class="dot c2"/><rect x="335.9" y="159.1" width="7.1" height="18.9" class="bar c1"><title>blur_000  chip 1.5 mm, ref 0.7 mm</title></rect><circle cx="339.8" cy="169.5" r="1.8" class="dot c2"/><rect x="343.8" y="159.0" width="7.1" height="19.0" class="bar c1"><title>clutter_002  chip 1.5 mm, ref 0.4 mm</title></rect><circle cx="347.7" cy="173.1" r="1.8" class="dot c2"/><rect x="351.7" y="159.0" width="7.1" height="19.0" class="bar c1"><title>clutter_003  chip 1.5 mm, ref 0.4 mm</title></rect><circle cx="355.6" cy="172.8" r="1.8" class="dot c2"/><rect x="359.6" y="159.0" width="7.1" height="19.0" class="bar c1"><title>normal_002  chip 1.5 mm, ref 0.4 mm</title></rect><circle cx="363.5" cy="172.9" r="1.8" class="dot c2"/><rect x="367.4" y="158.8" width="7.1" height="19.2" class="bar c1"><title>dark_007  chip 1.6 mm, ref 0.5 mm</title></rect><circle cx="371.4" cy="172.1" r="1.8" class="dot c2"/><rect x="375.3" y="158.5" width="7.1" height="19.5" class="bar c1"><title>dark_004  chip 1.6 mm, ref 0.4 mm</title></rect><circle cx="379.3" cy="173.1" r="1.8" class="dot c2"/><rect x="383.2" y="157.5" width="7.1" height="20.5" class="bar c1"><title>clutter_007  chip 1.7 mm, ref 0.2 mm</title></rect><circle cx="387.2" cy="175.5" r="1.8" class="dot c2"/><rect x="391.1" y="157.5" width="7.1" height="20.5" class="bar c1"><title>shadow_001  chip 1.7 mm, ref 0.5 mm</title></rect><circle cx="395.1" cy="172.4" r="1.8" class="dot c2"/><rect x="399.0" y="156.9" width="7.1" height="21.1" class="bar c1"><title>grad_006  chip 1.7 mm, ref 0.4 mm</title></rect><circle cx="402.9" cy="172.7" r="1.8" class="dot c2"/><rect x="406.9" y="156.8" width="7.1" height="21.2" class="bar c1"><title>bright_003  chip 1.7 mm, ref 1.9 mm</title></rect><circle cx="410.8" cy="154.6" r="1.8" class="dot c2"/><rect x="414.8" y="155.3" width="7.1" height="22.7" class="bar c1"><title>clutter_009  chip 1.8 mm, ref 0.2 mm</title></rect><circle cx="418.7" cy="175.0" r="1.8" class="dot c2"/><rect x="422.7" y="155.1" width="7.1" height="22.9" class="bar c1"><title>noise_006  chip 1.9 mm, ref 0.9 mm</title></rect><circle cx="426.6" cy="166.9" r="1.8" class="dot c2"/><rect x="430.6" y="154.9" width="7.1" height="23.1" class="bar c1"><title>normal_008  chip 1.9 mm, ref 0.9 mm</title></rect><circle cx="434.5" cy="167.0" r="1.8" class="dot c2"/><rect x="438.4" y="153.9" width="7.1" height="24.0" class="bar c1"><title>blur_004  chip 1.9 mm, ref 1.2 mm</title></rect><circle cx="442.4" cy="163.7" r="1.8" class="dot c2"/><rect x="446.3" y="153.9" width="7.1" height="24.0" class="bar c1"><title>noise_008  chip 1.9 mm, ref 0.5 mm</title></rect><circle cx="450.3" cy="172.2" r="1.8" class="dot c2"/><rect x="454.2" y="153.7" width="7.1" height="24.3" class="bar c1"><title>grad_008  chip 2.0 mm, ref 0.3 mm</title></rect><circle cx="458.2" cy="174.3" r="1.8" class="dot c2"/><rect x="462.1" y="153.5" width="7.1" height="24.5" class="bar c1"><title>blur_003  chip 2.0 mm, ref 0.5 mm</title></rect><circle cx="466.1" cy="172.3" r="1.8" class="dot c2"/><rect x="470.0" y="153.2" width="7.1" height="24.8" class="bar c1"><title>grad_007  chip 2.0 mm, ref 0.7 mm</title></rect><circle cx="473.9" cy="169.1" r="1.8" class="dot c2"/><rect x="477.9" y="153.0" width="7.1" height="25.0" class="bar c1"><title>blur_008  chip 2.0 mm, ref 0.7 mm</title></rect><circle cx="481.8" cy="169.1" r="1.8" class="dot c2"/><rect x="485.8" y="152.5" width="7.1" height="25.5" class="bar c1"><title>normal_007  chip 2.1 mm, ref 0.7 mm</title></rect><circle cx="489.7" cy="169.7" r="1.8" class="dot c2"/><rect x="493.7" y="151.9" width="7.1" height="26.1" class="bar c1"><title>normal_000  chip 2.1 mm, ref 0.5 mm</title></rect><circle cx="497.6" cy="172.4" r="1.8" class="dot c2"/><rect x="501.6" y="151.2" width="7.1" height="26.8" class="bar c1"><title>noise_000  chip 2.2 mm, ref 0.4 mm</title></rect><circle cx="505.5" cy="172.6" r="1.8" class="dot c2"/><rect x="509.4" y="151.0" width="7.1" height="27.0" class="bar c1"><title>clutter_006  chip 2.2 mm, ref 0.8 mm</title></rect><circle cx="513.4" cy="168.4" r="1.8" class="dot c2"/><rect x="517.3" y="150.6" width="7.1" height="27.4" class="bar c1"><title>noise_001  chip 2.2 mm, ref 0.5 mm</title></rect><circle cx="521.3" cy="171.8" r="1.8" class="dot c2"/><rect x="525.2" y="150.2" width="7.1" height="27.8" class="bar c1"><title>dark_003  chip 2.2 mm, ref 0.3 mm</title></rect><circle cx="529.2" cy="173.8" r="1.8" class="dot c2"/><rect x="533.1" y="147.9" width="7.1" height="30.1" class="bar c1"><title>persp_007  chip 2.4 mm, ref 4.6 mm</title></rect><circle cx="537.1" cy="121.4" r="1.8" class="dot c2"/><rect x="541.0" y="147.2" width="7.1" height="30.8" class="bar c1"><title>dark_005  chip 2.5 mm, ref 0.4 mm</title></rect><circle cx="544.9" cy="172.9" r="1.8" class="dot c2"/><rect x="548.9" y="147.0" width="7.1" height="31.0" class="bar c1"><title>persp_002  chip 2.5 mm, ref 0.3 mm</title></rect><circle cx="552.8" cy="174.3" r="1.8" class="dot c2"/><rect x="556.8" y="146.8" width="7.1" height="31.2" class="bar c1"><title>normal_009  chip 2.5 mm, ref 1.1 mm</title></rect><circle cx="560.7" cy="164.3" r="1.8" class="dot c2"/><rect x="564.7" y="146.3" width="7.1" height="31.7" class="bar c1"><title>dark_009  chip 2.6 mm, ref 1.1 mm</title></rect><circle cx="568.6" cy="164.6" r="1.8" class="dot c2"/><rect x="572.6" y="145.4" width="7.1" height="32.6" class="bar c1"><title>normal_003  chip 2.6 mm, ref 0.2 mm</title></rect><circle cx="576.5" cy="175.0" r="1.8" class="dot c2"/><rect x="580.4" y="145.3" width="7.1" height="32.7" class="bar c1"><title>clutter_001  chip 2.6 mm, ref 2.5 mm</title></rect><circle cx="584.4" cy="147.4" r="1.8" class="dot c2"/><rect x="588.3" y="145.2" width="7.1" height="32.8" class="bar c1"><title>dark_002  chip 2.7 mm, ref 0.7 mm</title></rect><circle cx="592.3" cy="169.6" r="1.8" class="dot c2"/><rect x="596.2" y="142.5" width="7.1" height="35.5" class="bar c1"><title>noise_005  chip 2.9 mm, ref 0.8 mm</title></rect><circle cx="600.2" cy="168.1" r="1.8" class="dot c2"/><rect x="604.1" y="142.5" width="7.1" height="35.5" class="bar c1"><title>shadow_004  chip 2.9 mm, ref 4.8 mm</title></rect><circle cx="608.1" cy="118.3" r="1.8" class="dot c2"/><rect x="612.0" y="142.1" width="7.1" height="35.9" class="bar c1"><title>bright_009  chip 2.9 mm, ref 2.5 mm</title></rect><circle cx="615.9" cy="147.2" r="1.8" class="dot c2"/><rect x="619.9" y="141.9" width="7.1" height="36.1" class="bar c1"><title>dark_008  chip 2.9 mm, ref 0.8 mm</title></rect><circle cx="623.8" cy="168.8" r="1.8" class="dot c2"/><rect x="627.8" y="141.6" width="7.1" height="36.4" class="bar c1"><title>clutter_008  chip 3.0 mm, ref 0.7 mm</title></rect><circle cx="631.7" cy="169.5" r="1.8" class="dot c2"/><rect x="635.7" y="139.9" width="7.1" height="38.1" class="bar c1"><title>noise_009  chip 3.1 mm, ref 0.6 mm</title></rect><circle cx="639.6" cy="170.1" r="1.8" class="dot c2"/><rect x="643.6" y="139.9" width="7.1" height="38.1" class="bar c1"><title>shadow_007  chip 3.1 mm, ref 0.8 mm</title></rect><circle cx="647.5" cy="167.9" r="1.8" class="dot c2"/><rect x="651.4" y="119.7" width="7.1" height="58.3" class="bar c1"><title>blur_001  chip 4.7 mm, ref 1.3 mm</title></rect><circle cx="655.4" cy="161.7" r="1.8" class="dot c2"/><rect x="659.3" y="108.1" width="7.1" height="69.9" class="bar c1"><title>bright_002  chip 5.7 mm, ref 2.3 mm</title></rect><circle cx="663.3" cy="149.6" r="1.8" class="dot c2"/><rect x="667.2" y="103.0" width="7.1" height="75.0" class="bar c1"><title>noise_007  chip 6.1 mm, ref 1.8 mm</title></rect><circle cx="671.2" cy="156.3" r="1.8" class="dot c2"/><rect x="675.1" y="93.3" width="7.1" height="84.7" class="bar c1"><title>blur_007  chip 6.9 mm, ref 4.2 mm</title></rect><circle cx="679.1" cy="126.6" r="1.8" class="dot c2"/><rect x="683.0" y="89.4" width="7.1" height="88.6" class="bar c1"><title>normal_001  chip 7.2 mm, ref 6.3 mm</title></rect><circle cx="686.9" cy="100.5" r="1.8" class="dot c2"/><rect x="690.9" y="78.8" width="7.1" height="99.2" class="bar c1"><title>noise_002  chip 8.0 mm, ref 4.8 mm</title></rect><circle cx="694.8" cy="118.3" r="1.8" class="dot c2"/><rect x="698.8" y="76.5" width="7.1" height="101.5" class="bar c1"><title>shadow_009  chip 8.2 mm, ref 4.5 mm</title></rect><circle cx="702.7" cy="122.3" r="1.8" class="dot c2"/><rect x="706.7" y="73.8" width="7.1" height="104.2" class="bar c1"><title>blur_009  chip 8.4 mm</title></rect><rect x="714.6" y="60.5" width="7.1" height="117.5" class="bar c1"><title>shadow_000  chip 9.5 mm, ref 3.0 mm</title></rect><circle cx="718.5" cy="141.6" r="1.8" class="dot c2"/><rect x="722.4" y="30.6" width="7.1" height="147.4" class="bar c1"><title>shadow_008  chip 11.9 mm, ref 5.9 mm</title></rect><circle cx="726.4" cy="105.0" r="1.8" class="dot c2"/><rect x="730.3" y="30.0" width="7.1" height="148.0" class="bar c1"><title>shadow_002  chip 13.6 mm, ref 3.1 mm</title></rect><circle cx="734.3" cy="140.3" r="1.8" class="dot c2"/><text x="730.3" y="36" class="ca" text-anchor="middle">14</text><rect x="738.2" y="30.0" width="7.1" height="148.0" class="bar c1"><title>blur_006  chip 14.9 mm, ref 2.8 mm</title></rect><circle cx="742.2" cy="143.7" r="1.8" class="dot c2"/><text x="738.2" y="36" class="ca" text-anchor="middle">15</text><rect x="746.1" y="30.0" width="7.1" height="148.0" class="bar c1"><title>clutter_004  chip 16.9 mm, ref 2.9 mm</title></rect><circle cx="750.1" cy="142.1" r="1.8" class="dot c2"/><text x="746.1" y="36" class="ca" text-anchor="middle">17</text><rect x="510" y="4" width="11" height="11" class="bar c1"/><text x="526" y="14" class="cl">chip (bar)</text><circle cx="640" cy="9" r="4" class="dot c2"/><text x="648" y="14" class="cl">reference (dot)</text></svg>
+<svg class="chart" viewBox="0 0 760 200" role="img" aria-label="per-image position error"><text x="0" y="14" class="ct">Per-image camera position error, sorted (mm, clipped at 12; labelled if larger)</text><line x1="44" x2="754" y1="178.0" y2="178.0" class="grid"/><text x="40" y="182.0" class="ca" text-anchor="end">0</text><line x1="44" x2="754" y1="141.0" y2="141.0" class="grid"/><text x="40" y="145.0" class="ca" text-anchor="end">3</text><line x1="44" x2="754" y1="104.0" y2="104.0" class="grid"/><text x="40" y="108.0" class="ca" text-anchor="end">6</text><line x1="44" x2="754" y1="67.0" y2="67.0" class="grid"/><text x="40" y="71.0" class="ca" text-anchor="end">9</text><line x1="44" x2="754" y1="30.0" y2="30.0" class="grid"/><text x="40" y="34.0" class="ca" text-anchor="end">12</text><rect x="44.0" y="171.7" width="7.0" height="6.3" class="bar c1"><title>bright_002  chip 0.5 mm, ref 1.8 mm</title></rect><circle cx="47.9" cy="156.0" r="1.8" class="dot c2"/><rect x="51.8" y="171.5" width="7.0" height="6.5" class="bar c1"><title>grad_009  chip 0.5 mm, ref 0.7 mm</title></rect><circle cx="55.7" cy="169.5" r="1.8" class="dot c2"/><rect x="59.6" y="170.4" width="7.0" height="7.6" class="bar c1"><title>bright_001  chip 0.6 mm, ref 0.7 mm</title></rect><circle cx="63.5" cy="169.2" r="1.8" class="dot c2"/><rect x="67.4" y="169.6" width="7.0" height="8.4" class="bar c1"><title>dark_003  chip 0.7 mm, ref 0.5 mm</title></rect><circle cx="71.3" cy="172.0" r="1.8" class="dot c2"/><rect x="75.2" y="169.0" width="7.0" height="9.0" class="bar c1"><title>bright_000  chip 0.7 mm, ref 0.7 mm</title></rect><circle cx="79.1" cy="169.5" r="1.8" class="dot c2"/><rect x="83.0" y="168.0" width="7.0" height="10.0" class="bar c1"><title>grad_005  chip 0.8 mm, ref 0.6 mm</title></rect><circle cx="86.9" cy="170.5" r="1.8" class="dot c2"/><rect x="90.8" y="167.9" width="7.0" height="10.1" class="bar c1"><title>persp_004  chip 0.8 mm, ref 0.4 mm</title></rect><circle cx="94.7" cy="173.2" r="1.8" class="dot c2"/><rect x="98.6" y="167.0" width="7.0" height="11.0" class="bar c1"><title>normal_005  chip 0.9 mm, ref 0.6 mm</title></rect><circle cx="102.5" cy="171.0" r="1.8" class="dot c2"/><rect x="106.4" y="166.8" width="7.0" height="11.2" class="bar c1"><title>bright_007  chip 0.9 mm, ref 1.2 mm</title></rect><circle cx="110.3" cy="162.8" r="1.8" class="dot c2"/><rect x="114.2" y="166.4" width="7.0" height="11.6" class="bar c1"><title>dark_001  chip 0.9 mm, ref 0.2 mm</title></rect><circle cx="118.1" cy="175.5" r="1.8" class="dot c2"/><rect x="122.0" y="165.9" width="7.0" height="12.1" class="bar c1"><title>normal_006  chip 1.0 mm, ref 0.5 mm</title></rect><circle cx="125.9" cy="171.8" r="1.8" class="dot c2"/><rect x="129.8" y="165.7" width="7.0" height="12.3" class="bar c1"><title>blur_003  chip 1.0 mm, ref 0.7 mm</title></rect><circle cx="133.7" cy="169.2" r="1.8" class="dot c2"/><rect x="137.6" y="165.1" width="7.0" height="13.0" class="bar c1"><title>grad_001  chip 1.1 mm, ref 0.5 mm</title></rect><circle cx="141.5" cy="172.0" r="1.8" class="dot c2"/><rect x="145.4" y="164.8" width="7.0" height="13.2" class="bar c1"><title>persp_005  chip 1.1 mm, ref 0.6 mm</title></rect><circle cx="149.3" cy="171.1" r="1.8" class="dot c2"/><rect x="153.2" y="163.9" width="7.0" height="14.1" class="bar c1"><title>dark_005  chip 1.1 mm, ref 0.8 mm</title></rect><circle cx="157.1" cy="168.8" r="1.8" class="dot c2"/><rect x="161.0" y="163.2" width="7.0" height="14.8" class="bar c1"><title>blur_002  chip 1.2 mm, ref 0.4 mm</title></rect><circle cx="164.9" cy="172.7" r="1.8" class="dot c2"/><rect x="168.8" y="163.2" width="7.0" height="14.8" class="bar c1"><title>clutter_007  chip 1.2 mm, ref 0.1 mm</title></rect><circle cx="172.7" cy="176.5" r="1.8" class="dot c2"/><rect x="176.6" y="163.2" width="7.0" height="14.8" class="bar c1"><title>dark_006  chip 1.2 mm, ref 0.5 mm</title></rect><circle cx="180.5" cy="171.7" r="1.8" class="dot c2"/><rect x="184.4" y="163.2" width="7.0" height="14.8" class="bar c1"><title>normal_007  chip 1.2 mm, ref 0.8 mm</title></rect><circle cx="188.3" cy="168.4" r="1.8" class="dot c2"/><rect x="192.2" y="163.0" width="7.0" height="15.0" class="bar c1"><title>grad_008  chip 1.2 mm, ref 0.2 mm</title></rect><circle cx="196.1" cy="175.8" r="1.8" class="dot c2"/><rect x="200.0" y="162.6" width="7.0" height="15.4" class="bar c1"><title>clutter_005  chip 1.2 mm, ref 0.5 mm</title></rect><circle cx="203.9" cy="171.5" r="1.8" class="dot c2"/><rect x="207.8" y="162.6" width="7.0" height="15.4" class="bar c1"><title>clutter_009  chip 1.2 mm, ref 0.5 mm</title></rect><circle cx="211.7" cy="172.4" r="1.8" class="dot c2"/><rect x="215.6" y="162.6" width="7.0" height="15.4" class="bar c1"><title>persp_006  chip 1.2 mm, ref 1.4 mm</title></rect><circle cx="219.5" cy="160.4" r="1.8" class="dot c2"/><rect x="223.5" y="162.5" width="7.0" height="15.5" class="bar c1"><title>persp_008  chip 1.3 mm, ref 0.8 mm</title></rect><circle cx="227.4" cy="168.4" r="1.8" class="dot c2"/><rect x="231.3" y="161.8" width="7.0" height="16.2" class="bar c1"><title>dark_000  chip 1.3 mm, ref 0.4 mm</title></rect><circle cx="235.2" cy="173.1" r="1.8" class="dot c2"/><rect x="239.1" y="161.5" width="7.0" height="16.5" class="bar c1"><title>clutter_006  chip 1.3 mm, ref 0.7 mm</title></rect><circle cx="243.0" cy="169.5" r="1.8" class="dot c2"/><rect x="246.9" y="161.1" width="7.0" height="16.9" class="bar c1"><title>clutter_003  chip 1.4 mm, ref 0.4 mm</title></rect><circle cx="250.8" cy="173.6" r="1.8" class="dot c2"/><rect x="254.7" y="161.1" width="7.0" height="16.9" class="bar c1"><title>dark_004  chip 1.4 mm, ref 0.4 mm</title></rect><circle cx="258.6" cy="172.7" r="1.8" class="dot c2"/><rect x="262.5" y="161.1" width="7.0" height="16.9" class="bar c1"><title>noise_006  chip 1.4 mm, ref 1.3 mm</title></rect><circle cx="266.4" cy="162.1" r="1.8" class="dot c2"/><rect x="270.3" y="161.1" width="7.0" height="16.9" class="bar c1"><title>persp_001  chip 1.4 mm, ref 0.7 mm</title></rect><circle cx="274.2" cy="169.1" r="1.8" class="dot c2"/><rect x="278.1" y="161.0" width="7.0" height="17.0" class="bar c1"><title>bright_006  chip 1.4 mm, ref 1.1 mm</title></rect><circle cx="282.0" cy="163.8" r="1.8" class="dot c2"/><rect x="285.9" y="160.2" width="7.0" height="17.8" class="bar c1"><title>blur_004  chip 1.4 mm, ref 1.1 mm</title></rect><circle cx="289.8" cy="164.7" r="1.8" class="dot c2"/><rect x="293.7" y="160.0" width="7.0" height="18.0" class="bar c1"><title>blur_008  chip 1.5 mm, ref 0.7 mm</title></rect><circle cx="297.6" cy="169.7" r="1.8" class="dot c2"/><rect x="301.5" y="159.7" width="7.0" height="18.3" class="bar c1"><title>grad_000  chip 1.5 mm, ref 0.6 mm</title></rect><circle cx="305.4" cy="170.1" r="1.8" class="dot c2"/><rect x="309.3" y="159.7" width="7.0" height="18.3" class="bar c1"><title>noise_004  chip 1.5 mm, ref 1.0 mm</title></rect><circle cx="313.2" cy="165.9" r="1.8" class="dot c2"/><rect x="317.1" y="159.6" width="7.0" height="18.4" class="bar c1"><title>grad_003  chip 1.5 mm, ref 0.6 mm</title></rect><circle cx="321.0" cy="170.4" r="1.8" class="dot c2"/><rect x="324.9" y="159.6" width="7.0" height="18.4" class="bar c1"><title>persp_000  chip 1.5 mm, ref 0.7 mm</title></rect><circle cx="328.8" cy="169.1" r="1.8" class="dot c2"/><rect x="332.7" y="159.4" width="7.0" height="18.6" class="bar c1"><title>noise_003  chip 1.5 mm, ref 1.2 mm</title></rect><circle cx="336.6" cy="163.4" r="1.8" class="dot c2"/><rect x="340.5" y="159.0" width="7.0" height="19.0" class="bar c1"><title>clutter_004  chip 1.5 mm, ref 5.2 mm</title></rect><circle cx="344.4" cy="113.7" r="1.8" class="dot c2"/><rect x="348.3" y="158.8" width="7.0" height="19.2" class="bar c1"><title>noise_000  chip 1.6 mm, ref 0.6 mm</title></rect><circle cx="352.2" cy="170.8" r="1.8" class="dot c2"/><rect x="356.1" y="158.4" width="7.0" height="19.6" class="bar c1"><title>bright_005  chip 1.6 mm, ref 0.8 mm</title></rect><circle cx="360.0" cy="168.8" r="1.8" class="dot c2"/><rect x="363.9" y="158.3" width="7.0" height="19.7" class="bar c1"><title>shadow_006  chip 1.6 mm, ref 0.6 mm</title></rect><circle cx="367.8" cy="170.6" r="1.8" class="dot c2"/><rect x="371.7" y="157.9" width="7.0" height="20.1" class="bar c1"><title>clutter_008  chip 1.6 mm, ref 0.5 mm</title></rect><circle cx="375.6" cy="172.4" r="1.8" class="dot c2"/><rect x="379.5" y="157.7" width="7.0" height="20.3" class="bar c1"><title>dark_008  chip 1.6 mm, ref 0.5 mm</title></rect><circle cx="383.4" cy="172.2" r="1.8" class="dot c2"/><rect x="387.3" y="157.7" width="7.0" height="20.3" class="bar c1"><title>grad_002  chip 1.6 mm, ref 0.4 mm</title></rect><circle cx="391.2" cy="173.6" r="1.8" class="dot c2"/><rect x="395.1" y="156.3" width="7.0" height="21.7" class="bar c1"><title>persp_009  chip 1.8 mm, ref 1.6 mm</title></rect><circle cx="399.0" cy="158.3" r="1.8" class="dot c2"/><rect x="402.9" y="156.2" width="7.0" height="21.8" class="bar c1"><title>normal_000  chip 1.8 mm, ref 0.3 mm</title></rect><circle cx="406.8" cy="173.8" r="1.8" class="dot c2"/><rect x="410.7" y="156.0" width="7.0" height="22.0" class="bar c1"><title>bright_004  chip 1.8 mm, ref 1.7 mm</title></rect><circle cx="414.6" cy="157.0" r="1.8" class="dot c2"/><rect x="418.5" y="156.0" width="7.0" height="22.0" class="bar c1"><title>persp_007  chip 1.8 mm, ref 3.7 mm</title></rect><circle cx="422.4" cy="132.1" r="1.8" class="dot c2"/><rect x="426.3" y="155.9" width="7.0" height="22.1" class="bar c1"><title>dark_002  chip 1.8 mm, ref 0.3 mm</title></rect><circle cx="430.2" cy="173.7" r="1.8" class="dot c2"/><rect x="434.1" y="155.8" width="7.0" height="22.2" class="bar c1"><title>grad_004  chip 1.8 mm, ref 0.5 mm</title></rect><circle cx="438.0" cy="172.2" r="1.8" class="dot c2"/><rect x="441.9" y="154.6" width="7.0" height="23.4" class="bar c1"><title>blur_000  chip 1.9 mm, ref 0.6 mm</title></rect><circle cx="445.8" cy="170.8" r="1.8" class="dot c2"/><rect x="449.7" y="154.4" width="7.0" height="23.6" class="bar c1"><title>normal_004  chip 1.9 mm, ref 0.5 mm</title></rect><circle cx="453.6" cy="171.3" r="1.8" class="dot c2"/><rect x="457.5" y="153.9" width="7.0" height="24.0" class="bar c1"><title>bright_003  chip 1.9 mm, ref 1.2 mm</title></rect><circle cx="461.4" cy="163.1" r="1.8" class="dot c2"/><rect x="465.3" y="153.8" width="7.0" height="24.2" class="bar c1"><title>normal_008  chip 2.0 mm, ref 0.8 mm</title></rect><circle cx="469.2" cy="168.6" r="1.8" class="dot c2"/><rect x="473.1" y="153.5" width="7.0" height="24.5" class="bar c1"><title>noise_001  chip 2.0 mm, ref 0.3 mm</title></rect><circle cx="477.0" cy="174.3" r="1.8" class="dot c2"/><rect x="480.9" y="153.1" width="7.0" height="24.9" class="bar c1"><title>shadow_003  chip 2.0 mm, ref 0.2 mm</title></rect><circle cx="484.8" cy="175.3" r="1.8" class="dot c2"/><rect x="488.7" y="151.6" width="7.0" height="26.4" class="bar c1"><title>grad_007  chip 2.1 mm, ref 0.3 mm</title></rect><circle cx="492.6" cy="174.1" r="1.8" class="dot c2"/><rect x="496.5" y="150.7" width="7.0" height="27.3" class="bar c1"><title>persp_002  chip 2.2 mm, ref 0.7 mm</title></rect><circle cx="500.4" cy="169.9" r="1.8" class="dot c2"/><rect x="504.3" y="150.4" width="7.0" height="27.6" class="bar c1"><title>noise_008  chip 2.2 mm, ref 1.1 mm</title></rect><circle cx="508.2" cy="164.2" r="1.8" class="dot c2"/><rect x="512.1" y="150.2" width="7.0" height="27.8" class="bar c1"><title>dark_009  chip 2.2 mm, ref 0.4 mm</title></rect><circle cx="516.0" cy="172.8" r="1.8" class="dot c2"/><rect x="519.9" y="150.1" width="7.0" height="27.9" class="bar c1"><title>shadow_005  chip 2.3 mm, ref 0.3 mm</title></rect><circle cx="523.8" cy="174.1" r="1.8" class="dot c2"/><rect x="527.7" y="148.2" width="7.0" height="29.8" class="bar c1"><title>noise_009  chip 2.4 mm, ref 0.5 mm</title></rect><circle cx="531.6" cy="171.6" r="1.8" class="dot c2"/><rect x="535.5" y="146.8" width="7.0" height="31.2" class="bar c1"><title>normal_003  chip 2.5 mm, ref 6.1 mm</title></rect><circle cx="539.4" cy="102.8" r="1.8" class="dot c2"/><rect x="543.3" y="144.8" width="7.0" height="33.2" class="bar c1"><title>shadow_007  chip 2.7 mm, ref 0.6 mm</title></rect><circle cx="547.2" cy="170.1" r="1.8" class="dot c2"/><rect x="551.1" y="144.5" width="7.0" height="33.5" class="bar c1"><title>shadow_001  chip 2.7 mm, ref 0.7 mm</title></rect><circle cx="555.0" cy="169.5" r="1.8" class="dot c2"/><rect x="558.9" y="141.0" width="7.0" height="37.0" class="bar c1"><title>normal_009  chip 3.0 mm, ref 2.0 mm</title></rect><circle cx="562.8" cy="153.3" r="1.8" class="dot c2"/><rect x="566.7" y="137.9" width="7.0" height="40.1" class="bar c1"><title>clutter_000  chip 3.2 mm, ref 0.6 mm</title></rect><circle cx="570.6" cy="171.0" r="1.8" class="dot c2"/><rect x="574.5" y="136.4" width="7.0" height="41.6" class="bar c1"><title>normal_002  chip 3.4 mm, ref 5.0 mm</title></rect><circle cx="578.5" cy="116.2" r="1.8" class="dot c2"/><rect x="582.4" y="136.2" width="7.0" height="41.8" class="bar c1"><title>grad_006  chip 3.4 mm, ref 0.7 mm</title></rect><circle cx="586.3" cy="169.6" r="1.8" class="dot c2"/><rect x="590.2" y="130.0" width="7.0" height="48.0" class="bar c1"><title>persp_003  chip 3.9 mm, ref 0.7 mm</title></rect><circle cx="594.1" cy="169.2" r="1.8" class="dot c2"/><rect x="598.0" y="125.8" width="7.0" height="52.2" class="bar c1"><title>dark_007  chip 4.2 mm, ref 2.6 mm</title></rect><circle cx="601.9" cy="146.1" r="1.8" class="dot c2"/><rect x="605.8" y="124.0" width="7.0" height="54.0" class="bar c1"><title>blur_001  chip 4.4 mm, ref 0.9 mm</title></rect><circle cx="609.7" cy="167.3" r="1.8" class="dot c2"/><rect x="613.6" y="122.9" width="7.0" height="55.1" class="bar c1"><title>bright_009  chip 4.5 mm, ref 2.6 mm</title></rect><circle cx="617.5" cy="145.3" r="1.8" class="dot c2"/><rect x="621.4" y="113.1" width="7.0" height="64.9" class="bar c1"><title>noise_002  chip 5.3 mm, ref 4.0 mm</title></rect><circle cx="625.3" cy="128.7" r="1.8" class="dot c2"/><rect x="629.2" y="111.5" width="7.0" height="66.5" class="bar c1"><title>blur_006  chip 5.4 mm, ref 1.9 mm</title></rect><circle cx="633.1" cy="155.1" r="1.8" class="dot c2"/><rect x="637.0" y="110.8" width="7.0" height="67.2" class="bar c1"><title>bright_008  chip 5.5 mm, ref 3.0 mm</title></rect><circle cx="640.9" cy="141.5" r="1.8" class="dot c2"/><rect x="644.8" y="105.7" width="7.0" height="72.3" class="bar c1"><title>clutter_002  chip 5.9 mm, ref 0.4 mm</title></rect><circle cx="648.7" cy="172.6" r="1.8" class="dot c2"/><rect x="652.6" y="101.5" width="7.0" height="76.5" class="bar c1"><title>noise_007  chip 6.2 mm, ref 2.5 mm</title></rect><circle cx="656.5" cy="147.0" r="1.8" class="dot c2"/><rect x="660.4" y="98.8" width="7.0" height="79.2" class="bar c1"><title>shadow_004  chip 6.4 mm, ref 10.5 mm</title></rect><circle cx="664.3" cy="49.0" r="1.8" class="dot c2"/><rect x="668.2" y="94.5" width="7.0" height="83.5" class="bar c1"><title>blur_009  chip 6.8 mm, ref 3.3 mm</title></rect><circle cx="672.1" cy="137.5" r="1.8" class="dot c2"/><rect x="676.0" y="91.9" width="7.0" height="86.1" class="bar c1"><title>normal_001  chip 7.0 mm, ref 4.8 mm</title></rect><circle cx="679.9" cy="119.2" r="1.8" class="dot c2"/><rect x="683.8" y="72.9" width="7.0" height="105.1" class="bar c1"><title>blur_005  chip 8.5 mm, ref 7.9 mm</title></rect><circle cx="687.7" cy="80.7" r="1.8" class="dot c2"/><rect x="691.6" y="67.5" width="7.0" height="110.5" class="bar c1"><title>shadow_009  chip 9.0 mm, ref 6.5 mm</title></rect><circle cx="695.5" cy="98.2" r="1.8" class="dot c2"/><rect x="699.4" y="34.3" width="7.0" height="143.7" class="bar c1"><title>clutter_001  chip 11.7 mm, ref 8.7 mm</title></rect><circle cx="703.3" cy="70.9" r="1.8" class="dot c2"/><rect x="707.2" y="30.9" width="7.0" height="147.1" class="bar c1"><title>blur_007  chip 11.9 mm, ref 2.2 mm</title></rect><circle cx="711.1" cy="150.5" r="1.8" class="dot c2"/><rect x="715.0" y="30.0" width="7.0" height="148.0" class="bar c1"><title>shadow_008  chip 13.6 mm, ref 6.4 mm</title></rect><circle cx="718.9" cy="98.7" r="1.8" class="dot c2"/><text x="715.0" y="36" class="ca" text-anchor="middle">14</text><rect x="722.8" y="30.0" width="7.0" height="148.0" class="bar c1"><title>noise_005  chip 13.9 mm, ref 3.4 mm</title></rect><circle cx="726.7" cy="135.7" r="1.8" class="dot c2"/><text x="722.8" y="36" class="ca" text-anchor="middle">14</text><rect x="730.6" y="30.0" width="7.0" height="148.0" class="bar c1"><title>shadow_000  chip 19.2 mm, ref 11.3 mm</title></rect><circle cx="734.5" cy="38.5" r="1.8" class="dot c2"/><text x="730.6" y="36" class="ca" text-anchor="middle">19</text><rect x="738.4" y="30.0" width="7.0" height="148.0" class="bar c1"><title>shadow_002  chip 44.9 mm, ref 19.8 mm</title></rect><circle cx="742.3" cy="30.0" r="1.8" class="dot c2"/><text x="738.4" y="36" class="ca" text-anchor="middle">45</text><rect x="746.2" y="30.0" width="7.0" height="148.0" class="bar c1"><title>lowcon_000  chip 54.5 mm, ref 0.6 mm</title></rect><circle cx="750.1" cy="170.7" r="1.8" class="dot c2"/><text x="746.2" y="36" class="ca" text-anchor="middle">55</text><rect x="510" y="4" width="11" height="11" class="bar c1"/><text x="526" y="14" class="cl">chip (bar)</text><circle cx="640" cy="9" r="4" class="dot c2"/><text x="648" y="14" class="cl">reference (dot)</text></svg>
 <h2>FPGA resources and timing (yosys + nextpnr-ecp5)</h2>
 <p><b>Shipping part LFE5U-25F-8BG381I:</b> 13,389 LUT4 (55 %), 56 of 56 block RAM (100 %), core 92.27 - 94.91 MHz, D-PHY 206.06 - 226.71 MHz, 7 of 7 seeds close (nextpnr estimates, pinned OSS CAD Suite 2025-09-01; <code>results/fpga_speed_grades.md</code>). <b>The table and the seed chart below were measured on the LFE5U-45F</b> with older RTL (12,227 LUT4) and older tools.</p>
 <svg class="chart" viewBox="0 0 720 190" role="img" aria-label="Resource utilisation (%)"><text x="0" y="14" class="ct">Resource utilisation (%)</text><text x="242" y="42" class="cl" text-anchor="end">LUT4 (total, incl. carry/RAM)</text><rect x="250" y="28" width="108.0" height="18" rx="3" class="bar c1"/><text x="364.0" y="42" class="cv">27%</text><text x="242" y="68" class="cl" text-anchor="end">flip-flops</text><rect x="250" y="54" width="48.0" height="18" rx="3" class="bar c1"/><text x="304.0" y="68" class="cv">12%</text><text x="242" y="94" class="cl" text-anchor="end">block RAM (DP16KD)</text><rect x="250" y="80" width="208.0" height="18" rx="3" class="bar c1"/><text x="464.0" y="94" class="cv">52%</text><text x="242" y="120" class="cl" text-anchor="end">MULT18X18D</text><rect x="250" y="106" width="16.0" height="18" rx="3" class="bar c1"/><text x="272.0" y="120" class="cv">4%</text><text x="242" y="146" class="cl" text-anchor="end">PLL</text><rect x="250" y="132" width="100.0" height="18" rx="3" class="bar c1"/><text x="356.0" y="146" class="cv">25%</text><text x="242" y="172" class="cl" text-anchor="end">IO</text><rect x="250" y="158" width="44.0" height="18" rx="3" class="bar c1"/><text x="300.0" y="172" class="cv">11%</text></svg>
@@ -3242,15 +3214,15 @@ Pick a scenario, then zoom with the mouse wheel, pan by dragging, click to place
 <h2>Camera calibration (config/camera_calibration.json)</h2><pre>{
  &quot;width&quot;: 1280,
  &quot;height&quot;: 800,
- &quot;fx&quot;: 640.0000000000001,
- &quot;fy&quot;: 640.0000000000001,
+ &quot;fx&quot;: 733.3333333333334,
+ &quot;fy&quot;: 733.3333333333334,
  &quot;cx&quot;: 639.5,
  &quot;cy&quot;: 399.5,
  &quot;dist&quot;: [
-  -0.18,
-  0.045,
-  0.0004,
-  -0.0003,
+  -0.126,
+  0.0,
+  0.0,
+  0.0,
   0.0
  ]
 }</pre></section>
