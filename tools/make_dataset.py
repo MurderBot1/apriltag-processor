@@ -91,6 +91,9 @@ def make_cases(seed=7):
     return cases
 
 
+SRC_F = 640.0   # focal length (px) of the ideal pinhole canvas rendered by tools/blender_render.py (1920x1200); independent of the lens FX
+
+
 def distortion_maps():
     K = K_matrix()
     u, v = np.meshgrid(np.arange(W, dtype=np.float64), np.arange(H, dtype=np.float64))
@@ -98,8 +101,8 @@ def distortion_maps():
     und = cv2.undistortPoints(pts, K, DIST_TRUE, None, None, None,
                                   (cv2.TERM_CRITERIA_COUNT | cv2.TERM_CRITERIA_EPS, 30, 1e-10)).reshape(-1, 2)
     src_cx, src_cy = 1920 / 2 - 0.5, 1200 / 2 - 0.5
-    mx = (und[:, 0] * FX + src_cx).reshape(H, W).astype(np.float32)
-    my = (und[:, 1] * FY + src_cy).reshape(H, W).astype(np.float32)
+    mx = (und[:, 0] * SRC_F + src_cx).reshape(H, W).astype(np.float32)
+    my = (und[:, 1] * SRC_F + src_cy).reshape(H, W).astype(np.float32)
     return mx, my
 
 

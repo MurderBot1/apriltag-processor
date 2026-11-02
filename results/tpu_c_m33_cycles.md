@@ -2,25 +2,27 @@
 
 `py -3.12 tools/m33_cycles.py --opt=-O3 --packets sim/chain_packets` (packets written by tests/run_chain_dataset.py). Unicorn executes the real Thumb-2 image of firmware/core/attpu.c (checked equal to the PC build on all 100 frames) and a table-driven Cortex-M33 cycle model costs it (see the script header). 150 MHz, one core, -O3 (the firmware setting). ESTIMATE, not measured on silicon.
 
+attpu_init: 626360 instr, optimistic 4.484 ms, nominal 5.632 ms, pessimistic 6.420 ms
+
 Cortex-M33 @ 150 MHz, one core, -O3; frame period 8.33 ms; budget (doc experiment 1): median <= 6 ms, worst <= 12 ms
 | category | frames | tags | cand (median) | instr (median) | optimistic med/max ms | nominal med/max ms | pessimistic med/max ms |
 |---|---|---|---|---|---|---|---|
-| blur | 10 | 54 | 7 | 117214 | 0.92 / 1.37 | 1.16 / 1.74 | 1.38 / 2.07 |
-| bright | 10 | 80 | 8 | 161106 | 1.26 / 1.58 | 1.59 / 2.00 | 1.89 / 2.37 |
-| clutter | 10 | 57 | 29 | 419247 | 3.24 / 4.61 | 4.08 / 5.81 | 4.83 / 6.90 |
-| dark | 10 | 70 | 8 | 174707 | 1.36 / 6.56 | 1.72 / 8.26 | 2.04 / 9.79 |
-| grad | 10 | 75 | 8 | 162184 | 1.26 / 3.28 | 1.60 / 4.13 | 1.90 / 4.90 |
-| lowcon | 10 | 0 | 0 | 32 | 0.00 / 1.02 | 0.00 / 1.28 | 0.00 / 1.52 |
-| noise | 10 | 57 | 30 | 378790 | 2.94 / 7.39 | 3.71 / 9.29 | 4.40 / 11.02 |
-| normal | 10 | 62 | 7 | 141899 | 1.11 / 1.87 | 1.40 / 2.36 | 1.66 / 2.80 |
-| persp | 10 | 65 | 9 | 158345 | 1.23 / 1.42 | 1.56 / 1.79 | 1.85 / 2.13 |
-| shadow | 10 | 43 | 7 | 126254 | 0.98 / 4.91 | 1.23 / 6.17 | 1.46 / 7.33 |
-| all | 100 | 563 | 8 | 160747 | 1.25 / 7.39 | 1.59 / 9.29 | 1.89 / 11.02 |
-optimistic   median 1.25 ms  p95 4.99  max 7.39  frames > 8.33 ms: 0  > 12 ms: 0
-nominal      median 1.59 ms  p95 6.26  max 9.29  frames > 8.33 ms: 3  > 12 ms: 0
-pessimistic  median 1.89 ms  p95 7.43  max 11.02  frames > 8.33 ms: 5  > 12 ms: 0
+| blur | 10 | 49 | 6 | 113390 | 0.88 / 1.55 | 1.12 / 1.96 | 1.33 / 2.33 |
+| bright | 10 | 77 | 8 | 160773 | 1.25 / 1.42 | 1.59 / 1.80 | 1.89 / 2.14 |
+| clutter | 10 | 49 | 30 | 364691 | 2.82 / 5.41 | 3.54 / 6.76 | 4.20 / 7.99 |
+| dark | 10 | 60 | 8 | 159854 | 1.25 / 6.88 | 1.58 / 8.64 | 1.88 / 10.26 |
+| grad | 10 | 66 | 8 | 153216 | 1.19 / 3.17 | 1.51 / 4.00 | 1.79 / 4.74 |
+| lowcon | 10 | 1 | 0 | 32 | 0.00 / 0.71 | 0.00 / 0.89 | 0.00 / 1.05 |
+| noise | 10 | 50 | 23 | 314779 | 2.44 / 7.78 | 3.08 / 9.77 | 3.65 / 11.58 |
+| normal | 10 | 52 | 5 | 102048 | 0.80 / 1.57 | 1.00 / 1.98 | 1.19 / 2.36 |
+| persp | 10 | 63 | 8 | 151585 | 1.18 / 1.41 | 1.49 / 1.78 | 1.77 / 2.12 |
+| shadow | 10 | 38 | 7 | 102970 | 0.80 / 4.24 | 1.00 / 5.32 | 1.19 / 6.32 |
+| all | 100 | 505 | 8 | 157790 | 1.22 / 7.78 | 1.54 / 9.77 | 1.82 / 11.58 |
+optimistic   median 1.22 ms  p95 5.44  max 7.78  frames > 8.33 ms: 0  > 12 ms: 0
+nominal      median 1.54 ms  p95 6.79  max 9.77  frames > 8.33 ms: 3  > 12 ms: 0
+pessimistic  median 1.82 ms  p95 8.03  max 11.58  frames > 8.33 ms: 5  > 12 ms: 0
 
 Pose solver: `py -3.12 tools/m33_pose_cycles.py` (float = single-precision FPU build, double = software doubles, the real firmware with the RP2350 DCP lies between):
 
-pose solve, float (FPU): frames with tags 90; nominal median 1.801 ms  p95 2.982  max 3.607  (optimistic max 2.611, pessimistic max 4.382)
-pose solve, double (software): frames with tags 90; nominal median 3.049 ms  p95 4.956  max 8.827  (optimistic max 7.487, pessimistic max 10.067)
+pose solve, float (FPU): frames with tags 91; nominal median 1.504 ms  p95 2.849  max 3.255  (optimistic max 2.358, pessimistic max 3.953)
+pose solve, double (software): frames with tags 91; nominal median 2.699 ms  p95 4.515  max 7.809  (optimistic max 6.619, pessimistic max 8.907)

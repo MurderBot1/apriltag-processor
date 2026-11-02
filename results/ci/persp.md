@@ -4,13 +4,13 @@ tag plane tilted 15-74 deg (yaw / pitch). Reference detector (pupil-apriltags ta
 
 | image | detectable tags | found | false ids | corner err px | pose err mm | result |
 |---|---|---|---|---|---|---|
-| persp_000 | 9 | 9 | 0 | 0.26 | 0.9 | pass |
-| persp_001 | 8 | 8 | 0 | 0.24 | 0.6 | pass |
-| persp_002 | 6 | 6 | 0 | 0.22 | 0.3 | pass |
-| persp_003 | 7 | 7 | 0 | 0.26 | 0.5 | pass |
-| persp_004 | 8 | 8 | 0 | 0.26 | 0.5 | pass |
-| persp_005 | 8 | 8 | 0 | 0.26 | 0.6 | pass |
-| persp_006 | 8 | 6 | 0 | 0.24 | 0.4 | FAIL (missed [58, 202]) |
-| persp_007 | 3 | 3 | 0 | 0.33 | 4.6 | pass |
-| persp_008 | 8 | 6 | 0 | 0.28 | 0.8 | FAIL (missed [17, 101]) |
-| persp_009 | 7 | 5 | 0 | 0.36 | 1.7 | FAIL (missed [77, 101]) |
+| persp_000 | 8 | 8 | 1 | 0.31 | 0.7 | FAIL |
+| persp_001 | 8 | 8 | 0 | 0.28 | 0.7 | pass |
+| persp_002 | 6 | 6 | 0 | 0.26 | 0.7 | pass |
+| persp_003 | 5 | 5 | 0 | 0.49 | 0.7 | pass |
+| persp_004 | 6 | 6 | 0 | 0.31 | 0.4 | pass |
+| persp_005 | 8 | 8 | 0 | 0.30 | 0.6 | pass |
+| persp_006 | 7 | 7 | 0 | 0.32 | 1.4 | pass |
+| persp_007 | 3 | 3 | 0 | 0.38 | 3.7 | pass |
+| persp_008 | 8 | 6 | 0 | 0.32 | 0.8 | FAIL (missed [17, 101]) |
+| persp_009 | 7 | 5 | 0 | 0.33 | 1.6 | FAIL (missed [77, 101]) |

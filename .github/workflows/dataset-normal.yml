@@ -9,3 +9,4 @@ jobs:
     uses: ./.github/workflows/dataset-category.yml
     with:
       category: normal
+      min_ok: 10

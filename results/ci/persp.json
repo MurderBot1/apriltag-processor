@@ -5,12 +5,12 @@
  "images": [
   {
    "image": "persp_000",
-   "ok": true,
-   "detectable": 9,
-   "detected": 9,
-   "false_ids": 0,
-   "corner_mean_px": 0.25838144307771166,
-   "t_err_mm": 0.9377747907444113,
+   "ok": false,
+   "detectable": 8,
+   "detected": 8,
+   "false_ids": 1,
+   "corner_mean_px": 0.30720777547353706,
+   "t_err_mm": 0.721469934216217,
    "missed": []
   },
   {
@@ -19,8 +19,8 @@
    "detectable": 8,
    "detected": 8,
    "false_ids": 0,
-   "corner_mean_px": 0.23802675404237972,
-   "t_err_mm": 0.5943325001856288,
+   "corner_mean_px": 0.28454303131545267,
+   "t_err_mm": 0.7235927103588699,
    "missed": []
   },
   {
@@ -29,28 +29,28 @@
    "detectable": 6,
    "detected": 6,
    "false_ids": 0,
-   "corner_mean_px": 0.22101515514499512,
-   "t_err_mm": 0.3012808811038245,
+   "corner_mean_px": 0.2622127082406545,
+   "t_err_mm": 0.6579658523138846,
    "missed": []
   },
   {
    "image": "persp_003",
    "ok": true,
-   "detectable": 7,
-   "detected": 7,
+   "detectable": 5,
+   "detected": 5,
    "false_ids": 0,
-   "corner_mean_px": 0.25601084987495,
-   "t_err_mm": 0.4672405662404092,
+   "corner_mean_px": 0.4852417552487399,
+   "t_err_mm": 0.7059546336887229,
    "missed": []
   },
   {
    "image": "persp_004",
    "ok": true,
-   "detectable": 8,
-   "detected": 8,
+   "detectable": 6,
+   "detected": 6,
    "false_ids": 0,
-   "corner_mean_px": 0.2588646664023103,
-   "t_err_mm": 0.45772015617557577,
+   "corner_mean_px": 0.3082756647357678,
+   "t_err_mm": 0.38566434247173975,
    "missed": []
   },
   {
@@ -59,22 +59,19 @@
    "detectable": 8,
    "detected": 8,
    "false_ids": 0,
-   "corner_mean_px": 0.2606760959251234,
-   "t_err_mm": 0.5745724691844915,
+   "corner_mean_px": 0.2960523923532711,
+   "t_err_mm": 0.5563753947489709,
    "missed": []
   },
   {
    "image": "persp_006",
-   "ok": false,
-   "detectable": 8,
-   "detected": 6,
+   "ok": true,
+   "detectable": 7,
+   "detected": 7,
    "false_ids": 0,
-   "corner_mean_px": 0.2448215742534089,
-   "t_err_mm": 0.4491556694295078,
-   "missed": [
-    58,
-    202
-   ]
+   "corner_mean_px": 0.3180806579037662,
+   "t_err_mm": 1.4348087494667514,
+   "missed": []
   },
   {
    "image": "persp_007",
@@ -82,8 +79,8 @@
    "detectable": 3,
    "detected": 3,
    "false_ids": 0,
-   "corner_mean_px": 0.33387140960708145,
-   "t_err_mm": 4.593527798050356,
+   "corner_mean_px": 0.38092390941106746,
+   "t_err_mm": 3.7222014468059577,
    "missed": []
   },
   {
@@ -92,8 +89,8 @@
    "detectable": 8,
    "detected": 6,
    "false_ids": 0,
-   "corner_mean_px": 0.27743956318424906,
-   "t_err_mm": 0.805633923543192,
+   "corner_mean_px": 0.3218987566281333,
+   "t_err_mm": 0.7811752690539254,
    "missed": [
     17,
     101
@@ -105,8 +102,8 @@
    "detectable": 7,
    "detected": 5,
    "false_ids": 0,
-   "corner_mean_px": 0.3563412533833717,
-   "t_err_mm": 1.6614371530577627,
+   "corner_mean_px": 0.32577593617181455,
+   "t_err_mm": 1.5978930185789335,
    "missed": [
     77,
     101
