@@ -58,6 +58,32 @@ jobs:
           REQUIRE: "fpga firmware api-python api-cpp api-java api-rust"
         run: bash tools/build_all.sh --strict
 
+      - name: Verify the build targets the shipping design
+        # Fails the release if the FPGA bitstream is not for the shipping part (BOM U1 LFE5U-25F-8BG381I = nextpnr 25k, CABGA381, speed 8),
+        # timing is not met for the chosen seed, or a shipped file is missing / stale.
+        run: |
+          python3 - <<'PY'
+          import json, csv, sys
+          m = json.load(open('products/MANIFEST.json'))
+          st = {s['step']: s['status'] for s in m['steps']}
+          f = m['fpga']
+          print("FPGA:", f)
+          bad = []
+          if (f['device'], f['speed_grade'], f['package']) != ('25k', '8', 'CABGA381'): bad.append(f"FPGA device/speed/package {f} is not 25k/8/CABGA381")
+          for need in ('fpga', 'fpga-target', 'fpga-timing', 'firmware', 'firmware-uf2', 'docs', 'pcb-fab'):
+              if st.get(need) != 'ok': bad.append(f"step {need} is {st.get(need)!r}, need 'ok'")
+          summ = open('products/fpga/summary.txt').read()
+          if 'device 25k' not in summ or 'LFE5U-25F-8BG381I' not in summ or 'FAIL' in summ: bad.append("fpga/summary.txt does not show device 25k / LFE5U-25F-8BG381I with timing met")
+          if open('pcb/output/bom.csv').read() != open('products/docs/bom.csv').read(): bad.append("products/docs/bom.csv differs from pcb/output/bom.csv")
+          u1 = [r for r in csv.reader(open('pcb/output/bom.csv')) if r and r[-1].strip() == 'U1']
+          if not any('LFE5U-25F-8BG381I' in ','.join(r) for r in u1): bad.append("pcb/output/bom.csv U1 is not LFE5U-25F-8BG381I")
+          if 'LFE5U-25F-8BG381I' not in open('pcb/output/apriltag_cam.kicad_pcb').read(): bad.append("kicad_pcb does not carry LFE5U-25F-8BG381I")
+          if bad: print("
+".join("RELEASE CHECK FAILED: " + b for b in bad), file=sys.stderr); sys.exit(1)
+          print("release check OK: shipping design 25k / LFE5U-25F-8BG381I / speed 8")
+          PY
+          { echo "### Release target"; echo; echo '```'; cat products/fpga/summary.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Upload products as workflow artifact
         uses: actions/upload-artifact@v4
         with:
@@ -76,6 +102,9 @@ jobs:
           import json
           m = json.load(open('products/MANIFEST.json'))
           print(f"Automated build of `{m['git_commit']}` (branch `{m['git_branch']}`), built {m['build_date_utc']}.\n")
+          f = m['fpga']
+          print(f"**FPGA target: ECP5 `{f['device']}` (nextpnr), package {f['package']}, speed grade {f['speed_grade']}; part {f['part']}.**
+")
           print("## Build / test results\n\n| step | status | note |\n|---|---|---|")
           for s in m['steps']: print(f"| {s['step']} | {s['status']} | {s['note']} |")
           print("\n## Tool versions\n")
