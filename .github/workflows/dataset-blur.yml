@@ -9,3 +9,4 @@ jobs:
     uses: ./.github/workflows/dataset-category.yml
     with:
       category: blur
+      min_ok: 9

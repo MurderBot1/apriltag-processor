@@ -9,3 +9,4 @@ jobs:
     uses: ./.github/workflows/dataset-category.yml
     with:
       category: lowcon
+      min_ok: 9

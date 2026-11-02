@@ -91,8 +91,8 @@ def test_detection_rate_and_corner_error(rows):
     for n, r in rows.items():
         det += r['n_det_detectable']; dt += r['n_detectable']; errs += r['corner_errs']
         assert r['n_false'] <= 1, n
-    assert dt > 600
-    assert det / dt >= 0.93, det / dt                # measured 630 / 647 = 0.974
+    assert dt > 540                            # 570 detectable tags (CIL023 optics, 82.2 deg; the old 90 deg set had 647)
+    assert det / dt >= 0.93, det / dt                # measured 560 / 570 = 0.982
     assert np.median(errs) < 0.6, np.median(errs)    # measured ~0.28
     assert np.percentile(errs, 99) < 1.5
 
@@ -112,3 +112,14 @@ def test_pose_errors(rows):
     for n, r in rows.items():
         if r['t_err_mm'] is not None:
             assert r['t_err_mm'] < 40 and r['rot_err_deg'] < 1.5, n
+
+
+def test_camera_model_is_the_shipping_lens():
+    import geom, json
+    assert abs(geom.FX - 2.2 / 0.003) < 1e-9 and geom.FX == geom.FY                 # CIL023 EFL 2.2 mm, 3 um pixels, full 1280x800 frames
+    assert abs(geom.HFOV_DEG - 82.2) < 0.1
+    assert geom.DIST_TRUE[0] < 0 and not geom.DIST_TRUE[1:].any()                     # -5 % TV barrel distortion, k1 only
+    cal = json.load(open(os.path.join(ROOT, 'config', 'camera_calibration.json')))
+    assert abs(cal['fx'] - geom.FX) < 1e-6 and np.allclose(cal['dist'], geom.DIST_TRUE)
+    from dataset_gt import fold_radius
+    assert fold_radius(geom.DIST_TRUE) > 1.2                                          # monotonic over the whole sensor (corner ray tan = 1.1)

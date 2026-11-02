@@ -9,8 +9,8 @@
    "detectable": 6,
    "detected": 6,
    "false_ids": 0,
-   "corner_mean_px": 0.24836627477788709,
-   "t_err_mm": 0.5246072154856556,
+   "corner_mean_px": 0.28095924504465875,
+   "t_err_mm": 0.6376143428431323,
    "missed": []
   },
   {
@@ -19,18 +19,18 @@
    "detectable": 8,
    "detected": 8,
    "false_ids": 0,
-   "corner_mean_px": 0.2369096239852112,
-   "t_err_mm": 0.7774763406430532,
+   "corner_mean_px": 0.27768708126804054,
+   "t_err_mm": 0.48668607221057064,
    "missed": []
   },
   {
    "image": "grad_002",
    "ok": true,
-   "detectable": 5,
-   "detected": 5,
+   "detectable": 4,
+   "detected": 4,
    "false_ids": 0,
-   "corner_mean_px": 0.2569198659854145,
-   "t_err_mm": 0.32094776509957523,
+   "corner_mean_px": 0.2948645966124371,
+   "t_err_mm": 0.358550741586961,
    "missed": []
   },
   {
@@ -39,8 +39,8 @@
    "detectable": 8,
    "detected": 8,
    "false_ids": 0,
-   "corner_mean_px": 0.2457536387888173,
-   "t_err_mm": 0.557642680451113,
+   "corner_mean_px": 0.29067084043097646,
+   "t_err_mm": 0.621952649285154,
    "missed": []
   },
   {
@@ -49,8 +49,8 @@
    "detectable": 8,
    "detected": 8,
    "false_ids": 0,
-   "corner_mean_px": 0.25411807652207796,
-   "t_err_mm": 0.42926720610451363,
+   "corner_mean_px": 0.2850512975798527,
+   "t_err_mm": 0.4693685753498448,
    "missed": []
   },
   {
@@ -59,38 +59,38 @@
    "detectable": 9,
    "detected": 9,
    "false_ids": 0,
-   "corner_mean_px": 0.25646055838879106,
-   "t_err_mm": 1.0376636856154497,
+   "corner_mean_px": 0.31101145868551894,
+   "t_err_mm": 0.6080583146803964,
    "missed": []
   },
   {
    "image": "grad_006",
    "ok": true,
-   "detectable": 8,
-   "detected": 8,
+   "detectable": 6,
+   "detected": 6,
    "false_ids": 0,
-   "corner_mean_px": 0.24637243148931257,
-   "t_err_mm": 0.4324792184077105,
+   "corner_mean_px": 0.28607485120004494,
+   "t_err_mm": 0.6817000045746534,
    "missed": []
   },
   {
    "image": "grad_007",
    "ok": true,
-   "detectable": 8,
-   "detected": 8,
+   "detectable": 4,
+   "detected": 4,
    "false_ids": 0,
-   "corner_mean_px": 0.25601252375554184,
-   "t_err_mm": 0.7191040052135503,
+   "corner_mean_px": 0.26871859208845444,
+   "t_err_mm": 0.31731961532488456,
    "missed": []
   },
   {
    "image": "grad_008",
    "ok": true,
-   "detectable": 8,
-   "detected": 8,
+   "detectable": 6,
+   "detected": 6,
    "false_ids": 0,
-   "corner_mean_px": 0.2534653549339707,
-   "t_err_mm": 0.29777947318361053,
+   "corner_mean_px": 0.2723331204999336,
+   "t_err_mm": 0.1772339055668097,
    "missed": []
   },
   {
@@ -99,8 +99,8 @@
    "detectable": 7,
    "detected": 7,
    "false_ids": 0,
-   "corner_mean_px": 0.25224883587463176,
-   "t_err_mm": 0.9788495440871726,
+   "corner_mean_px": 0.2934914089680443,
+   "t_err_mm": 0.6907929427863719,
    "missed": []
   }
  ]

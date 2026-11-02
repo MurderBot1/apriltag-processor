@@ -17,6 +17,9 @@ Categories (name = <category>_<000..009>, category = name.split('_')[0]):
   blur      defocus / motion blur: extra Gaussian blur sigma 1.0 .. 3.0 px on top of the nominal 0.55 px, tags 0.9 .. 2.2 m away
   persp     perspective: tag plane tilted 15 .. 74 deg, alternating yaw / pitch, either sign, 1.2 .. 3.0 m
 
+Camera: the shipping lens as modelled in tools/geom.py (CIL023, EFL 2.2 mm, 3 um pixels, 1280x800 full resolution: fx = 733.33 px, HFOV 82.2 deg; OpenCV k1 = -0.126 for -5 % TV distortion).
+Blender renders an ideal pinhole canvas (1920x1200, f = 640 px) which make_dataset.distortion_maps resamples.  Delete test_images/sensor/*.png and test_images/raw before re-running to rebuild.
+
 Deterministic: case k of category c uses numpy Generator([CASE_SEED, c_index]) with rejection sampling (documented accept rules
 below); per-frame stratified parameters (distance, noise gain, blur, ...) are linspace over the 10 frames; sensor noise of frame
 `seed` uses SeedSequence([SENSOR_SEED, seed]).  Blender renders use the fixed seed set in tools/blender_render.py, so re-running

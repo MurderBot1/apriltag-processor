@@ -1,5 +1,7 @@
 # Cost-down study (2026-10-30)
 
+Note (dataset update): every tag count and timing in this study was measured on the earlier 90 degree dataset (647 detectable tags). The dataset was re-rendered for the CIL023 lens (570 detectable tags; chip 501, reference 560, see `docs/verification.md`); this study was not re-run, so its numbers stay as measured on the old frames.
+
 Question: can the unit be made cheaper (any part may be redesigned, e.g. a CPU doing the detection) while keeping **everything on the
 unit**, the **OV9281 at 1280x800 @ 120 fps**, the same output (tags + poses over USB) and dataset accuracy (100-image set; reference
 detector 630/647 detectable tags, current chip 562/647)?

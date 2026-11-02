@@ -33,6 +33,16 @@ the committed frames are the reference, tests never need Blender. Generation is 
 so each category sweeps its condition from mild to severe), rejection sampling so that every frame has at least one detectable tag.
 The case list (poses, lights, occluders, sensor knobs) is stored in `test_images/cases.json`.
 
+**Camera model of the dataset = the shipping lens** (`tools/geom.py`): Commonlands CIL023, EFL 2.2 mm, on the OV9281 at 3 um pixels. The frames are the sensor's full
+1280x800, so there is no scaling: fx = fy = 2.2 mm / 3 um = 733.33 px, cx = 639.5, cy = 399.5, HFOV 82.2 degrees (VFOV 57.2). Distortion is OpenCV k1 = -0.126, k2 = k3 = p1 = p2 = 0:
+k1 is chosen so that the -5 % TV distortion of the datasheet comes out (TV taken as the sag of the top picture edge, corner height minus edge-midpoint height, divided by the full picture
+height at the edge midpoint; this definition is my reading, the lens page does not define it, so the real k1 can differ and must be calibrated). The same values are in
+`config/camera_calibration.json`, which the pose tests, host library and firmware tests load. Blender still renders an ideal pinhole canvas (1920x1200, f = 640 px) and
+`tools/make_dataset.py:distortion_maps` resamples it through the distortion model. The ground truth marks a tag outside the frame when any corner ray is beyond the point where the polynomial folds back
+(tan(theta) > 1.63, about 58 degrees; `tools/dataset_gt.py:fold_radius`): beyond it the OpenCV polynomial projects to false in-frame pixels. Poses and seeds are the same as the earlier
+90 degree set (`cases.json` did not change); only the optics changed, so tags are about 14.6 % larger in pixels and fewer are in view (570 detectable tags against 647). The firmware default calibration
+(fx = fy = 640, `at_app_t` before the first `set_calibration`) is a placeholder and was left unchanged; load `config/camera_calibration.json` to match this dataset.
+
 | category | condition (parameter sweep over its 10 frames) |
 |---|---|
 | `normal` | clean baseline: nominal light, plain walls, distance 0.8 ... 3.8 m (log spaced) |
@@ -49,41 +59,41 @@ The case list (poses, lights, occluders, sensor knobs) is stored in `test_images
 ### Reference detector per category (`tools/reference_pipeline.py`, `results/reference_baseline.md`)
 
 A frame *succeeds* when every ground-truth-detectable tag is found and no false id is reported. Measured (python 3.12,
-pupil-apriltags 1.0.4): `normal` 10/10, `bright` 10/10, `dark` 10/10, `lowcon` 10/10, `grad` 10/10, `clutter` 10/10, `noise` 10/10,
-`blur` 9/10, `shadow` 7/10, `persp` 7/10. 630 of 647 detectable tags found (97.4 %), no false ids, median corner error 0.28 px,
-median camera position error 0.7 mm (p95 4.5 mm, max 6.3 mm).
+pupil-apriltags 1.0.4): `normal` 10/10, `bright` 10/10, `dark` 9/10, `lowcon` 9/10, `grad` 10/10, `clutter` 8/10, `noise` 10/10,
+`blur` 9/10, `shadow` 7/10, `persp` 7/10. 560 of 570 detectable tags found (98.2 %), median corner error 0.31 px,
+median camera position error 0.7 mm (p95 7.9 mm, max 19.8 mm). The 5 "false ids" are tags whose corners are 0.2 to 2 px inside the 2 px border margin of the ground-truth `in_frame` rule, which the detector still reads; none is a wrong id.
+The dataset is rendered with the shipping lens model (CIL023, 82.2 degrees, -5 % TV distortion, see below); the earlier 90 degree set had 647 detectable tags, 630 found by the reference.
 
 ### Whole-pipeline accuracy (RTL simulation of the chip -> firmware solver -> ground truth)
 
 Chip (CSI-2 at 120 fps timing, simulated RTL as it is in this branch) -> tag estimates over SPI -> C pose solver, versus the reference
 detector on the *same* 100 images (`tests/run_chain_dataset.py`, `tests/analyze_chain.py`, `results/rtl_chain_results.json`;
-measured 474 s for the 100 frames with 12 workers):
+re-run on the CIL023 dataset: 344 s for the 100 frames with 12 workers):
 
 | category | detectable tags | chip detects | pose t median / max (mm) | reference t median (mm) |
 |---|---|---|---|---|
-| normal | 62 | 62 (100 %) | 2.0 / 7.2 | 0.6 |
-| bright | 81 | 80 (99 %) | 1.1 / 5.7 | 1.5 |
-| dark | 69 | 69 (100 %) | 1.9 / 2.9 | 0.6 |
-| lowcon | 66 | **0 (0 %)** with reset values, **66 (100 %)** with THRESH ratio 2 | no pose / 2.2 / 8.9 | 1.0 |
-| grad | 75 | 75 (100 %) | 1.3 / 2.0 | 0.5 |
-| shadow | 47 | 43 (91 %) | 3.0 / 13.6 | 1.9 |
-| noise | 57 | 57 (100 %) | 2.2 / 8.0 | 0.7 |
-| clutter | 59 | 57 (97 %) | 1.7 / 17.0 | 0.6 |
-| blur | 59 | 54 (92 %) | 2.0 / 14.9 | 0.8 |
-| persp | 72 | 65 (90 %) | 1.3 / 2.5 | 0.6 |
-| **all** | 647 | **562 (86.9 %)** | | reference 630 (97 %) |
+| normal | 52 | 52 (100 %) | 1.9 / 7.0 | 0.8 |
+| bright | 78 | 77 (99 %) | 1.5 / 5.5 | 1.2 |
+| dark | 59 | 59 (100 %) | 1.3 / 4.2 | 0.5 |
+| lowcon | 54 | **1 (2 %)** with reset values, **54 (100 %)** with THRESH ratio 1 or 2 | no pose / 1.7 / 24.0 | 0.7 |
+| grad | 66 | 66 (100 %) | 1.5 / 3.4 | 0.5 |
+| shadow | 42 | 38 (90 %) | 4.6 / 44.9 | 3.6 |
+| noise | 50 | 50 (100 %) | 2.1 / 13.9 | 1.1 |
+| clutter | 51 | 47 (92 %) | 1.5 / 11.7 | 0.5 |
+| blur | 52 | 49 (94 %) | 3.1 / 11.9 | 1.0 |
+| persp | 66 | 62 (94 %) | 1.4 / 3.9 | 0.7 |
+| **all** | 570 | **501 (87.9 %)** | | reference 560 (98 %) |
 
 0 false-id detections, no dropped frames (single-frame runs). These numbers are with the noise-robust labeller (`rtl/run_ccl.v`: 256 runs
 per row, ~3 clocks per run on the common path, label recycling, the 64 largest candidates by area; CCL flags are diagnostics of a degraded
-frame, never a rejection). Before that rework the same harness gave **450 / 647 (70 %)**: dark 72 %, noise 70 %, shadow 68 %, clutter 14 %.
+frame, never a rejection). Before that rework the same harness gave **450 / 647 (70 %)** on the earlier 90 degree dataset: dark 72 %, noise 70 %, shadow 68 %, clutter 14 %.
 The `lowcon` weakness (0 % with the reset values) was traced to the tile ratio test `2*diff >= max`, not to the 24-level margin: with the new THRESH `ratio`
-field set to 2 or 1 the chip detects 66 / 66 (see `results/lowcon_ratio.md`). The reset value stays 0 because the ratio tests 3x / 4x cost `noise` frames (57 -> 31 / 24 of 57) through labeller row drops. The firmware therefore picks the ratio per frame (`firmware/core/atratio.c`, on after boot): ratio 1 after 3 tagless frames, back to 0 on a CCL `row dropped` flag, with lockout and backoff. Simulated on the measured per-frame chain results (`tools/auto_ratio_sim.py`, `tests/test_fw_ratio.py`, `results/auto_ratio.md`): lowcon 66 / 66 in steady state after 4 lost frames at the scene start, every other category identical to ratio 0 (562 + 66 = 628 / 647 in steady state; noise stays 57). The switching latency is modelled, not measured on hardware.
+field set to 2 or 1 the chip detects 54 / 54 (see `results/lowcon_ratio.md`). The reset value stays 0 because the ratio tests 3x / 4x cost `noise` frames (50 -> 29 / 19 of 50) through labeller row drops. The firmware therefore picks the ratio per frame (`firmware/core/atratio.c`, on after boot): ratio 1 after 3 tagless frames, back to 0 on a CCL `row dropped` flag, with lockout and backoff. Simulated on the measured per-frame chain results (`tools/auto_ratio_sim.py`, `tests/test_fw_ratio.py`, `results/auto_ratio.md`): lowcon 66 / 66 in steady state after 4 lost frames at the scene start, every other category identical to ratio 0 (562 + 66 = 628 / 647 in steady state; noise stays 57). The switching latency is modelled, not measured on hardware.
 The chip now misses only a few tags in `blur`, `persp` and `shadow` (small / grazing / shadowed tags).
 CCL status flag set on 6 of the 100 frames (candidate table full, i.e. more than 64 candidates, only the 64 largest kept), no dropped rows.
 
-**Architecture A3 (tag unit on the MCU), same 100 frames, full RTL chain (`tests/run_chain_dataset.py`, 470 s with 10 workers) then the C tag unit on the
-packets that leave the FPGA bus: 562 / 647 detectable tags, per category identical to the table above; tag ids and corners are bit-identical to the old
-all-FPGA run for every one of the 100 frames (max corner difference 0 px, 0 frames with a different tag set).** This is measured (simulation), not estimated.
+**Architecture A3 (tag unit on the MCU), same 100 frames, full RTL chain (`tests/run_chain_dataset.py`, 344 s with 12 workers) then the C tag unit on the
+packets that leave the FPGA bus: 501 / 570 detectable tags, per category identical to the table above.** (The bit-identity with the old all-FPGA run was measured on the earlier 90 degree dataset; the C tag unit equals the instruction-set simulator word for word on the 100 current frames, `tests/test_fw_tpu.py`.) This is measured (simulation), not estimated.
 
 Tag-unit time on the MCU (**estimates**: `tools/m33_cycles.py`, Unicorn runs the Cortex-M33 machine code of the -O3 build and a static latency table costs it;
 150 MHz, one core; not measured on silicon; `results/tpu_c_m33_cycles.md`): median 1.59 ms, p95 6.3 ms, worst 9.3 ms (optimistic model 1.25 / 7.4, pessimistic

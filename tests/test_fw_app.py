@@ -112,8 +112,8 @@ def test_commit_reboot_persists_config(dev):
     dev.reboot()
     assert fwutil.close_dump(before, dev.dump())
     # and the pose solution after reboot still works
-    push(dev, rtl_tags('normal_004'))
-    assert pose_error(last_pose(dev), GT['normal_004'])[0] < 10
+    push(dev, rtl_tags('normal_006'))
+    assert pose_error(last_pose(dev), GT['normal_006'])[0] < 10
 
 
 def test_reboot_without_commit_loses_changes(dev):
@@ -173,13 +173,13 @@ def test_status_message(dev):
     st = P.decode_status(b)
     assert st.ntags == len(TMAP) and not st.pose_valid and not st.streaming and st.init_done
     assert st.ae_enabled and st.exposure == 100 and st.gain == 0x10
-    push(dev, rtl_tags('normal_004'), fid=77)
+    push(dev, rtl_tags('normal_006'), fid=77)
     st = P.decode_status(dev.rsp(P.CMD_GET_STATUS, b'', P.RSP_STATUS))
     assert st.solved == 1 and st.pose_valid and st.frame_id == 77 and st.fpga_seq == 1 and st.res_valid
 
 
 def test_stream_on_off_and_divider(dev):
-    names = ['normal_004', 'bright_001', 'normal_006']
+    names = ['normal_006', 'bright_001', 'normal_005']
     dev.ok(P.CMD_STREAM, struct.pack('<BH', 1, 1))
     for i in range(6):
         push(dev, rtl_tags(names[i % 3]), fid=i + 1)
@@ -187,16 +187,16 @@ def test_stream_on_off_and_divider(dev):
     assert [p.frame_id for p in poses] == [1, 2, 3, 4, 5, 6]
     dev.ok(P.CMD_STREAM, struct.pack('<BH', 1, 3))
     for i in range(9):
-        push(dev, rtl_tags('normal_004'), fid=100 + i)
+        push(dev, rtl_tags('normal_006'), fid=100 + i)
     poses = [P.decode_pose(b) for t, b in dev.drain() if t == P.RSP_POSE]
     assert [p.frame_id for p in poses] == [102, 105, 108]
     dev.ok(P.CMD_STREAM, struct.pack('<BH', 0, 1))
-    push(dev, rtl_tags('normal_004'))
+    push(dev, rtl_tags('normal_006'))
     assert [t for t, b in dev.drain() if t == P.RSP_POSE] == []
     # divider 0 behaves like 1
     dev.ok(P.CMD_STREAM, struct.pack('<BH', 1, 0))
-    push(dev, rtl_tags('normal_004'))
-    push(dev, rtl_tags('normal_004'))
+    push(dev, rtl_tags('normal_006'))
+    push(dev, rtl_tags('normal_006'))
     assert len([1 for t, b in dev.drain() if t == P.RSP_POSE]) == 2
 
 
@@ -208,7 +208,7 @@ def test_stream_not_emitted_when_solve_fails(dev):
 
 
 def test_get_tags_raw_reports_last_frame(dev):
-    tags = rtl_tags('normal_004')
+    tags = rtl_tags('normal_006')
     push(dev, tags, fid=5)
     b = dev.rsp(P.CMD_GET_TAGS_RAW, b'', P.RSP_TAGS)
     fid, n = struct.unpack_from('<IB', b)
@@ -222,16 +222,16 @@ def test_get_tags_raw_reports_last_frame(dev):
 # --------------------------------------------------------------------------------------------- FPGA polling
 def test_no_frame_yet_and_each_packet_processed_once(dev):
     assert dev.fw.poll() == 0 and dev.fw.stats()['solved'] == 0
-    assert push(dev, rtl_tags('normal_004')) == 1
+    assert push(dev, rtl_tags('normal_006')) == 1
     assert dev.fw.poll() == 0 and dev.fw.poll() == 0                 # packet was released: nothing new
     assert dev.fw.stats()['solved'] == 1
-    assert push(dev, rtl_tags('normal_004')) == 1
+    assert push(dev, rtl_tags('normal_006')) == 1
 
 
 def test_register_read_failures_do_not_stop_frame_processing(dev):
     """frames arrive on the bus, not over SPI: a failing register read (GET_STATUS) must not disturb them"""
     dev.fpga.fail_reads = 1
-    dev.fpga.publish(rtl_tags('normal_004'))
+    dev.fpga.publish(rtl_tags('normal_006'))
     assert dev.fw.poll() == 1 and dev.fw.stats()['solved'] == 1
     dev.fpga.fail_reads = 5
     assert dev.rsp(P.CMD_GET_STATUS, b'', P.RSP_STATUS)               # status answers even though the register reads failed
@@ -256,13 +256,13 @@ def test_damaged_packets_are_rejected_and_counted(dev):
     assert P.decode_status(dev.rsp(P.CMD_GET_STATUS, b'', P.RSP_STATUS)).torn_reads == 8
     dev.fpga.publish_packet(simfw.make_packet(7, 1000, 0, simfw_status.THR_BUSY))     # diagnostic bit only: still processed
     assert dev.fw.poll() == 1 and dev.fw.stats()['frame_id'] == 7
-    push(dev, rtl_tags('normal_004'))                                                 # and the device keeps working
+    push(dev, rtl_tags('normal_006'))                                                 # and the device keeps working
     assert dev.fw.stats()['solved'] == 1
 
 
 def test_lost_frames_are_reported_in_status(dev):
     for k in range(5):
-        dev.fpga.publish(rtl_tags('normal_004'), frame_id=20 + k)          # three buffers: the rest is lost before the firmware sees them
+        dev.fpga.publish(rtl_tags('normal_006'), frame_id=20 + k)          # three buffers: the rest is lost before the firmware sees them
     assert dev.fpga.lost == 2
     assert [dev.fw.poll() for _ in range(4)] == [1, 1, 1, 0]
     st = P.decode_status(dev.rsp(P.CMD_GET_STATUS, b'', P.RSP_STATUS))
@@ -274,7 +274,7 @@ def test_real_packet_goes_through_the_c_tag_unit(dev):
     import cv2
     import golden
     from test_tpu import pack_fb
-    img = cv2.imread(os.path.join(fwutil.ROOT, 'test_images', 'sensor', 'normal_004.png'), 0)
+    img = cv2.imread(os.path.join(fwutil.ROOT, 'test_images', 'sensor', 'normal_006.png'), 0)
     mask = golden.binarize_clean(img)
     keep, lab, _ = golden.components(mask)
     keep = keep[:64]
@@ -282,7 +282,7 @@ def test_real_packet_goes_through_the_c_tag_unit(dev):
     dev.fpga.publish_packet(simfw.make_packet(77, 5000, 0, 0, mask=pack_fb(mask), cand=words, count=len(keep)))
     assert dev.fw.poll() == 1
     s = dev.fw.stats()
-    want = {t[0] for t in rtl_tags('normal_004')}
+    want = {t[0] for t in rtl_tags('normal_006')}
     assert s['frame_id'] == 77 and s['nobs'] == len(want)
     raw = dev.rsp(P.CMD_GET_TAGS_RAW, b'', P.RSP_TAGS)
     ids = {struct.unpack_from('<H', raw, 5 + 35 * i)[0] for i in range(raw[4])}
@@ -301,10 +301,10 @@ def test_unknown_tag_ids(dev):
     assert s['solved'] == 0 and s['solve_fail'] == 1 and s['pose_valid'] == 0
     assert dev.nak(P.CMD_GET_POSE) == P.ERR_NO_POSE
     # unknown ids mixed with known ones are ignored by the solver
-    tags = rtl_tags('normal_004') + [(500, c, 0), (600, c, 1)]
+    tags = rtl_tags('normal_006') + [(500, c, 0), (600, c, 1)]
     push(dev, tags)
     p = last_pose(dev)
-    assert p.ntags == len(rtl_tags('normal_004')) and pose_error(p, GT['normal_004'])[0] < 10
+    assert p.ntags == len(rtl_tags('normal_006')) and pose_error(p, GT['normal_006'])[0] < 10
     assert p.nobs == len(tags)
 
 
@@ -315,31 +315,31 @@ def test_zero_tags_is_not_a_failure(dev):
 
 
 def test_observations_capped_at_16(dev):
-    tags = rtl_tags('normal_004')
+    tags = rtl_tags('normal_006')
     many = [(TMAP[i % len(TMAP)]['id'], tags[i % len(tags)][1], 0) for i in range(25)]
     push(dev, many)
     assert dev.fw.stats()['nobs'] == 16
 
 
 def test_outlier_tag_is_dropped_and_flagged(dev):
-    tags = rtl_tags('normal_004')
+    tags = rtl_tags('normal_006')
     assert len(tags) >= 5
     bad = [(tid, [[x + 60, y - 45] for x, y in c] if i == 0 else c, h) for i, (tid, c, h) in enumerate(tags)]
     push(dev, bad)
     p = last_pose(dev)
     assert p.flags & P.Pose.FLAG_OUTLIER_DROPPED
     assert p.ntags == len(tags) - 1
-    assert pose_error(p, GT['normal_004'])[0] < 15
+    assert pose_error(p, GT['normal_006'])[0] < 15
 
 
 def test_single_tag_flag(dev):
-    push(dev, rtl_tags('normal_004')[:1])
+    push(dev, rtl_tags('normal_006')[:1])
     p = last_pose(dev)
     assert p.flags & P.Pose.FLAG_SINGLE_TAG and p.ntags == 1
 
 
 def test_processing_time_reported(dev):
-    push(dev, rtl_tags('normal_004'))
+    push(dev, rtl_tags('normal_006'))
     assert last_pose(dev).processing_us == 250        # fake clock steps 250 us per micros() call
 
 

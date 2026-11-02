@@ -172,9 +172,9 @@ def test_auto_never_below_ratio_zero_per_category_and_recovers_lowcon(dataset, l
         ra = sim.run_sequence(names, gt, res, lat, 'auto')
         assert ra['found'] >= r0['found'], (c, ra['found'], r0['found'])
         if c == 'lowcon':
-            assert r0['found'] == 0
-            assert ra['found'] >= 0.9 * ra['vis'] * (len(names) - 3 - lat - 1) / len(names)
-            assert ra['ratios'].index(1) == 3 + lat - 1       # three tagless frames + register latency
+            assert r0['found'] <= len(names) // 10        # reset value: only lowcon_000 yields one tag (CIL023 dataset); the other 9 frames none
+            assert ra['found'] >= 0.9 * ra['vis'] * (len(names) - 3 - lat - 2) / len(names)
+            assert ra['ratios'].index(1) == 3 + lat       # frame 0 finds a tag (resets the tagless counter), frames 1..3 are tagless, + register latency
         else:
             assert sum(ra['ratios']) == 0, c              # categories that already work never leave ratio 0
 

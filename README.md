@@ -91,10 +91,10 @@ build/test results. Earlier releases are never overwritten. `main` does not trig
 
 * **120.08 fps** sustained in full-chip simulation at true sensor timing (832,800 clocks per frame at 100 MHz), every frame leaves the FPGA
   as a complete packet; the MCU has two frame buffers so capture never stalls.
-* 100 rendered frames (10 conditions x 10) through the simulated chip + the MCU's solver: **median camera position error about
-  1-3 mm and 0.02-0.05 deg** where tags are found; **87 % of the detectable tags overall (562 / 647; the reference AprilTag library: 97 %)**,
-  (identical to the previous all-FPGA design, tag by tag), up from 70 % before the noise-robust labeller - 100 % on normal / dark / grad / noise, 97 % clutter, 90-92 % blur / persp / shadow, but still
-  **0 % on the low-contrast category**, see `docs/verification.md`.
+* 100 rendered frames (10 conditions x 10, rendered for the shipping lens: CIL023, 82.2 degrees HFOV, fx 733 px, -5 % TV distortion) through the simulated chip + the MCU's solver: **median camera position error about
+  1-5 mm and 0.03-0.17 deg per category** where tags are found; **88 % of the detectable tags overall (501 / 570; the reference AprilTag library: 98 %)**,
+  100 % on dark / grad / noise / normal, 99 % bright, 92-94 % clutter / blur / persp, 90 % shadow, but still
+  **2 % on the low-contrast category** with the reset THRESH ratio (54 / 54 with ratio 1, chosen automatically by the firmware), see `docs/verification.md`.
 * GitHub Actions: one check per dataset category (`N/10 detected`, reference detector) plus an all-tests workflow, see `docs/verification.md`.
 * RTL is verified bit-exact against Python golden models (threshold, despeckle, labelling), the C tag unit bit-exact against the golden model of the old FPGA processor, and the whole
   chain is exercised with real CSI-2 packets and a bit-level D-PHY model with lane skew and clock offsets.

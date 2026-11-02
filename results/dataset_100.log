@@ -266,3 +266,276 @@ Blender quit
 2026-10-28 23:20:27 batch 4 device=HIP rc=0 ok=True 72s
 2026-10-28 23:21:29 ground truth written: 100 images
 2026-10-28 23:21:29 done
+2026-11-01 19:34:28 generated 100 cases -> D:\claude\w82\apriltag-proccessor\test_images\cases.json
+2026-11-01 19:34:28 0/100 raw frames present, 100 pending
+00:05.984  cycles           | WARNING CUEW initialization failed: Error opening the library
+D:\claude\w82\apriltag-proccessor\tools\blender_render.py:35: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new(name); m.use_nodes = True
+D:\claude\w82\apriltag-proccessor\tools\blender_render.py:78: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new(f"tag{t['id']}"); m.use_nodes = True
+D:\claude\w82\apriltag-proccessor\tools\blender_render.py:99: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  world = bpy.data.worlds.new('w'); world.use_nodes = True; sc.world = world
+00:09.937  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\normal_000.part.png'
+[INFO ] services.locationservice ...............: Not adding link to MakeHuman user data, since neither explicit path nor auto-discovery is set in preferences.
+[INFO ] mpfb.init ..............................: Build info 20261010
+[INFO ] mpfb.init ..............................: MPFB initialization has finished.
+addon_utils.disable: bl_ext.lab_blender_org.mcp not enabled
+rendered normal_000
+00:12.718  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\normal_001.part.png'
+rendered normal_001
+00:15.468  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\normal_002.part.png'
+rendered normal_002
+00:18.281  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\normal_003.part.png'
+rendered normal_003
+00:21.031  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\normal_004.part.png'
+rendered normal_004
+00:23.812  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\normal_005.part.png'
+rendered normal_005
+00:26.578  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\normal_006.part.png'
+rendered normal_006
+00:29.296  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\normal_007.part.png'
+rendered normal_007
+00:32.015  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\normal_008.part.png'
+rendered normal_008
+00:34.718  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\normal_009.part.png'
+rendered normal_009
+00:37.531  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\bright_000.part.png'
+rendered bright_000
+00:40.312  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\bright_001.part.png'
+rendered bright_001
+00:43.046  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\bright_002.part.png'
+rendered bright_002
+00:45.765  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\bright_003.part.png'
+rendered bright_003
+00:48.500  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\bright_004.part.png'
+rendered bright_004
+00:51.265  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\bright_005.part.png'
+rendered bright_005
+00:54.015  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\bright_006.part.png'
+rendered bright_006
+00:56.718  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\bright_007.part.png'
+rendered bright_007
+00:59.437  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\bright_008.part.png'
+rendered bright_008
+01:02.125  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\bright_009.part.png'
+rendered bright_009
+01:04.875  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\dark_000.part.png'
+rendered dark_000
+01:07.656  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\dark_001.part.png'
+rendered dark_001
+01:10.437  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\dark_002.part.png'
+rendered dark_002
+01:13.203  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\dark_003.part.png'
+rendered dark_003
+01:16.015  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\dark_004.part.png'
+rendered dark_004
+Blender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 01:37:34)
+
+Blender quit
+2026-11-01 19:35:44 batch 1 device=HIP rc=0 ok=True 77s
+00:00.953  cycles           | WARNING CUEW initialization failed: Error opening the library
+D:\claude\w82\apriltag-proccessor\tools\blender_render.py:35: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new(name); m.use_nodes = True
+D:\claude\w82\apriltag-proccessor\tools\blender_render.py:78: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new(f"tag{t['id']}"); m.use_nodes = True
+D:\claude\w82\apriltag-proccessor\tools\blender_render.py:99: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  world = bpy.data.worlds.new('w'); world.use_nodes = True; sc.world = world
+00:04.281  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\dark_005.part.png'
+[INFO ] services.locationservice ...............: Not adding link to MakeHuman user data, since neither explicit path nor auto-discovery is set in preferences.
+[INFO ] mpfb.init ..............................: Build info 20261010
+[INFO ] mpfb.init ..............................: MPFB initialization has finished.
+addon_utils.disable: bl_ext.lab_blender_org.mcp not enabled
+rendered dark_005
+00:07.015  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\dark_006.part.png'
+rendered dark_006
+00:09.796  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\dark_007.part.png'
+rendered dark_007
+00:12.531  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\dark_008.part.png'
+rendered dark_008
+00:15.250  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\dark_009.part.png'
+rendered dark_009
+00:18.031  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\lowcon_000.part.png'
+rendered lowcon_000
+00:20.796  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\lowcon_001.part.png'
+rendered lowcon_001
+00:23.546  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\lowcon_002.part.png'
+rendered lowcon_002
+00:26.296  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\lowcon_003.part.png'
+rendered lowcon_003
+00:29.078  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\lowcon_004.part.png'
+rendered lowcon_004
+00:31.859  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\lowcon_005.part.png'
+rendered lowcon_005
+00:34.640  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\lowcon_006.part.png'
+rendered lowcon_006
+00:37.359  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\lowcon_007.part.png'
+rendered lowcon_007
+00:40.140  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\lowcon_008.part.png'
+rendered lowcon_008
+00:42.906  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\lowcon_009.part.png'
+rendered lowcon_009
+00:45.671  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\grad_000.part.png'
+rendered grad_000
+00:48.375  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\grad_001.part.png'
+rendered grad_001
+00:51.156  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\grad_002.part.png'
+rendered grad_002
+00:53.906  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\grad_003.part.png'
+rendered grad_003
+00:56.656  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\grad_004.part.png'
+rendered grad_004
+00:59.390  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\grad_005.part.png'
+rendered grad_005
+01:02.093  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\grad_006.part.png'
+rendered grad_006
+01:04.843  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\grad_007.part.png'
+rendered grad_007
+01:07.531  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\grad_008.part.png'
+rendered grad_008
+01:10.265  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\grad_009.part.png'
+rendered grad_009
+Blender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 01:37:34)
+
+Blender quit
+2026-11-01 19:36:55 batch 2 device=HIP rc=0 ok=True 70s
+00:00.953  cycles           | WARNING CUEW initialization failed: Error opening the library
+D:\claude\w82\apriltag-proccessor\tools\blender_render.py:35: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new(name); m.use_nodes = True
+D:\claude\w82\apriltag-proccessor\tools\blender_render.py:78: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new(f"tag{t['id']}"); m.use_nodes = True
+D:\claude\w82\apriltag-proccessor\tools\blender_render.py:99: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  world = bpy.data.worlds.new('w'); world.use_nodes = True; sc.world = world
+D:\claude\w82\apriltag-proccessor\tools\blender_render.py:106: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new('bg_' + kind); m.use_nodes = True
+00:05.046  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\shadow_000.part.png'
+[INFO ] services.locationservice ...............: Not adding link to MakeHuman user data, since neither explicit path nor auto-discovery is set in preferences.
+[INFO ] mpfb.init ..............................: Build info 20261010
+[INFO ] mpfb.init ..............................: MPFB initialization has finished.
+addon_utils.disable: bl_ext.lab_blender_org.mcp not enabled
+rendered shadow_000
+00:07.828  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\shadow_001.part.png'
+rendered shadow_001
+00:10.562  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\shadow_002.part.png'
+rendered shadow_002
+00:12.984  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\shadow_003.part.png'
+rendered shadow_003
+00:15.687  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\shadow_004.part.png'
+rendered shadow_004
+00:18.437  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\shadow_005.part.png'
+rendered shadow_005
+00:21.265  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\shadow_006.part.png'
+rendered shadow_006
+00:24.234  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\shadow_007.part.png'
+rendered shadow_007
+00:26.453  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\shadow_008.part.png'
+rendered shadow_008
+00:29.187  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\shadow_009.part.png'
+rendered shadow_009
+00:31.906  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\noise_000.part.png'
+rendered noise_000
+00:34.625  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\noise_001.part.png'
+rendered noise_001
+00:37.359  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\noise_002.part.png'
+rendered noise_002
+00:40.125  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\noise_003.part.png'
+rendered noise_003
+00:42.906  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\noise_004.part.png'
+rendered noise_004
+00:45.671  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\noise_005.part.png'
+rendered noise_005
+00:48.406  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\noise_006.part.png'
+rendered noise_006
+00:51.203  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\noise_007.part.png'
+rendered noise_007
+00:53.984  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\noise_008.part.png'
+rendered noise_008
+00:56.703  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\noise_009.part.png'
+rendered noise_009
+00:58.828  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\clutter_000.part.png'
+rendered clutter_000
+01:01.703  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\clutter_001.part.png'
+rendered clutter_001
+01:03.953  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\clutter_002.part.png'
+rendered clutter_002
+01:06.796  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\clutter_003.part.png'
+rendered clutter_003
+01:10.640  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\clutter_004.part.png'
+rendered clutter_004
+Blender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 01:37:34)
+
+Blender quit
+2026-11-01 19:38:06 batch 3 device=HIP rc=0 ok=True 71s
+00:00.937  cycles           | WARNING CUEW initialization failed: Error opening the library
+D:\claude\w82\apriltag-proccessor\tools\blender_render.py:35: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new(name); m.use_nodes = True
+D:\claude\w82\apriltag-proccessor\tools\blender_render.py:78: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new(f"tag{t['id']}"); m.use_nodes = True
+D:\claude\w82\apriltag-proccessor\tools\blender_render.py:99: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  world = bpy.data.worlds.new('w'); world.use_nodes = True; sc.world = world
+D:\claude\w82\apriltag-proccessor\tools\blender_render.py:106: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m = bpy.data.materials.new('bg_' + kind); m.use_nodes = True
+00:03.937  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\clutter_005.part.png'
+[INFO ] services.locationservice ...............: Not adding link to MakeHuman user data, since neither explicit path nor auto-discovery is set in preferences.
+[INFO ] mpfb.init ..............................: Build info 20261010
+[INFO ] mpfb.init ..............................: MPFB initialization has finished.
+addon_utils.disable: bl_ext.lab_blender_org.mcp not enabled
+rendered clutter_005
+00:06.687  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\clutter_006.part.png'
+rendered clutter_006
+00:08.828  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\clutter_007.part.png'
+rendered clutter_007
+00:11.203  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\clutter_008.part.png'
+rendered clutter_008
+00:14.031  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\clutter_009.part.png'
+rendered clutter_009
+00:16.796  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\blur_000.part.png'
+rendered blur_000
+00:19.546  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\blur_001.part.png'
+rendered blur_001
+00:22.328  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\blur_002.part.png'
+rendered blur_002
+00:25.250  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\blur_003.part.png'
+rendered blur_003
+00:28.015  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\blur_004.part.png'
+rendered blur_004
+00:30.734  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\blur_005.part.png'
+rendered blur_005
+00:33.546  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\blur_006.part.png'
+rendered blur_006
+00:36.265  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\blur_007.part.png'
+rendered blur_007
+00:39.046  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\blur_008.part.png'
+rendered blur_008
+00:41.812  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\blur_009.part.png'
+rendered blur_009
+00:44.578  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\persp_000.part.png'
+rendered persp_000
+00:47.296  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\persp_001.part.png'
+rendered persp_001
+00:50.015  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\persp_002.part.png'
+rendered persp_002
+00:52.765  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\persp_003.part.png'
+rendered persp_003
+00:55.515  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\persp_004.part.png'
+rendered persp_004
+00:58.250  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\persp_005.part.png'
+rendered persp_005
+01:00.984  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\persp_006.part.png'
+rendered persp_006
+01:03.687  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\persp_007.part.png'
+rendered persp_007
+01:06.453  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\persp_008.part.png'
+rendered persp_008
+01:09.218  render           | Saved: 'D:\claude\w82\apriltag-proccessor\test_images\raw\persp_009.part.png'
+rendered persp_009
+Blender 5.1.2 (hash ec6e62d40fa9 built 2026-05-19 01:37:34)
+
+Blender quit
+2026-11-01 19:39:15 batch 4 device=HIP rc=0 ok=True 69s
+2026-11-01 19:39:31 ground truth written: 100 images
+2026-11-01 19:39:31 done
+2026-11-01 19:39:42 100/100 raw frames present, 0 pending
+2026-11-01 19:40:03 ground truth written: 100 images
+2026-11-01 19:40:03 done
+2026-11-01 19:46:14 ground truth written: 100 images
+2026-11-01 19:46:14 done
