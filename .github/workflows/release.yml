@@ -78,8 +78,7 @@ jobs:
           u1 = [r for r in csv.reader(open('pcb/output/bom.csv')) if r and r[-1].strip() == 'U1']
           if not any('LFE5U-25F-8BG381I' in ','.join(r) for r in u1): bad.append("pcb/output/bom.csv U1 is not LFE5U-25F-8BG381I")
           if 'LFE5U-25F-8BG381I' not in open('pcb/output/apriltag_cam.kicad_pcb').read(): bad.append("kicad_pcb does not carry LFE5U-25F-8BG381I")
-          if bad: print("
-".join("RELEASE CHECK FAILED: " + b for b in bad), file=sys.stderr); sys.exit(1)
+          if bad: print(chr(10).join("RELEASE CHECK FAILED: " + b for b in bad), file=sys.stderr); sys.exit(1)
           print("release check OK: shipping design 25k / LFE5U-25F-8BG381I / speed 8")
           PY
           { echo "### Release target"; echo; echo '```'; cat products/fpga/summary.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
@@ -103,8 +102,7 @@ jobs:
           m = json.load(open('products/MANIFEST.json'))
           print(f"Automated build of `{m['git_commit']}` (branch `{m['git_branch']}`), built {m['build_date_utc']}.\n")
           f = m['fpga']
-          print(f"**FPGA target: ECP5 `{f['device']}` (nextpnr), package {f['package']}, speed grade {f['speed_grade']}; part {f['part']}.**
-")
+          print(f"**FPGA target: ECP5 `{f['device']}` (nextpnr), package {f['package']}, speed grade {f['speed_grade']}; part {f['part']}.**{chr(10)}")
           print("## Build / test results\n\n| step | status | note |\n|---|---|---|")
           for s in m['steps']: print(f"| {s['step']} | {s['status']} | {s['note']} |")
           print("\n## Tool versions\n")
